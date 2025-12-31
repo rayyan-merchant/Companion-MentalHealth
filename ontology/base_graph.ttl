@@ -1,0 +1,39 @@
+@prefix mh: <http://example.org/mental-health#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+############################################
+# Base Knowledge Graph (Domain Truths)
+# No students, no sessions, no evidence
+############################################
+
+# Symptom–Emotion associations
+mh:Insomnia mh:associatedWithMentalState mh:Anxiety .
+mh:Fatigue mh:associatedWithMentalState mh:Stress .
+mh:DifficultyConcentrating mh:associatedWithMentalState mh:Stress .
+
+# Trigger–Stressor mappings
+mh:ExamPressure mh:mapsToStressor mh:AcademicStressor .
+mh:AcademicWorkload mh:mapsToStressor mh:AcademicStressor .
+mh:FamilyPressure mh:mapsToStressor mh:FamilyStressor .
+
+# Stressor–MentalState relations
+mh:AcademicStressor mh:leadsToMentalState mh:AcademicStress .
+mh:FamilyStressor mh:leadsToMentalState mh:AnxietyRisk .
+mh:SocialStressor mh:leadsToMentalState mh:AnxietyRisk .
+mh:ChronicSleepDeprivation mh:leadsToMentalState mh:DepressiveSpectrum .
+mh:PoorCopingSkills mh:leadsToMentalState mh:AnxietyRisk .
+mh:SocialIsolationRisk mh:leadsToMentalState mh:DepressiveSpectrum .
+
+# MentalState–RiskLevel
+mh:AcademicStress mh:hasRiskLevel mh:ModerateRisk .
+mh:AnxietyRisk mh:hasRiskLevel mh:HighRisk .
+
+# MentalState–Intervention knowledge
+mh:AcademicStress mh:recommendIntervention mh:TimeManagement .
+mh:AcademicStress mh:recommendIntervention mh:SleepHygiene .
+mh:AnxietyRisk mh:recommendIntervention mh:BreathingExercise .
+mh:AnxietyRisk mh:recommendIntervention mh:GroundingTechnique .
+mh:DepressiveSpectrum mh:recommendIntervention mh:ConsultCounselor .
+mh:DepressiveSpectrum mh:recommendIntervention mh:SocialSupport .

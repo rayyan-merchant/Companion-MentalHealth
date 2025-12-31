@@ -1,0 +1,230 @@
+# =============================================================================
+# EXPLANATION QUERIES
+# Mental Health KRR System - Phase 3
+# =============================================================================
+# Purpose: Retrieve evidence for WHY-based explanations of inferred states
+# Note: These queries return the evidence that led to each mental state
+#       inference. No ranking, scoring, or interpretation is performed.
+# =============================================================================
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX krr: <http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#>
+
+# =============================================================================
+# GENERAL EXPLANATION QUERY
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Query: Get all mental states for a student with their evidence
+# Returns: student, mental state, and all associated evidence
+# -----------------------------------------------------------------------------
+SELECT ?student ?mentalState ?emotion ?symptom ?trigger ?riskFactor
+WHERE {
+  ?student rdf:type krr:Student .
+  ?student rdf:type ?mentalState .
+  ?mentalState rdfs:subClassOf* krr:Mental_State .
+  
+  OPTIONAL { ?student krr:experiencesEmotion ?emotion . }
+  OPTIONAL { ?student krr:hasSymptom ?symptom . }
+  OPTIONAL { ?student krr:triggeredBy ?trigger . }
+  OPTIONAL { ?student krr:hasRiskFactor ?riskFactor . }
+};
+
+# =============================================================================
+# STATE-SPECIFIC EXPLANATION QUERIES
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Query: Explain AcademicStress
+# Evidence: Stress emotion + Academic triggers (Exam_Pressure / Academic_Workload)
+# -----------------------------------------------------------------------------
+SELECT ?student ?emotion ?emotionType ?trigger ?triggerType
+WHERE {
+  ?student rdf:type krr:Student .
+  ?student rdf:type krr:AcademicStress .
+  ?student krr:experiencesEmotion ?emotion .
+  ?emotion rdf:type ?emotionType .
+  ?student krr:triggeredBy ?trigger .
+  ?trigger rdf:type ?triggerType .
+};
+
+# -----------------------------------------------------------------------------
+# Query: Explain AnxietyRisk
+# Evidence: Stress/Anxiety + Insomnia + ExamPressure OR Anxiety + RepeatedStressExposure
+# -----------------------------------------------------------------------------
+SELECT ?student ?emotion ?emotionType ?symptom ?symptomType ?trigger ?triggerType ?riskFactor ?riskFactorType
+WHERE {
+  ?student rdf:type krr:Student .
+  ?student rdf:type krr:AnxietyRisk .
+  
+  OPTIONAL { 
+    ?student krr:experiencesEmotion ?emotion .
+    ?emotion rdf:type ?emotionType .
+  }
+  OPTIONAL { 
+    ?student krr:hasSymptom ?symptom .
+    ?symptom rdf:type ?symptomType .
+  }
+  OPTIONAL { 
+    ?student krr:triggeredBy ?trigger .
+    ?trigger rdf:type ?triggerType .
+  }
+  OPTIONAL { 
+    ?student krr:hasRiskFactor ?riskFactor .
+    ?riskFactor rdf:type ?riskFactorType .
+  }
+};
+
+# -----------------------------------------------------------------------------
+# Query: Explain BurnoutRisk
+# Evidence: Emotional_Overwhelm/Stress + Fatigue + RepeatedStressExposure + Workload
+# -----------------------------------------------------------------------------
+SELECT ?student ?emotion ?emotionType ?symptom ?symptomType ?trigger ?triggerType ?riskFactor ?riskFactorType
+WHERE {
+  ?student rdf:type krr:Student .
+  ?student rdf:type krr:BurnoutRisk .
+  
+  OPTIONAL { 
+    ?student krr:experiencesEmotion ?emotion .
+    ?emotion rdf:type ?emotionType .
+  }
+  OPTIONAL { 
+    ?student krr:hasSymptom ?symptom .
+    ?symptom rdf:type ?symptomType .
+  }
+  OPTIONAL { 
+    ?student krr:triggeredBy ?trigger .
+    ?trigger rdf:type ?triggerType .
+  }
+  OPTIONAL { 
+    ?student krr:hasRiskFactor ?riskFactor .
+    ?riskFactor rdf:type ?riskFactorType .
+  }
+};
+
+# -----------------------------------------------------------------------------
+# Query: Explain PanicRisk
+# Evidence: Anxiety + Rapid_Heart_Rate + Breathing_Difficulty
+# -----------------------------------------------------------------------------
+SELECT ?student ?emotion ?emotionType ?symptom ?symptomType
+WHERE {
+  ?student rdf:type krr:Student .
+  ?student rdf:type krr:PanicRisk .
+  ?student krr:experiencesEmotion ?emotion .
+  ?emotion rdf:type ?emotionType .
+  ?student krr:hasSymptom ?symptom .
+  ?symptom rdf:type ?symptomType .
+};
+
+# -----------------------------------------------------------------------------
+# Query: Explain DepressiveSpectrum
+# Evidence: SocialISolationRisk + Emotional_Overwhelm + RepeatedStressExposure
+#        OR Fatigue + Insomnia + SocialISolationRisk
+# -----------------------------------------------------------------------------
+SELECT ?student ?emotion ?emotionType ?symptom ?symptomType ?riskFactor ?riskFactorType
+WHERE {
+  ?student rdf:type krr:Student .
+  ?student rdf:type krr:DepressiveSpectrum .
+  
+  OPTIONAL { 
+    ?student krr:experiencesEmotion ?emotion .
+    ?emotion rdf:type ?emotionType .
+  }
+  OPTIONAL { 
+    ?student krr:hasSymptom ?symptom .
+    ?symptom rdf:type ?symptomType .
+  }
+  OPTIONAL { 
+    ?student krr:hasRiskFactor ?riskFactor .
+    ?riskFactor rdf:type ?riskFactorType .
+  }
+};
+
+# =============================================================================
+# RISK LEVEL EXPLANATION QUERIES
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Query: Explain ModerateRisk
+# Evidence: AnxietyRisk/BurnoutRisk + RepeatedStressExposure
+# -----------------------------------------------------------------------------
+SELECT ?student ?mentalState ?riskFactor ?riskFactorType
+WHERE {
+  ?student rdf:type krr:Student .
+  ?student rdf:type krr:ModerateRisk .
+  
+  {
+    ?student rdf:type krr:AnxietyRisk .
+    BIND(krr:AnxietyRisk AS ?mentalState)
+  }
+  UNION
+  {
+    ?student rdf:type krr:BurnoutRisk .
+    BIND(krr:BurnoutRisk AS ?mentalState)
+  }
+  
+  ?student krr:hasRiskFactor ?riskFactor .
+  ?riskFactor rdf:type ?riskFactorType .
+};
+
+# -----------------------------------------------------------------------------
+# Query: Explain HighRisk
+# Evidence: PanicRisk + RepeatedStressExposure
+# -----------------------------------------------------------------------------
+SELECT ?student ?riskFactor ?riskFactorType
+WHERE {
+  ?student rdf:type krr:Student .
+  ?student rdf:type krr:HighRisk .
+  ?student rdf:type krr:PanicRisk .
+  ?student krr:hasRiskFactor ?riskFactor .
+  ?riskFactor rdf:type ?riskFactorType .
+};
+
+# =============================================================================
+# EVIDENCE RETRIEVAL QUERIES
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Query: Get all emotions for a student
+# -----------------------------------------------------------------------------
+SELECT ?student ?emotion ?emotionType
+WHERE {
+  ?student rdf:type krr:Student .
+  ?student krr:experiencesEmotion ?emotion .
+  ?emotion rdf:type ?emotionType .
+  ?emotionType rdfs:subClassOf krr:Emotion .
+};
+
+# -----------------------------------------------------------------------------
+# Query: Get all symptoms for a student
+# -----------------------------------------------------------------------------
+SELECT ?student ?symptom ?symptomType
+WHERE {
+  ?student rdf:type krr:Student .
+  ?student krr:hasSymptom ?symptom .
+  ?symptom rdf:type ?symptomType .
+  ?symptomType rdfs:subClassOf krr:Symptom .
+};
+
+# -----------------------------------------------------------------------------
+# Query: Get all triggers for a student
+# -----------------------------------------------------------------------------
+SELECT ?student ?trigger ?triggerType
+WHERE {
+  ?student rdf:type krr:Student .
+  ?student krr:triggeredBy ?trigger .
+  ?trigger rdf:type ?triggerType .
+  ?triggerType rdfs:subClassOf krr:Trigger .
+};
+
+# -----------------------------------------------------------------------------
+# Query: Get all risk factors for a student
+# -----------------------------------------------------------------------------
+SELECT ?student ?riskFactor ?riskFactorType
+WHERE {
+  ?student rdf:type krr:Student .
+  ?student krr:hasRiskFactor ?riskFactor .
+  ?riskFactor rdf:type ?riskFactorType .
+  ?riskFactorType rdfs:subClassOf krr:Risk_Factor .
+};

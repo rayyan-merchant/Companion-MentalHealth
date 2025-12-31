@@ -1,0 +1,166 @@
+# =============================================================================
+# ESCALATION CHECK QUERIES
+# Mental Health KRR System - Phase 3
+# =============================================================================
+# Purpose: Detect high-risk persisted states that may require escalation
+# Note: These queries identify students in critical states for potential
+#       intervention. No diagnosis or treatment decisions are made.
+# =============================================================================
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX krr: <http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#>
+
+# =============================================================================
+# HIGH RISK DETECTION
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Check: Students with HighRisk classification
+# Priority: CRITICAL - These students should be flagged for immediate review
+# -----------------------------------------------------------------------------
+SELECT ?student
+WHERE {
+  ?student rdf:type krr:Student .
+  ?student rdf:type krr:HighRisk .
+};
+
+# -----------------------------------------------------------------------------
+# Check: Students with PanicRisk + RepeatedStressExposure
+# Priority: HIGH - Acute physiological patterns with chronic exposure
+# -----------------------------------------------------------------------------
+SELECT ?student ?riskFactor
+WHERE {
+  ?student rdf:type krr:Student .
+  ?student rdf:type krr:PanicRisk .
+  ?student krr:hasRiskFactor ?riskFactor .
+  ?riskFactor rdf:type krr:RepeatedStressExposure .
+};
+
+# -----------------------------------------------------------------------------
+# Check: Students with DepressiveSpectrum
+# Priority: HIGH - Withdrawal-based patterns requiring soft escalation
+# -----------------------------------------------------------------------------
+SELECT ?student
+WHERE {
+  ?student rdf:type krr:Student .
+  ?student rdf:type krr:DepressiveSpectrum .
+};
+
+# =============================================================================
+# MULTIPLE RISK STATE DETECTION
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Check: Students with multiple mental risk states
+# Priority: ELEVATED - Compound presentations may indicate complex needs
+# -----------------------------------------------------------------------------
+SELECT ?student (COUNT(DISTINCT ?mentalState) AS ?stateCount)
+WHERE {
+  ?student rdf:type krr:Student .
+  ?student rdf:type ?mentalState .
+  VALUES ?mentalState {
+    krr:AcademicStress
+    krr:AnxietyRisk
+    krr:BurnoutRisk
+    krr:PanicRisk
+    krr:DepressiveSpectrum
+  }
+}
+GROUP BY ?student
+HAVING (COUNT(DISTINCT ?mentalState) > 1);
+
+# -----------------------------------------------------------------------------
+# Check: Students with both AnxietyRisk and BurnoutRisk
+# Priority: ELEVATED - Overlapping stress patterns
+# -----------------------------------------------------------------------------
+SELECT ?student
+WHERE {
+  ?student rdf:type krr:Student .
+  ?student rdf:type krr:AnxietyRisk .
+  ?student rdf:type krr:BurnoutRisk .
+};
+
+# -----------------------------------------------------------------------------
+# Check: Students with both PanicRisk and DepressiveSpectrum
+# Priority: HIGH - Acute + chronic pattern combination
+# -----------------------------------------------------------------------------
+SELECT ?student
+WHERE {
+  ?student rdf:type krr:Student .
+  ?student rdf:type krr:PanicRisk .
+  ?student rdf:type krr:DepressiveSpectrum .
+};
+
+# =============================================================================
+# RISK LEVEL SUMMARY
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Check: All students with ModerateRisk classification
+# Priority: MODERATE - Monitor for potential escalation
+# -----------------------------------------------------------------------------
+SELECT ?student
+WHERE {
+  ?student rdf:type krr:Student .
+  ?student rdf:type krr:ModerateRisk .
+};
+
+# -----------------------------------------------------------------------------
+# Summary: Count of students by risk level
+# Purpose: Dashboard/reporting overview
+# -----------------------------------------------------------------------------
+SELECT ?riskLevel (COUNT(DISTINCT ?student) AS ?studentCount)
+WHERE {
+  ?student rdf:type krr:Student .
+  ?student rdf:type ?riskLevel .
+  VALUES ?riskLevel {
+    krr:HighRisk
+    krr:ModerateRisk
+  }
+}
+GROUP BY ?riskLevel;
+
+# -----------------------------------------------------------------------------
+# Summary: Count of students by mental state
+# Purpose: Dashboard/reporting overview
+# -----------------------------------------------------------------------------
+SELECT ?mentalState (COUNT(DISTINCT ?student) AS ?studentCount)
+WHERE {
+  ?student rdf:type krr:Student .
+  ?student rdf:type ?mentalState .
+  VALUES ?mentalState {
+    krr:AcademicStress
+    krr:AnxietyRisk
+    krr:BurnoutRisk
+    krr:PanicRisk
+    krr:DepressiveSpectrum
+  }
+}
+GROUP BY ?mentalState;
+
+# =============================================================================
+# REPEATED STRESS EXPOSURE CHECKS
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Check: All students with RepeatedStressExposure risk factor
+# Purpose: Identify chronic stress patterns
+# -----------------------------------------------------------------------------
+SELECT ?student ?riskFactor
+WHERE {
+  ?student rdf:type krr:Student .
+  ?student krr:hasRiskFactor ?riskFactor .
+  ?riskFactor rdf:type krr:RepeatedStressExposure .
+};
+
+# -----------------------------------------------------------------------------
+# Check: Students with SocialISolationRisk
+# Purpose: Identify isolation patterns that may require intervention
+# -----------------------------------------------------------------------------
+SELECT ?student ?riskFactor
+WHERE {
+  ?student rdf:type krr:Student .
+  ?student krr:hasRiskFactor ?riskFactor .
+  ?riskFactor rdf:type krr:SocialISolationRisk .
+};

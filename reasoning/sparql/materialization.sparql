@@ -1,0 +1,105 @@
+# =============================================================================
+# SPARQL MATERIALIZATION QUERIES
+# Mental Health KRR System - Phase 3
+# =============================================================================
+# Purpose: Persist SWRL-inferred class memberships as explicit RDF triples
+# Note: These queries read inferred states from reasoner and write them as
+#       explicit triples so downstream systems can query without SWRL enabled.
+# =============================================================================
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX krr: <http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#>
+
+# =============================================================================
+# MENTAL STATE MATERIALIZATION
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Materialize: AcademicStress
+# Source Rules: R_ACS_01a, R_ACS_01b
+# -----------------------------------------------------------------------------
+INSERT {
+  ?s rdf:type krr:AcademicStress .
+}
+WHERE {
+  ?s rdf:type krr:Student .
+  ?s rdf:type krr:AcademicStress .
+};
+
+# -----------------------------------------------------------------------------
+# Materialize: AnxietyRisk
+# Source Rules: R_ANX_01, R_ANX_02
+# -----------------------------------------------------------------------------
+INSERT {
+  ?s rdf:type krr:AnxietyRisk .
+}
+WHERE {
+  ?s rdf:type krr:Student .
+  ?s rdf:type krr:AnxietyRisk .
+};
+
+# -----------------------------------------------------------------------------
+# Materialize: BurnoutRisk
+# Source Rules: R_BRN_01, R_BRN_02
+# -----------------------------------------------------------------------------
+INSERT {
+  ?s rdf:type krr:BurnoutRisk .
+}
+WHERE {
+  ?s rdf:type krr:Student .
+  ?s rdf:type krr:BurnoutRisk .
+};
+
+# -----------------------------------------------------------------------------
+# Materialize: PanicRisk
+# Source Rules: R_PAN_01
+# -----------------------------------------------------------------------------
+INSERT {
+  ?s rdf:type krr:PanicRisk .
+}
+WHERE {
+  ?s rdf:type krr:Student .
+  ?s rdf:type krr:PanicRisk .
+};
+
+# -----------------------------------------------------------------------------
+# Materialize: DepressiveSpectrum
+# Source Rules: R_DEP_01, R_DEP_02
+# -----------------------------------------------------------------------------
+INSERT {
+  ?s rdf:type krr:DepressiveSpectrum .
+}
+WHERE {
+  ?s rdf:type krr:Student .
+  ?s rdf:type krr:DepressiveSpectrum .
+};
+
+# =============================================================================
+# RISK LEVEL MATERIALIZATION
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Materialize: ModerateRisk
+# Source Rules: R_RISK_01a, R_RISK_01b
+# -----------------------------------------------------------------------------
+INSERT {
+  ?s rdf:type krr:ModerateRisk .
+}
+WHERE {
+  ?s rdf:type krr:Student .
+  ?s rdf:type krr:ModerateRisk .
+};
+
+# -----------------------------------------------------------------------------
+# Materialize: HighRisk
+# Source Rules: R_RISK_02
+# -----------------------------------------------------------------------------
+INSERT {
+  ?s rdf:type krr:HighRisk .
+}
+WHERE {
+  ?s rdf:type krr:Student .
+  ?s rdf:type krr:HighRisk .
+};

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<catalog prefer="public" xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
+    <uri id="Imports Wizard Entry" name="http://www.semanticweb.org/mental_health/swrl_rules" uri="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl"/>
+    <uri id="Imports Wizard Entry" name="http://www.semanticweb.org/mental_health/swrl_rules" uri="file:/C:/Users/ND.COM/Desktop/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl"/>
+    <group id="Folder Repository, directory=, recursive=true, Auto-Update=true, version=2" prefer="public" xml:base="">
+        <uri id="Automatically generated entry, Timestamp=1767171349556" name="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project/" uri="mental_health.owl"/>
+    </group>
+</catalog>

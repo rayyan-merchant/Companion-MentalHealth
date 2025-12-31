@@ -1,0 +1,1329 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project/"
+     xml:base="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project/"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:krr_project="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#">
+    <owl:Ontology rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project">
+        <owl:imports rdf:resource="http://www.semanticweb.org/mental_health/swrl_rules"/>
+        <rdfs:comment xml:lang="en">KRR semester prject</rdfs:comment>
+    </owl:Ontology>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Object Properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#associatedWithMentalState -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#associatedWithMentalState">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Behavior_Pattern"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Emotion"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Symptom"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Mental_State"/>
+        <rdfs:comment xml:lang="en">evidence associated with mental state</rdfs:comment>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#causedBy -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#causedBy">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Mental_State"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Event"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Stressor"/>
+        <rdfs:comment xml:lang="en">event or stressor that directly causes the symptom , behavior or mental state.</rdfs:comment>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#exacerbatedBy -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#exacerbatedBy">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Behavior_Pattern"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Mental_State"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Symptom"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Stressor"/>
+        <rdfs:comment xml:lang="en">a stressor that worsens the current mental state, symptom or behavior</rdfs:comment>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#exhibitsBehavior -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#exhibitsBehavior">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Agent"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Behavior_Pattern"/>
+        <rdfs:comment xml:lang="en">student shoes recurring behavioral patterns</rdfs:comment>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#experiencesEmotion -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#experiencesEmotion">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Agent"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Emotion"/>
+        <rdfs:comment xml:lang="en">student expresses a subjective emotional state.</rdfs:comment>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#hasProtectiveFactor -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#hasProtectiveFactor">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Agent"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Protective_Factor"/>
+        <rdfs:comment xml:lang="en">protective factor associated with student</rdfs:comment>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#hasRiskFactor -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#hasRiskFactor">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Agent"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Risk_Factor"/>
+        <rdfs:comment xml:lang="en">risk factor associated to individual</rdfs:comment>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#hasRiskLevel -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#hasRiskLevel">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Mental_State"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Risk_Level"/>
+        <rdfs:comment xml:lang="en">mental state&apos;s risk level</rdfs:comment>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#hasSeverity -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#hasSeverity">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Symptom"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Severity_Level"/>
+        <rdfs:comment xml:lang="en">severity level of symptom experienced by individual</rdfs:comment>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#hasSymptom -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#hasSymptom">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Agent"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Symptom"/>
+        <rdfs:comment xml:lang="en">student exhibits an observable symptom</rdfs:comment>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#leadsToMentalState -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#leadsToMentalState">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Event"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Stressor"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Mental_State"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Risk_Level"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Symptom"/>
+        <rdfs:comment xml:lang="en">stressor or event leads to a particular mental state,symptom or risk level</rdfs:comment>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#manifestAsEvent -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#manifestAsEvent">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Stressor"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Event"/>
+        <rdfs:comment xml:lang="en">stressor appears as a concrete event.</rdfs:comment>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#mapsToStressor -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#mapsToStressor">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Trigger"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Stressor"/>
+        <rdfs:comment xml:lang="en">immediate trigger corresponds to a broader stressor</rdfs:comment>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#mitigatedBy -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#mitigatedBy">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Mental_State"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Risk_Level"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Symptom"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Intervention"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Protective_Factor"/>
+        <rdfs:comment xml:lang="en">a protective factor or intervention that reduces the risk or severity of symptom or state</rdfs:comment>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#occursDuring -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#occursDuring">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Event"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Stressor"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Trigger"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Time_Period"/>
+        <rdfs:comment xml:lang="en">indicates time period during which event,stressor or trigger occurs.</rdfs:comment>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#occursInEnvironment -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#occursInEnvironment">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Event"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Stressor"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Environment"/>
+        <rdfs:comment xml:lang="en">the environment where the event or stressor occurs</rdfs:comment>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#recommendIntervention -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#recommendIntervention">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Mental_State"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Risk_Level"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Symptom"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Intervention"/>
+        <rdfs:comment xml:lang="en">intervention recommended for current mental state, risk or symptom of an individual</rdfs:comment>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#triggeredBy -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#triggeredBy">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Agent"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Trigger"/>
+        <rdfs:comment xml:lang="en">student attributes stress/emption to a trigger</rdfs:comment>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Data properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#ageAtOccurrence -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#ageAtOccurrence">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Event"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Stressor"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Trigger"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+        <rdfs:comment xml:lang="en">age of the student when the event,stressor or trigger occurred</rdfs:comment>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#confidenceScore -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#confidenceScore">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Behavior_Pattern"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Emotion"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Symptom"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Trigger"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#decimal"/>
+        <rdfs:comment xml:lang="en">nlp extraction confidence (0-1)</rdfs:comment>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#durationDays -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#durationDays">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Behavior_Pattern"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Event"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Symptom"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+        <rdfs:comment xml:lang="en">how long symptom,event,stressor, behavior  lasted</rdfs:comment>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#hasEffectivenessScore -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#hasEffectivenessScore">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Intervention"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Protective_Factor"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#decimal"/>
+        <rdfs:comment xml:lang="en">expected or observed effectiveness of the intervention or protective factor</rdfs:comment>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#hasEndDate -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#hasEndDate">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Event"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Intervention"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Stressor"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Trigger"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#dateTime"/>
+        <rdfs:comment xml:lang="en">the date/time when the event,stressor,trigger or intervention ended</rdfs:comment>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#hasFrequency -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#hasFrequency">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Behavior_Pattern"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Stressor"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Trigger"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:comment xml:lang="en">how often the stressor,trigger or behavior pattern occurs</rdfs:comment>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#hasImpactScore -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#hasImpactScore">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Event"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Risk_Factor"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Stressor"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#decimal"/>
+        <rdfs:comment xml:lang="en">numerical impact of the event or factor on student&apos;s well-being</rdfs:comment>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#hasIntensity -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#hasIntensity">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Emotion"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Symptom"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+        <rdfs:comment xml:lang="en">intensity level of emotion,stressor or symptom</rdfs:comment>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#hasNotes -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#hasNotes">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Intervention"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Mental_State"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Risk_Level"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:comment xml:lang="en">additional notes from counselors/assessments.</rdfs:comment>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#hasPriority -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#hasPriority">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Intervention"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:comment xml:lang="en">priority level for recommending the intervention</rdfs:comment>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#hasStartDate -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#hasStartDate">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Event"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Intervention"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Stressor"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Trigger"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#dateTime"/>
+        <rdfs:comment xml:lang="en">the date/time when the event, stressor, trigger or intervention began</rdfs:comment>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#lastObserved -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#lastObserved">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Event"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#dateTime"/>
+        <rdfs:comment xml:lang="en">when was the event last observed</rdfs:comment>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#occurenceCount -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#occurenceCount">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Behavior_Pattern"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Symptom"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+        <rdfs:comment xml:lang="en">how often observed in session</rdfs:comment>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#riskScore -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#riskScore">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Mental_State"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#float"/>
+        <rdfs:comment xml:lang="en">what is the risk score of condition</rdfs:comment>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#severityScore -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#severityScore">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Severity_Level"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#float"/>
+        <rdfs:comment xml:lang="en">what is the severity score of the condition</rdfs:comment>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#AcademicEnvironment -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#AcademicEnvironment">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Environment"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#AcademicStress -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#AcademicStress">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Mental_State"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#AcademicStressor -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#AcademicStressor">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Stressor"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Academic_Workload -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Academic_Workload">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Trigger"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Agent -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Agent">
+        <rdfs:comment xml:lang="en">the student facing mental health challenge.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Anxiety -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Anxiety">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Emotion"/>
+        <owl:disjointWith rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Emotional_Overwhelm"/>
+        <owl:disjointWith rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Fear"/>
+        <owl:disjointWith rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Hopelessness"/>
+        <owl:disjointWith rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Irritability"/>
+        <owl:disjointWith rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Sadness"/>
+        <owl:disjointWith rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Stress"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#AnxietyRisk -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#AnxietyRisk">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Mental_State"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Appetite_Change -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Appetite_Change">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Symptom"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Assignment_Deadline -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Assignment_Deadline">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Trigger"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Avoidance -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Avoidance">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Behavior_Pattern"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Behavior_Pattern -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Behavior_Pattern">
+        <rdfs:comment xml:lang="en">a recurring pattern of actions/reactions observed in an individual.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#BreathingExcercise -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#BreathingExcercise">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Intervention"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Breathing_Difficulty -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Breathing_Difficulty">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Symptom"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#BurnoutRisk -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#BurnoutRisk">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Mental_State"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#ChronicSleepDeprivation -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#ChronicSleepDeprivation">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Risk_Factor"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#ConflictEvent -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#ConflictEvent">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Event"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#ConsultCounselor -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#ConsultCounselor">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Intervention"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#CopingSkills -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#CopingSkills">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Protective_Factor"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#CounsellingAccess -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#CounsellingAccess">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Protective_Factor"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#DeadlineEvent -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#DeadlineEvent">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Event"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#DepressiveSpectrum -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#DepressiveSpectrum">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Mental_State"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Difficulty_Concentrating -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Difficulty_Concentrating">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Symptom"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Emotion -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Emotion">
+        <rdfs:comment xml:lang="en">pyschological state or feeling experienced by an individual</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Emotional_Overwhelm -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Emotional_Overwhelm">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Emotion"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Environment -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Environment">
+        <rdfs:comment xml:lang="en">The physical,social or cultural context surrounding an individual.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Event -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Event">
+        <rdfs:comment xml:lang="en">a discrete occurence or incident in an individual&apos;s life.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#ExamEvent -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#ExamEvent">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Event"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#ExamPhase -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#ExamPhase">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Time_Period"/>
+        <owl:disjointWith rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#ProlongPeriod"/>
+        <owl:disjointWith rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Semester"/>
+        <owl:disjointWith rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#ShortTerm"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#ExamStressor -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#ExamStressor">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#AcademicStressor"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Exam_Pressure -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Exam_Pressure">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Trigger"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Excessive_Screen_Use -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Excessive_Screen_Use">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Behavior_Pattern"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#FamilyConflict -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#FamilyConflict">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#FamilyStressor"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#FamilyStressor -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#FamilyStressor">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Stressor"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Family_Pressure -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Family_Pressure">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Trigger"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Fatigue -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Fatigue">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Symptom"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Fear -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Fear">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Emotion"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#FinancialInstability -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#FinancialInstability">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#FamilyStressor"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Financial_Concern -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Financial_Concern">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Trigger"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#GroundingTechinique -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#GroundingTechinique">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Intervention"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Headache -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Headache">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Symptom"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#HealthyRoutine -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#HealthyRoutine">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Protective_Factor"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#HighAcademicLoad -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#HighAcademicLoad">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Risk_Factor"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#HighRisk -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#HighRisk">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Risk_Level"/>
+        <owl:disjointWith rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#LowRisk"/>
+        <owl:disjointWith rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#ModerateRisk"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#HomeEnvironment -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#HomeEnvironment">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Environment"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Hopelessness -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Hopelessness">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Emotion"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Insomnia -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Insomnia">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Symptom"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Intervention -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Intervention">
+        <rdfs:comment xml:lang="en">a planned action or strategy aimed at reducing the impact of adverse experiences, supporting recovery, or preventing negative health outcomes.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Irreugular_Sleep_Routine -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Irreugular_Sleep_Routine">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Behavior_Pattern"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Irritability -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Irritability">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Emotion"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Isolation -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Isolation">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Behavior_Pattern"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Journaling -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Journaling">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Intervention"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Loss_Of_Interest -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Loss_Of_Interest">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Symptom"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#LowRisk -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#LowRisk">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Risk_Level"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Mental_State -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Mental_State">
+        <rdfs:comment xml:lang="en">a temporary or persistent psychological state of an individual</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Mild -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Mild">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Severity_Level"/>
+        <owl:disjointWith rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Moderate"/>
+        <owl:disjointWith rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Severe"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Moderate -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Moderate">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Severity_Level"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#ModerateRisk -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#ModerateRisk">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Risk_Level"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#PanicRisk -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#PanicRisk">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Mental_State"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#PeerComparison -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#PeerComparison">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#SocialStressor"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#PerformancePressure -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#PerformancePressure">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#AcademicStressor"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#PhysicalActivity -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#PhysicalActivity">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Intervention"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#PoorCopingSkills -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#PoorCopingSkills">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Risk_Factor"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Poor_Grades -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Poor_Grades">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Trigger"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Procrastination -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Procrastination">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Behavior_Pattern"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#ProlongPeriod -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#ProlongPeriod">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Time_Period"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Protective_Factor -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Protective_Factor">
+        <rdfs:comment xml:lang="en">a characterstic, resource or condition that reduces the likelihood of negative outcomes despite exposure to adversity.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Rapid_Heart_Rate -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Rapid_Heart_Rate">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Symptom"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Reduced_Participation -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Reduced_Participation">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Behavior_Pattern"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#RepeatedStressExposure -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#RepeatedStressExposure">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Risk_Factor"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Restlessness -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Restlessness">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Symptom"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Risk_Factor -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Risk_Factor">
+        <rdfs:comment xml:lang="en">a characterstic, condition or exposure that increases the probability of negative outcomes.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Risk_Level -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Risk_Level">
+        <rdfs:comment xml:lang="en">a qualitative ir quantitative assessment of the likelihood or severity of negative outcomes.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Sadness -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Sadness">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Emotion"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Semester -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Semester">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Time_Period"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Severe -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Severe">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Severity_Level"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Severity_Level -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Severity_Level">
+        <rdfs:comment xml:lang="en">a measure of intensity or impact of an adverse experience.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#ShortTerm -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#ShortTerm">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Time_Period"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#SleepHygiene -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#SleepHygiene">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Intervention"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#SocialEnvironment -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#SocialEnvironment">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Environment"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#SocialExposureEvent -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#SocialExposureEvent">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Event"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#SocialISolationRisk -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#SocialISolationRisk">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Risk_Factor"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#SocialIsolation -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#SocialIsolation">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#SocialStressor"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#SocialStressor -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#SocialStressor">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Stressor"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#SocialSupport -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#SocialSupport">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Protective_Factor"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Social_Withdrawal -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Social_Withdrawal">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Symptom"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Stress -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Stress">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Emotion"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#StressEvent -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#StressEvent">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Event"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Stressor -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Stressor">
+        <rdfs:comment xml:lang="en">an external event or condition that causes stress or strain in an individual.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Student -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Student">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Agent"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Symptom -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Symptom">
+        <rdfs:comment xml:lang="en">observable manifestation of a mental or physucal health condition.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#TimeManagement -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#TimeManagement">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Intervention"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#TimeManagementSkills -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#TimeManagementSkills">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Protective_Factor"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Time_Period -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Time_Period">
+        <rdfs:comment xml:lang="en">A specific interval or phase in an individual&apos;s life.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Trigger -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Trigger">
+        <rdfs:comment xml:lang="en">an event or stimulus that elicits a negative emotional/behavioral response.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#WorkloadStressor -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#WorkloadStressor">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#AcademicStressor"/>
+    </owl:Class>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Individuals
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#anxiety001 -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#anxiety001"/>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#emotion_anxiety_01 -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#emotion_anxiety_01">
+        <rdf:type rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Anxiety"/>
+        <krr_project:confidenceScore rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">0.85</krr_project:confidenceScore>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#event_exam_01 -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#event_exam_01">
+        <rdf:type rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#ExamEvent"/>
+        <krr_project:occursDuring rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#time_examphase_01"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#stress001 -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#stress001"/>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#stress_01 -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#stress_01">
+        <rdf:type rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Stress"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#stressor_academic_01 -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#stressor_academic_01">
+        <rdf:type rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#AcademicStressor"/>
+        <krr_project:manifestAsEvent rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#event_exam_01"/>
+        <krr_project:hasImpactScore rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">0.7</krr_project:hasImpactScore>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#student001 -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#student001">
+        <rdf:type rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Student"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#student_001 -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#student_001">
+        <rdf:type rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Student"/>
+        <krr_project:experiencesEmotion rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#stress_01"/>
+        <krr_project:hasSymptom rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#symptom_insomnia_01"/>
+        <krr_project:triggeredBy rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#trigger_exampressure_01"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#symptom_insomnia_01 -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#symptom_insomnia_01">
+        <rdf:type rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Insomnia"/>
+        <krr_project:durationDays rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">10</krr_project:durationDays>
+        <krr_project:hasIntensity rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">3</krr_project:hasIntensity>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#time_examphase_01 -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#time_examphase_01">
+        <rdf:type rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#ExamPhase"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#trigger_exampressure_01 -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#trigger_exampressure_01">
+        <rdf:type rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Exam_Pressure"/>
+        <krr_project:mapsToStressor rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#stressor_academic_01"/>
+    </owl:NamedIndividual>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 4.5.29.2024-05-13T12:11:03Z) https://github.com/owlcs/owlapi -->
+

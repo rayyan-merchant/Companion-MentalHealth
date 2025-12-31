@@ -1,0 +1,430 @@
+# SPARQL Validation Queries for Mental Health KRR System
+# Purpose: Verify inferred states and validate reasoning outcomes
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX krr: <http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#>
+
+# =============================================================================
+# VALIDATION QUERIES FOR INFERRED STATES
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Query: Verify all students and their inferred mental states
+# Purpose: Confirm that reasoning produced expected class memberships
+# -----------------------------------------------------------------------------
+SELECT ?student ?inferredMentalState
+WHERE {
+  ?student rdf:type krr:Student .
+  ?student rdf:type ?inferredMentalState .
+  ?inferredMentalState rdfs:subClassOf* krr:Mental_State .
+  FILTER(?inferredMentalState != krr:Student)
+}
+ORDER BY ?student ?inferredMentalState;
+
+# -----------------------------------------------------------------------------
+# Query: Verify all students and their risk levels
+# Purpose: Confirm risk level inferences are correct
+# -----------------------------------------------------------------------------
+SELECT ?student ?inferredRiskLevel
+WHERE {
+  ?student rdf:type krr:Student .
+  ?student rdf:type ?inferredRiskLevel .
+  ?inferredRiskLevel rdfs:subClassOf* krr:Risk_Level .
+  FILTER(?inferredRiskLevel != krr:Student)
+}
+ORDER BY ?student ?inferredRiskLevel;
+
+# -----------------------------------------------------------------------------
+# Query: Validate AcademicStress inferences
+# Purpose: Verify R_ACS_01a and R_ACS_01b rule outcomes
+# -----------------------------------------------------------------------------
+SELECT ?student ?evidenceStress ?evidenceTrigger
+WHERE {
+  ?student rdf:type krr:Student .
+  ?student rdf:type krr:AcademicStress .
+  ?student krr:experiencesEmotion ?evidenceStress .
+  ?evidenceStress rdf:type krr:Stress .
+  ?student krr:triggeredBy ?evidenceTrigger .
+  {
+    ?evidenceTrigger rdf:type krr:Exam_Pressure .
+  } UNION {
+    ?evidenceTrigger rdf:type krr:Academic_Workload .
+  }
+}
+ORDER BY ?student;
+
+# -----------------------------------------------------------------------------
+# Query: Validate AnxietyRisk inferences
+# Purpose: Verify R_ANX_01 and R_ANX_02 rule outcomes
+# -----------------------------------------------------------------------------
+SELECT ?student ?evidenceType ?evidenceItem
+WHERE {
+  ?student rdf:type krr:Student .
+  ?student rdf:type krr:AnxietyRisk .
+  {
+    # R_ANX_01 pathway: Stress + Insomnia + Exam_Pressure
+    {
+      ?student krr:experiencesEmotion ?e .
+      ?e rdf:type krr:Stress .
+      ?student krr:hasSymptom ?s .
+      ?s rdf:type krr:Insomnia .
+      ?student krr:triggeredBy ?t .
+      ?t rdf:type krr:Exam_Pressure .
+      BIND("R_ANX_01" AS ?evidenceType)
+      BIND(CONCAT(STR(?e), ", ", STR(?s), ", ", STR(?t)) AS ?evidenceItem)
+    }
+  } UNION {
+    # R_ANX_02 pathway: Anxiety + RepeatedStressExposure
+    {
+      ?student krr:experiencesEmotion ?e2 .
+      ?e2 rdf:type krr:Anxiety .
+      ?student krr:hasRiskFactor ?rf .
+      ?rf rdf:type krr:RepeatedStressExposure .
+      BIND("R_ANX_02" AS ?evidenceType)
+      BIND(CONCAT(STR(?e2), ", ", STR(?rf)) AS ?evidenceItem)
+    }
+  }
+}
+ORDER BY ?student ?evidenceType;
+
+# -----------------------------------------------------------------------------
+# Query: Validate BurnoutRisk inferences
+# Purpose: Verify R_BRN_01 and R_BRN_02 rule outcomes
+# -----------------------------------------------------------------------------
+SELECT ?student ?rulePath ?evidenceItems
+WHERE {
+  ?student rdf:type krr:Student .
+  ?student rdf:type krr:BurnoutRisk .
+  {
+    # R_BRN_01 pathway: Emotional_Overwhelm + Academic_Workload + RepeatedStressExposure
+    {
+      ?student krr:experiencesEmotion ?e1 .
+      ?e1 rdf:type krr:Emotional_Overwhelm .
+      ?student krr:triggeredBy ?t1 .
+      ?t1 rdf:type krr:Academic_Workload .
+      ?student krr:hasRiskFactor ?rf1 .
+      ?rf1 rdf:type krr:RepeatedStressExposure .
+      BIND("R_BRN_01" AS ?rulePath)
+      BIND(CONCAT(STR(?e1), ", ", STR(?t1), ", ", STR(?rf1)) AS ?evidenceItems)
+    }
+  } UNION {
+    # R_BRN_02 pathway: Stress + Fatigue + RepeatedStressExposure
+    {
+      ?student krr:experiencesEmotion ?e2 .
+      ?e2 rdf:type krr:Stress .
+      ?student krr:hasSymptom ?s2 .
+      ?s2 rdf:type krr:Fatigue .
+      ?student krr:hasRiskFactor ?rf2 .
+      ?rf2 rdf:type krr:RepeatedStressExposure .
+      BIND("R_BRN_02" AS ?rulePath)
+      BIND(CONCAT(STR(?e2), ", ", STR(?s2), ", ", STR(?rf2)) AS ?evidenceItems)
+    }
+  }
+}
+ORDER BY ?student ?rulePath;
+
+# -----------------------------------------------------------------------------
+# Query: Validate PanicRisk inferences
+# Purpose: Verify R_PAN_01 rule outcomes
+# -----------------------------------------------------------------------------
+SELECT ?student ?evidenceAnxiety ?evidenceSymptom1 ?evidenceSymptom2
+WHERE {
+  ?student rdf:type krr:Student .
+  ?student rdf:type krr:PanicRisk .
+  ?student krr:experiencesEmotion ?evidenceAnxiety .
+  ?evidenceAnxiety rdf:type krr:Anxiety .
+  ?student krr:hasSymptom ?evidenceSymptom1 .
+  ?evidenceSymptom1 rdf:type krr:Rapid_Heart_Rate .
+  ?student krr:hasSymptom ?evidenceSymptom2 .
+  ?evidenceSymptom2 rdf:type krr:Breathing_Difficulty .
+}
+ORDER BY ?student;
+
+# -----------------------------------------------------------------------------
+# Query: Validate DepressiveSpectrum inferences
+# Purpose: Verify R_DEP_01 and R_DEP_02 rule outcomes
+# -----------------------------------------------------------------------------
+SELECT ?student ?rulePath ?evidenceItems
+WHERE {
+  ?student rdf:type krr:Student .
+  ?student rdf:type krr:DepressiveSpectrum .
+  {
+    # R_DEP_01 pathway: SocialISolationRisk + Emotional_Overwhelm + RepeatedStressExposure
+    {
+      ?student krr:hasRiskFactor ?rf1 .
+      ?rf1 rdf:type krr:SocialISolationRisk .
+      ?student krr:experiencesEmotion ?e1 .
+      ?e1 rdf:type krr:Emotional_Overwhelm .
+      ?student krr:hasRiskFactor ?rf2 .
+      ?rf2 rdf:type krr:RepeatedStressExposure .
+      BIND("R_DEP_01" AS ?rulePath)
+      BIND(CONCAT(STR(?rf1), ", ", STR(?e1), ", ", STR(?rf2)) AS ?evidenceItems)
+    }
+  } UNION {
+    # R_DEP_02 pathway: Fatigue + Insomnia + SocialISolationRisk
+    {
+      ?student krr:hasSymptom ?s1 .
+      ?s1 rdf:type krr:Fatigue .
+      ?student krr:hasSymptom ?s2 .
+      ?s2 rdf:type krr:Insomnia .
+      ?student krr:hasRiskFactor ?rf .
+      ?rf rdf:type krr:SocialISolationRisk .
+      BIND("R_DEP_02" AS ?rulePath)
+      BIND(CONCAT(STR(?s1), ", ", STR(?s2), ", ", STR(?rf)) AS ?evidenceItems)
+    }
+  }
+}
+ORDER BY ?student ?rulePath;
+
+# -----------------------------------------------------------------------------
+# Query: Validate Risk Level inferences
+# Purpose: Verify R_RISK_01a, R_RISK_01b, and R_RISK_02 rule outcomes
+# -----------------------------------------------------------------------------
+SELECT ?student ?riskLevel ?baseRiskType
+WHERE {
+  ?student rdf:type krr:Student .
+  ?student rdf:type ?riskLevel .
+  VALUES ?riskLevel {krr:ModerateRisk krr:HighRisk} .
+  {
+    # ModerateRisk from AnxietyRisk + RepeatedStressExposure (R_RISK_01a)
+    {
+      ?student rdf:type krr:AnxietyRisk .
+      ?student krr:hasRiskFactor ?rf1 .
+      ?rf1 rdf:type krr:RepeatedStressExposure .
+      BIND(krr:ModerateRisk AS ?riskLevel)
+      BIND("AnxietyRisk" AS ?baseRiskType)
+    }
+  } UNION {
+    # ModerateRisk from BurnoutRisk + RepeatedStressExposure (R_RISK_01b)
+    {
+      ?student rdf:type krr:BurnoutRisk .
+      ?student krr:hasRiskFactor ?rf2 .
+      ?rf2 rdf:type krr:RepeatedStressExposure .
+      BIND(krr:ModerateRisk AS ?riskLevel)
+      BIND("BurnoutRisk" AS ?baseRiskType)
+    }
+  } UNION {
+    # HighRisk from PanicRisk + RepeatedStressExposure (R_RISK_02)
+    {
+      ?student rdf:type krr:PanicRisk .
+      ?student krr:hasRiskFactor ?rf3 .
+      ?rf3 rdf:type krr:RepeatedStressExposure .
+      BIND(krr:HighRisk AS ?riskLevel)
+      BIND("PanicRisk" AS ?baseRiskType)
+    }
+  }
+}
+ORDER BY ?student ?riskLevel;
+
+# =============================================================================
+# EXAMPLE OUTPUTS FOR TWO STUDENTS
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Query: Sample student data for validation
+# Purpose: Show example outputs for validation testing
+# -----------------------------------------------------------------------------
+SELECT ?student ?baseClass ?inferredClass ?evidenceType ?evidenceValue
+WHERE {
+  ?student rdf:type ?baseClass .
+  OPTIONAL {
+    ?student rdf:type ?inferredClass .
+    FILTER(?inferredClass != ?baseClass)
+    FILTER(?inferredClass != owl:NamedIndividual)
+  }
+  OPTIONAL {
+    ?student ?evidenceType ?evidenceValue .
+    FILTER(strstarts(str(?evidenceType), "http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#"))
+  }
+  VALUES ?student {
+    krr:student_001
+  }
+}
+ORDER BY ?student ?baseClass ?inferredClass;
+
+# -----------------------------------------------------------------------------
+# Query: Count of inferred states per student
+# Purpose: Verify the reasoning system produces appropriate number of inferences
+# -----------------------------------------------------------------------------
+SELECT ?student (COUNT(DISTINCT ?inferredState) AS ?inferenceCount)
+WHERE {
+  ?student rdf:type krr:Student .
+  ?student rdf:type ?inferredState .
+  ?inferredState rdfs:subClassOf* krr:Mental_State .
+  FILTER(?inferredState != krr:Student)
+}
+GROUP BY ?student
+ORDER BY DESC(?inferenceCount);
+
+
+-- updated 
+# Mental Health Ontology – SPARQL Validation Queries
+
+> Use **SPARQL (not OWL DL Query)** in Protégé  
+> Run the **HermiT reasoner** before executing inference-based queries.
+
+---
+
+## Prefixes (update ontology IRI if needed)
+
+```sparql
+PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX owl:  <http://www.w3.org/2002/07/owl#>
+PREFIX krr:  <http://www.semanticweb.org/yourname/ontologies/mental_health#>
+```
+
+---
+
+## 1. List all Students
+```sparql
+SELECT ?student
+WHERE {
+  ?student rdf:type krr:Student .
+}
+```
+
+---
+
+## 2. Students and their experienced Emotions
+```sparql
+SELECT ?student ?emotion
+WHERE {
+  ?student rdf:type krr:Student .
+  ?student krr:experiencesEmotion ?emotion .
+}
+```
+
+---
+
+## 3. Students experiencing Stress
+```sparql
+SELECT ?student
+WHERE {
+  ?student krr:experiencesEmotion ?e .
+  ?e rdf:type krr:Stress .
+}
+```
+
+---
+
+## 4. Students with Symptoms
+```sparql
+SELECT ?student ?symptom
+WHERE {
+  ?student krr:hasSymptom ?symptom .
+}
+```
+
+---
+
+## 5. Students with Insomnia
+```sparql
+SELECT ?student
+WHERE {
+  ?student krr:hasSymptom ?s .
+  ?s rdf:type krr:Insomnia .
+}
+```
+
+---
+
+## 6. Students under Exam Pressure
+```sparql
+SELECT ?student
+WHERE {
+  ?student krr:hasTrigger ?t .
+  ?t rdf:type krr:Exam_Pressure .
+}
+```
+
+---
+
+## 7. Students with Stress AND Insomnia
+```sparql
+SELECT ?student
+WHERE {
+  ?student krr:experiencesEmotion ?e .
+  ?e rdf:type krr:Stress .
+  ?student krr:hasSymptom ?s .
+  ?s rdf:type krr:Insomnia .
+}
+```
+
+---
+
+## 8. All inferred types of each Student (debug query)
+```sparql
+SELECT ?student ?type
+WHERE {
+  ?student rdf:type krr:Student .
+  ?student rdf:type ?type .
+}
+ORDER BY ?student ?type
+```
+
+---
+
+## 9. Inferred Mental States of Students
+> Requires inferred classes to be subclasses of `Mental_State`
+
+```sparql
+SELECT ?student ?mentalState
+WHERE {
+  ?student rdf:type krr:Student .
+  ?student rdf:type ?mentalState .
+  ?mentalState rdfs:subClassOf* krr:Mental_State .
+  FILTER(?mentalState != krr:Student)
+}
+ORDER BY ?student ?mentalState
+```
+
+---
+
+## 10. Validate HighStressStudent inference
+```sparql
+SELECT ?student
+WHERE {
+  ?student rdf:type krr:HighStressStudent .
+}
+```
+
+---
+
+## 11. List all individuals and their classes
+```sparql
+SELECT ?ind ?class
+WHERE {
+  ?ind rdf:type ?class .
+}
+```
+
+---
+
+## 12. Data Property Validation (example: confidenceScore)
+```sparql
+SELECT ?student ?score
+WHERE {
+  ?student krr:confidenceScore ?score .
+}
+```
+
+---
+
+## 13. Missing Data Check (students without confidenceScore)
+```sparql
+SELECT ?student
+WHERE {
+  ?student rdf:type krr:Student .
+  FILTER NOT EXISTS { ?student krr:confidenceScore ?score }
+}
+```
+
+---
+
+## Notes
+- Always **run the reasoner** before inference queries
+- Ensure inferred classes are declared as subclasses of `Mental_State`
+- Use **CTRL + Space** in Protégé to autocomplete names

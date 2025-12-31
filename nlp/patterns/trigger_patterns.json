@@ -1,0 +1,14 @@
+{
+  "ExamPressure": [
+    "exam",
+    "tests",
+    "midterms",
+    "finals"
+  ],
+  "AcademicWorkload": [
+    "assignments",
+    "deadlines",
+    "academic pressure",
+    "course load"
+  ]
+}

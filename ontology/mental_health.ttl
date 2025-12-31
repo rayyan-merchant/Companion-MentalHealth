@@ -1,0 +1,862 @@
+@prefix : <http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix krr_project: <http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#> .
+@base <http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project/> .
+
+<http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project> rdf:type owl:Ontology ;
+                                                                           rdfs:comment "KRR semester prject"@en .
+
+#################################################################
+#    Object Properties
+#################################################################
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#associatedWithMentalState
+krr_project:associatedWithMentalState rdf:type owl:ObjectProperty ;
+                                      rdfs:subPropertyOf owl:topObjectProperty ;
+                                      rdfs:domain krr_project:Behavior_Pattern ,
+                                                  krr_project:Emotion ,
+                                                  krr_project:Symptom ;
+                                      rdfs:range krr_project:Mental_State ;
+                                      rdfs:comment "evidence associated with mental state"@en .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#causedBy
+krr_project:causedBy rdf:type owl:ObjectProperty ;
+                     rdfs:subPropertyOf owl:topObjectProperty ;
+                     rdfs:domain krr_project:Mental_State ;
+                     rdfs:range krr_project:Event ,
+                                krr_project:Stressor ;
+                     rdfs:comment "event or stressor that directly causes the symptom , behavior or mental state."@en .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#exacerbatedBy
+krr_project:exacerbatedBy rdf:type owl:ObjectProperty ;
+                          rdfs:subPropertyOf owl:topObjectProperty ;
+                          rdfs:domain krr_project:Behavior_Pattern ,
+                                      krr_project:Mental_State ,
+                                      krr_project:Symptom ;
+                          rdfs:range krr_project:Stressor ;
+                          rdfs:comment "a stressor that worsens the current mental state, symptom or behavior"@en .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#exhibitsBehavior
+krr_project:exhibitsBehavior rdf:type owl:ObjectProperty ;
+                             rdfs:subPropertyOf owl:topObjectProperty ;
+                             rdfs:domain krr_project:Agent ;
+                             rdfs:range krr_project:Behavior_Pattern ;
+                             rdfs:comment "student shoes recurring behavioral patterns"@en .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#experiencesEmotion
+krr_project:experiencesEmotion rdf:type owl:ObjectProperty ;
+                               rdfs:subPropertyOf owl:topObjectProperty ;
+                               rdfs:domain krr_project:Agent ;
+                               rdfs:range krr_project:Emotion ;
+                               rdfs:comment "student expresses a subjective emotional state."@en .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#hasProtectiveFactor
+krr_project:hasProtectiveFactor rdf:type owl:ObjectProperty ;
+                                rdfs:subPropertyOf owl:topObjectProperty ;
+                                rdfs:domain krr_project:Agent ;
+                                rdfs:range krr_project:Protective_Factor ;
+                                rdfs:comment "protective factor associated with student"@en .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#hasRiskFactor
+krr_project:hasRiskFactor rdf:type owl:ObjectProperty ;
+                          rdfs:subPropertyOf owl:topObjectProperty ;
+                          rdfs:domain krr_project:Agent ;
+                          rdfs:range krr_project:Risk_Factor ;
+                          rdfs:comment "risk factor associated to individual"@en .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#hasRiskLevel
+krr_project:hasRiskLevel rdf:type owl:ObjectProperty ;
+                         rdfs:subPropertyOf owl:topObjectProperty ;
+                         rdfs:domain krr_project:Mental_State ;
+                         rdfs:range krr_project:Risk_Level ;
+                         rdfs:comment "mental state's risk level"@en .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#hasSeverity
+krr_project:hasSeverity rdf:type owl:ObjectProperty ;
+                        rdfs:subPropertyOf owl:topObjectProperty ;
+                        rdfs:domain krr_project:Symptom ;
+                        rdfs:range krr_project:Severity_Level ;
+                        rdfs:comment "severity level of symptom experienced by individual"@en .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#hasSymptom
+krr_project:hasSymptom rdf:type owl:ObjectProperty ;
+                       rdfs:subPropertyOf owl:topObjectProperty ;
+                       rdfs:domain krr_project:Agent ;
+                       rdfs:range krr_project:Symptom ;
+                       rdfs:comment "student exhibits an observable symptom"@en .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#leadsToMentalState
+krr_project:leadsToMentalState rdf:type owl:ObjectProperty ;
+                               rdfs:subPropertyOf owl:topObjectProperty ;
+                               rdfs:domain krr_project:Event ,
+                                           krr_project:Stressor ;
+                               rdfs:range krr_project:Mental_State ,
+                                          krr_project:Risk_Level ,
+                                          krr_project:Symptom ;
+                               rdfs:comment "stressor or event leads to a particular mental state,symptom or risk level"@en .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#manifestAsEvent
+krr_project:manifestAsEvent rdf:type owl:ObjectProperty ;
+                            rdfs:subPropertyOf owl:topObjectProperty ;
+                            rdfs:domain krr_project:Stressor ;
+                            rdfs:range krr_project:Event ;
+                            rdfs:comment "stressor appears as a concrete event."@en .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#mapsToStressor
+krr_project:mapsToStressor rdf:type owl:ObjectProperty ;
+                           rdfs:subPropertyOf owl:topObjectProperty ;
+                           rdfs:domain krr_project:Trigger ;
+                           rdfs:range krr_project:Stressor ;
+                           rdfs:comment "immediate trigger corresponds to a broader stressor"@en .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#mitigatedBy
+krr_project:mitigatedBy rdf:type owl:ObjectProperty ;
+                        rdfs:subPropertyOf owl:topObjectProperty ;
+                        rdfs:domain krr_project:Mental_State ,
+                                    krr_project:Risk_Level ,
+                                    krr_project:Symptom ;
+                        rdfs:range krr_project:Intervention ,
+                                   krr_project:Protective_Factor ;
+                        rdfs:comment "a protective factor or intervention that reduces the risk or severity of symptom or state"@en .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#occursDuring
+krr_project:occursDuring rdf:type owl:ObjectProperty ;
+                         rdfs:subPropertyOf owl:topObjectProperty ;
+                         rdfs:domain krr_project:Event ,
+                                     krr_project:Stressor ,
+                                     krr_project:Trigger ;
+                         rdfs:range krr_project:Time_Period ;
+                         rdfs:comment "indicates time period during which event,stressor or trigger occurs."@en .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#occursInEnvironment
+krr_project:occursInEnvironment rdf:type owl:ObjectProperty ;
+                                rdfs:subPropertyOf owl:topObjectProperty ;
+                                rdfs:domain krr_project:Event ,
+                                            krr_project:Stressor ;
+                                rdfs:range krr_project:Environment ;
+                                rdfs:comment "the environment where the event or stressor occurs"@en .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#recommendIntervention
+krr_project:recommendIntervention rdf:type owl:ObjectProperty ;
+                                  rdfs:subPropertyOf owl:topObjectProperty ;
+                                  rdfs:domain krr_project:Mental_State ,
+                                              krr_project:Risk_Level ,
+                                              krr_project:Symptom ;
+                                  rdfs:range krr_project:Intervention ;
+                                  rdfs:comment "intervention recommended for current mental state, risk or symptom of an individual"@en .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#triggeredBy
+krr_project:triggeredBy rdf:type owl:ObjectProperty ;
+                        rdfs:domain krr_project:Agent ;
+                        rdfs:range krr_project:Trigger ;
+                        rdfs:comment "student attributes stress/emption to a trigger"@en .
+
+
+#################################################################
+#    Data properties
+#################################################################
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#ageAtOccurrence
+krr_project:ageAtOccurrence rdf:type owl:DatatypeProperty ;
+                            rdfs:subPropertyOf owl:topDataProperty ;
+                            rdfs:domain krr_project:Event ,
+                                        krr_project:Stressor ,
+                                        krr_project:Trigger ;
+                            rdfs:range xsd:integer ;
+                            rdfs:comment "age of the student when the event,stressor or trigger occurred"@en .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#confidenceScore
+krr_project:confidenceScore rdf:type owl:DatatypeProperty ;
+                            rdfs:subPropertyOf owl:topDataProperty ;
+                            rdfs:domain krr_project:Behavior_Pattern ,
+                                        krr_project:Emotion ,
+                                        krr_project:Symptom ,
+                                        krr_project:Trigger ;
+                            rdfs:range xsd:decimal ;
+                            rdfs:comment "nlp extraction confidence (0-1)"@en .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#durationDays
+krr_project:durationDays rdf:type owl:DatatypeProperty ;
+                         rdfs:subPropertyOf owl:topDataProperty ;
+                         rdfs:domain krr_project:Behavior_Pattern ,
+                                     krr_project:Event ,
+                                     krr_project:Symptom ;
+                         rdfs:range xsd:integer ;
+                         rdfs:comment "how long symptom,event,stressor, behavior  lasted"@en .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#hasEffectivenessScore
+krr_project:hasEffectivenessScore rdf:type owl:DatatypeProperty ;
+                                  rdfs:subPropertyOf owl:topDataProperty ;
+                                  rdfs:domain krr_project:Intervention ,
+                                              krr_project:Protective_Factor ;
+                                  rdfs:range xsd:decimal ;
+                                  rdfs:comment "expected or observed effectiveness of the intervention or protective factor"@en .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#hasEndDate
+krr_project:hasEndDate rdf:type owl:DatatypeProperty ;
+                       rdfs:subPropertyOf owl:topDataProperty ;
+                       rdfs:domain krr_project:Event ,
+                                   krr_project:Intervention ,
+                                   krr_project:Stressor ,
+                                   krr_project:Trigger ;
+                       rdfs:range xsd:dateTime ;
+                       rdfs:comment "the date/time when the event,stressor,trigger or intervention ended"@en .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#hasFrequency
+krr_project:hasFrequency rdf:type owl:DatatypeProperty ;
+                         rdfs:subPropertyOf owl:topDataProperty ;
+                         rdfs:domain krr_project:Behavior_Pattern ,
+                                     krr_project:Stressor ,
+                                     krr_project:Trigger ;
+                         rdfs:range xsd:string ;
+                         rdfs:comment "how often the stressor,trigger or behavior pattern occurs"@en .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#hasImpactScore
+krr_project:hasImpactScore rdf:type owl:DatatypeProperty ;
+                           rdfs:subPropertyOf owl:topDataProperty ;
+                           rdfs:domain krr_project:Event ,
+                                       krr_project:Risk_Factor ,
+                                       krr_project:Stressor ;
+                           rdfs:range xsd:decimal ;
+                           rdfs:comment "numerical impact of the event or factor on student's well-being"@en .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#hasIntensity
+krr_project:hasIntensity rdf:type owl:DatatypeProperty ;
+                         rdfs:subPropertyOf owl:topDataProperty ;
+                         rdfs:domain krr_project:Emotion ,
+                                     krr_project:Symptom ;
+                         rdfs:range xsd:integer ;
+                         rdfs:comment "intensity level of emotion,stressor or symptom"@en .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#hasNotes
+krr_project:hasNotes rdf:type owl:DatatypeProperty ;
+                     rdfs:subPropertyOf owl:topDataProperty ;
+                     rdfs:domain krr_project:Intervention ,
+                                 krr_project:Mental_State ,
+                                 krr_project:Risk_Level ;
+                     rdfs:range xsd:string ;
+                     rdfs:comment "additional notes from counselors/assessments."@en .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#hasPriority
+krr_project:hasPriority rdf:type owl:DatatypeProperty ;
+                        rdfs:subPropertyOf owl:topDataProperty ;
+                        rdfs:domain krr_project:Intervention ;
+                        rdfs:range xsd:string ;
+                        rdfs:comment "priority level for recommending the intervention"@en .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#hasStartDate
+krr_project:hasStartDate rdf:type owl:DatatypeProperty ;
+                         rdfs:subPropertyOf owl:topDataProperty ;
+                         rdfs:domain krr_project:Event ,
+                                     krr_project:Intervention ,
+                                     krr_project:Stressor ,
+                                     krr_project:Trigger ;
+                         rdfs:range xsd:dateTime ;
+                         rdfs:comment "the date/time when the event, stressor, trigger or intervention began"@en .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#lastObserved
+krr_project:lastObserved rdf:type owl:DatatypeProperty ;
+                         rdfs:subPropertyOf owl:topDataProperty ;
+                         rdfs:domain krr_project:Event ;
+                         rdfs:range xsd:dateTime ;
+                         rdfs:comment "when was the event last observed"@en .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#occurenceCount
+krr_project:occurenceCount rdf:type owl:DatatypeProperty ;
+                           rdfs:subPropertyOf owl:topDataProperty ;
+                           rdfs:domain krr_project:Behavior_Pattern ,
+                                       krr_project:Symptom ;
+                           rdfs:range xsd:integer ;
+                           rdfs:comment "how often observed in session"@en .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#riskScore
+krr_project:riskScore rdf:type owl:DatatypeProperty ;
+                      rdfs:domain krr_project:Mental_State ;
+                      rdfs:range xsd:float ;
+                      rdfs:comment "what is the risk score of condition"@en .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#severityScore
+krr_project:severityScore rdf:type owl:DatatypeProperty ;
+                          rdfs:subPropertyOf owl:topDataProperty ;
+                          rdfs:domain krr_project:Severity_Level ;
+                          rdfs:range xsd:float ;
+                          rdfs:comment "what is the severity score of the condition"@en .
+
+
+#################################################################
+#    Classes
+#################################################################
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#AcademicEnvironment
+krr_project:AcademicEnvironment rdf:type owl:Class ;
+                                rdfs:subClassOf krr_project:Environment .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#AcademicStress
+krr_project:AcademicStress rdf:type owl:Class ;
+                           rdfs:subClassOf krr_project:Mental_State .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#AcademicStressor
+krr_project:AcademicStressor rdf:type owl:Class ;
+                             rdfs:subClassOf krr_project:Stressor .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Academic_Workload
+krr_project:Academic_Workload rdf:type owl:Class ;
+                              rdfs:subClassOf krr_project:Trigger .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Agent
+krr_project:Agent rdf:type owl:Class ;
+                  rdfs:comment "the student facing mental health challenge."@en .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Anxiety
+krr_project:Anxiety rdf:type owl:Class ;
+                    rdfs:subClassOf krr_project:Emotion ;
+                    owl:disjointWith krr_project:Emotional_Overwhelm ,
+                                     krr_project:Fear ,
+                                     krr_project:Hopelessness ,
+                                     krr_project:Irritability ,
+                                     krr_project:Sadness ,
+                                     krr_project:Stress .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#AnxietyRisk
+krr_project:AnxietyRisk rdf:type owl:Class ;
+                        rdfs:subClassOf krr_project:Mental_State .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Appetite_Change
+krr_project:Appetite_Change rdf:type owl:Class ;
+                            rdfs:subClassOf krr_project:Symptom .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Assignment_Deadline
+krr_project:Assignment_Deadline rdf:type owl:Class ;
+                                rdfs:subClassOf krr_project:Trigger .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Avoidance
+krr_project:Avoidance rdf:type owl:Class ;
+                      rdfs:subClassOf krr_project:Behavior_Pattern .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Behavior_Pattern
+krr_project:Behavior_Pattern rdf:type owl:Class ;
+                             rdfs:comment "a recurring pattern of actions/reactions observed in an individual."@en .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#BreathingExcercise
+krr_project:BreathingExcercise rdf:type owl:Class ;
+                               rdfs:subClassOf krr_project:Intervention .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Breathing_Difficulty
+krr_project:Breathing_Difficulty rdf:type owl:Class ;
+                                 rdfs:subClassOf krr_project:Symptom .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#BurnoutRisk
+krr_project:BurnoutRisk rdf:type owl:Class ;
+                        rdfs:subClassOf krr_project:Mental_State .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#ChronicSleepDeprivation
+krr_project:ChronicSleepDeprivation rdf:type owl:Class ;
+                                    rdfs:subClassOf krr_project:Risk_Factor .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#ConflictEvent
+krr_project:ConflictEvent rdf:type owl:Class ;
+                          rdfs:subClassOf krr_project:Event .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#ConsultCounselor
+krr_project:ConsultCounselor rdf:type owl:Class ;
+                             rdfs:subClassOf krr_project:Intervention .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#CopingSkills
+krr_project:CopingSkills rdf:type owl:Class ;
+                         rdfs:subClassOf krr_project:Protective_Factor .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#CounsellingAccess
+krr_project:CounsellingAccess rdf:type owl:Class ;
+                              rdfs:subClassOf krr_project:Protective_Factor .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#DeadlineEvent
+krr_project:DeadlineEvent rdf:type owl:Class ;
+                          rdfs:subClassOf krr_project:Event .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#DepressiveSpectrum
+krr_project:DepressiveSpectrum rdf:type owl:Class ;
+                               rdfs:subClassOf krr_project:Mental_State .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Difficulty_Concentrating
+krr_project:Difficulty_Concentrating rdf:type owl:Class ;
+                                     rdfs:subClassOf krr_project:Symptom .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Emotion
+krr_project:Emotion rdf:type owl:Class ;
+                    rdfs:comment "pyschological state or feeling experienced by an individual"@en .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Emotional_Overwhelm
+krr_project:Emotional_Overwhelm rdf:type owl:Class ;
+                                rdfs:subClassOf krr_project:Emotion .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Environment
+krr_project:Environment rdf:type owl:Class ;
+                        rdfs:comment "The physical,social or cultural context surrounding an individual."@en .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Event
+krr_project:Event rdf:type owl:Class ;
+                  rdfs:comment "a discrete occurence or incident in an individual's life."@en .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#ExamEvent
+krr_project:ExamEvent rdf:type owl:Class ;
+                      rdfs:subClassOf krr_project:Event .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#ExamPhase
+krr_project:ExamPhase rdf:type owl:Class ;
+                      rdfs:subClassOf krr_project:Time_Period ;
+                      owl:disjointWith krr_project:ProlongPeriod ,
+                                       krr_project:Semester ,
+                                       krr_project:ShortTerm .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#ExamStressor
+krr_project:ExamStressor rdf:type owl:Class ;
+                         rdfs:subClassOf krr_project:AcademicStressor .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Exam_Pressure
+krr_project:Exam_Pressure rdf:type owl:Class ;
+                          rdfs:subClassOf krr_project:Trigger .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Excessive_Screen_Use
+krr_project:Excessive_Screen_Use rdf:type owl:Class ;
+                                 rdfs:subClassOf krr_project:Behavior_Pattern .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#FamilyConflict
+krr_project:FamilyConflict rdf:type owl:Class ;
+                           rdfs:subClassOf krr_project:FamilyStressor .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#FamilyStressor
+krr_project:FamilyStressor rdf:type owl:Class ;
+                           rdfs:subClassOf krr_project:Stressor .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Family_Pressure
+krr_project:Family_Pressure rdf:type owl:Class ;
+                            rdfs:subClassOf krr_project:Trigger .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Fatigue
+krr_project:Fatigue rdf:type owl:Class ;
+                    rdfs:subClassOf krr_project:Symptom .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Fear
+krr_project:Fear rdf:type owl:Class ;
+                 rdfs:subClassOf krr_project:Emotion .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#FinancialInstability
+krr_project:FinancialInstability rdf:type owl:Class ;
+                                 rdfs:subClassOf krr_project:FamilyStressor .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Financial_Concern
+krr_project:Financial_Concern rdf:type owl:Class ;
+                              rdfs:subClassOf krr_project:Trigger .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#GroundingTechinique
+krr_project:GroundingTechinique rdf:type owl:Class ;
+                                rdfs:subClassOf krr_project:Intervention .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Headache
+krr_project:Headache rdf:type owl:Class ;
+                     rdfs:subClassOf krr_project:Symptom .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#HealthyRoutine
+krr_project:HealthyRoutine rdf:type owl:Class ;
+                           rdfs:subClassOf krr_project:Protective_Factor .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#HighAcademicLoad
+krr_project:HighAcademicLoad rdf:type owl:Class ;
+                             rdfs:subClassOf krr_project:Risk_Factor .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#HighRisk
+krr_project:HighRisk rdf:type owl:Class ;
+                     rdfs:subClassOf krr_project:Risk_Level ;
+                     owl:disjointWith krr_project:LowRisk ,
+                                      krr_project:ModerateRisk .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#HomeEnvironment
+krr_project:HomeEnvironment rdf:type owl:Class ;
+                            rdfs:subClassOf krr_project:Environment .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Hopelessness
+krr_project:Hopelessness rdf:type owl:Class ;
+                         rdfs:subClassOf krr_project:Emotion .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Insomnia
+krr_project:Insomnia rdf:type owl:Class ;
+                     rdfs:subClassOf krr_project:Symptom .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Intervention
+krr_project:Intervention rdf:type owl:Class ;
+                         rdfs:comment "a planned action or strategy aimed at reducing the impact of adverse experiences, supporting recovery, or preventing negative health outcomes."@en .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Irreugular_Sleep_Routine
+krr_project:Irreugular_Sleep_Routine rdf:type owl:Class ;
+                                     rdfs:subClassOf krr_project:Behavior_Pattern .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Irritability
+krr_project:Irritability rdf:type owl:Class ;
+                         rdfs:subClassOf krr_project:Emotion .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Isolation
+krr_project:Isolation rdf:type owl:Class ;
+                      rdfs:subClassOf krr_project:Behavior_Pattern .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Journaling
+krr_project:Journaling rdf:type owl:Class ;
+                       rdfs:subClassOf krr_project:Intervention .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Loss_Of_Interest
+krr_project:Loss_Of_Interest rdf:type owl:Class ;
+                             rdfs:subClassOf krr_project:Symptom .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#LowRisk
+krr_project:LowRisk rdf:type owl:Class ;
+                    rdfs:subClassOf krr_project:Risk_Level .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Mental_State
+krr_project:Mental_State rdf:type owl:Class ;
+                         rdfs:comment "a temporary or persistent psychological state of an individual"@en .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Mild
+krr_project:Mild rdf:type owl:Class ;
+                 rdfs:subClassOf krr_project:Severity_Level ;
+                 owl:disjointWith krr_project:Moderate ,
+                                  krr_project:Severe .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Moderate
+krr_project:Moderate rdf:type owl:Class ;
+                     rdfs:subClassOf krr_project:Severity_Level .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#ModerateRisk
+krr_project:ModerateRisk rdf:type owl:Class ;
+                         rdfs:subClassOf krr_project:Risk_Level .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#PanicRisk
+krr_project:PanicRisk rdf:type owl:Class ;
+                      rdfs:subClassOf krr_project:Mental_State .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#PeerComparison
+krr_project:PeerComparison rdf:type owl:Class ;
+                           rdfs:subClassOf krr_project:SocialStressor .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#PerformancePressure
+krr_project:PerformancePressure rdf:type owl:Class ;
+                                rdfs:subClassOf krr_project:AcademicStressor .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#PhysicalActivity
+krr_project:PhysicalActivity rdf:type owl:Class ;
+                             rdfs:subClassOf krr_project:Intervention .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#PoorCopingSkills
+krr_project:PoorCopingSkills rdf:type owl:Class ;
+                             rdfs:subClassOf krr_project:Risk_Factor .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Poor_Grades
+krr_project:Poor_Grades rdf:type owl:Class ;
+                        rdfs:subClassOf krr_project:Trigger .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Procrastination
+krr_project:Procrastination rdf:type owl:Class ;
+                            rdfs:subClassOf krr_project:Behavior_Pattern .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#ProlongPeriod
+krr_project:ProlongPeriod rdf:type owl:Class ;
+                          rdfs:subClassOf krr_project:Time_Period .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Protective_Factor
+krr_project:Protective_Factor rdf:type owl:Class ;
+                              rdfs:comment "a characterstic, resource or condition that reduces the likelihood of negative outcomes despite exposure to adversity."@en .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Rapid_Heart_Rate
+krr_project:Rapid_Heart_Rate rdf:type owl:Class ;
+                             rdfs:subClassOf krr_project:Symptom .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Reduced_Participation
+krr_project:Reduced_Participation rdf:type owl:Class ;
+                                  rdfs:subClassOf krr_project:Behavior_Pattern .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#RepeatedStressExposure
+krr_project:RepeatedStressExposure rdf:type owl:Class ;
+                                   rdfs:subClassOf krr_project:Risk_Factor .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Restlessness
+krr_project:Restlessness rdf:type owl:Class ;
+                         rdfs:subClassOf krr_project:Symptom .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Risk_Factor
+krr_project:Risk_Factor rdf:type owl:Class ;
+                        rdfs:comment "a characterstic, condition or exposure that increases the probability of negative outcomes."@en .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Risk_Level
+krr_project:Risk_Level rdf:type owl:Class ;
+                       rdfs:comment "a qualitative ir quantitative assessment of the likelihood or severity of negative outcomes."@en .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Sadness
+krr_project:Sadness rdf:type owl:Class ;
+                    rdfs:subClassOf krr_project:Emotion .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Semester
+krr_project:Semester rdf:type owl:Class ;
+                     rdfs:subClassOf krr_project:Time_Period .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Severe
+krr_project:Severe rdf:type owl:Class ;
+                   rdfs:subClassOf krr_project:Severity_Level .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Severity_Level
+krr_project:Severity_Level rdf:type owl:Class ;
+                           rdfs:comment "a measure of intensity or impact of an adverse experience."@en .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#ShortTerm
+krr_project:ShortTerm rdf:type owl:Class ;
+                      rdfs:subClassOf krr_project:Time_Period .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#SleepHygiene
+krr_project:SleepHygiene rdf:type owl:Class ;
+                         rdfs:subClassOf krr_project:Intervention .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#SocialEnvironment
+krr_project:SocialEnvironment rdf:type owl:Class ;
+                              rdfs:subClassOf krr_project:Environment .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#SocialExposureEvent
+krr_project:SocialExposureEvent rdf:type owl:Class ;
+                                rdfs:subClassOf krr_project:Event .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#SocialISolationRisk
+krr_project:SocialISolationRisk rdf:type owl:Class ;
+                                rdfs:subClassOf krr_project:Risk_Factor .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#SocialIsolation
+krr_project:SocialIsolation rdf:type owl:Class ;
+                            rdfs:subClassOf krr_project:SocialStressor .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#SocialStressor
+krr_project:SocialStressor rdf:type owl:Class ;
+                           rdfs:subClassOf krr_project:Stressor .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#SocialSupport
+krr_project:SocialSupport rdf:type owl:Class ;
+                          rdfs:subClassOf krr_project:Protective_Factor .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Social_Withdrawal
+krr_project:Social_Withdrawal rdf:type owl:Class ;
+                              rdfs:subClassOf krr_project:Symptom .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Stress
+krr_project:Stress rdf:type owl:Class ;
+                   rdfs:subClassOf krr_project:Emotion .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#StressEvent
+krr_project:StressEvent rdf:type owl:Class ;
+                        rdfs:subClassOf krr_project:Event .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Stressor
+krr_project:Stressor rdf:type owl:Class ;
+                     rdfs:comment "an external event or condition that causes stress or strain in an individual."@en .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Student
+krr_project:Student rdf:type owl:Class ;
+                    rdfs:subClassOf krr_project:Agent .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Symptom
+krr_project:Symptom rdf:type owl:Class ;
+                    rdfs:comment "observable manifestation of a mental or physucal health condition."@en .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#TimeManagement
+krr_project:TimeManagement rdf:type owl:Class ;
+                           rdfs:subClassOf krr_project:Intervention .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#TimeManagementSkills
+krr_project:TimeManagementSkills rdf:type owl:Class ;
+                                 rdfs:subClassOf krr_project:Protective_Factor .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Time_Period
+krr_project:Time_Period rdf:type owl:Class ;
+                        rdfs:comment "A specific interval or phase in an individual's life."@en .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Trigger
+krr_project:Trigger rdf:type owl:Class ;
+                    rdfs:comment "an event or stimulus that elicits a negative emotional/behavioral response."@en .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#WorkloadStressor
+krr_project:WorkloadStressor rdf:type owl:Class ;
+                             rdfs:subClassOf krr_project:AcademicStressor .
+
+
+#################################################################
+#    Individuals
+#################################################################
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#emotion_anxiety_01
+krr_project:emotion_anxiety_01 rdf:type owl:NamedIndividual ,
+                                        krr_project:Anxiety ;
+                               krr_project:confidenceScore 0.85 .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#event_exam_01
+krr_project:event_exam_01 rdf:type owl:NamedIndividual ,
+                                   krr_project:ExamEvent ;
+                          krr_project:occursDuring krr_project:time_examphase_01 .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#stressor_academic_01
+krr_project:stressor_academic_01 rdf:type owl:NamedIndividual ,
+                                          krr_project:AcademicStressor ;
+                                 krr_project:manifestAsEvent krr_project:event_exam_01 ;
+                                 krr_project:hasImpactScore 0.7 .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#student_001
+krr_project:student_001 rdf:type owl:NamedIndividual ,
+                                 krr_project:Student ;
+                        krr_project:experiencesEmotion krr_project:emotion_anxiety_01 ;
+                        krr_project:hasSymptom krr_project:symptom_insomnia_01 ;
+                        krr_project:triggeredBy krr_project:trigger_exampressure_01 .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#symptom_insomnia_01
+krr_project:symptom_insomnia_01 rdf:type owl:NamedIndividual ,
+                                         krr_project:Insomnia ;
+                                krr_project:durationDays 10 ;
+                                krr_project:hasIntensity 3 .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#time_examphase_01
+krr_project:time_examphase_01 rdf:type owl:NamedIndividual ,
+                                       krr_project:ExamPhase .
+
+
+###  http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#trigger_exampressure_01
+krr_project:trigger_exampressure_01 rdf:type owl:NamedIndividual ,
+                                             krr_project:Exam_Pressure ;
+                                    krr_project:mapsToStressor krr_project:stressor_academic_01 .
+
+
+###  Generated by the OWL API (version 4.5.29.2024-05-13T12:11:03Z) https://github.com/owlcs/owlapi

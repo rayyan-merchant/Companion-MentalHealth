@@ -1,0 +1,109 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-slate-text leading-7;
+  }
+
+  h1 {
+    @apply text-3xl font-semibold text-slate-header;
+  }
+
+  h2 {
+    @apply text-xl font-semibold text-slate-header;
+  }
+
+  h3 {
+    @apply text-lg font-medium text-slate-header;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply px-6 py-3 bg-primary text-white font-medium rounded-xl
+           hover:bg-primary-dark transition-colors duration-200
+           focus:outline-none focus:ring-2 focus:ring-primary/50;
+  }
+
+  .btn-secondary {
+    @apply px-4 py-2 bg-secondary/10 text-secondary-dark font-medium rounded-lg
+           hover:bg-secondary/20 transition-colors duration-200
+           focus:outline-none focus:ring-2 focus:ring-secondary/50;
+  }
+
+  .card {
+    @apply bg-card rounded-2xl shadow-soft p-6;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-3 bg-background border border-gray-200 rounded-xl
+           focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary
+           transition-all duration-200;
+  }
+
+  .nav-link {
+    @apply flex items-center gap-3 px-4 py-3 rounded-xl text-slate-text/70
+           hover:bg-primary/10 hover:text-primary transition-colors duration-200;
+  }
+
+  .nav-link.active {
+    @apply bg-primary/10 text-primary font-medium;
+  }
+
+  .message-bubble {
+    @apply max-w-[80%] px-4 py-3 rounded-2xl animate-slide-up;
+  }
+
+  .message-bubble.user {
+    @apply bg-primary text-white ml-auto rounded-br-md;
+  }
+
+  .message-bubble.bot {
+    @apply bg-card shadow-soft mr-auto rounded-bl-md;
+  }
+
+  .chip {
+    @apply inline-flex items-center px-3 py-1.5 bg-gray-100 text-sm rounded-full
+           hover:bg-primary/10 hover:text-primary cursor-pointer transition-colors duration-200;
+  }
+
+  .confidence-badge {
+    @apply inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full;
+  }
+
+  .confidence-badge.high {
+    @apply bg-secondary/20 text-secondary-dark;
+  }
+
+  .confidence-badge.medium {
+    @apply bg-warning/50 text-amber-700;
+  }
+
+  .confidence-badge.low {
+    @apply bg-error/10 text-error;
+  }
+}
+
+@layer utilities {
+  .typing-indicator {
+    @apply flex gap-1 items-center px-4 py-3;
+  }
+
+  .typing-indicator span {
+    @apply w-2 h-2 bg-slate-text/40 rounded-full animate-pulse-soft;
+  }
+
+  .typing-indicator span:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+
+  .typing-indicator span:nth-child(3) {
+    animation-delay: 0.4s;
+  }
+}

@@ -1,0 +1,1181 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns="http://www.semanticweb.org/mental_health/swrl_rules#"
+     xml:base="http://www.semanticweb.org/mental_health/swrl_rules"
+     xmlns:krr="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:swrl="http://www.w3.org/2003/11/swrl#"
+     xmlns:swrlb="http://www.w3.org/2003/11/swrlb#">
+    <owl:Ontology rdf:about="http://www.semanticweb.org/mental_health/swrl_rules">
+        <owl:imports rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project"/>
+        <rdfs:comment>Implements symbolic inference from observed evidence to mental/risk states</rdfs:comment>
+        <rdfs:comment>SWRL Rules for Mental Health KRR System - Phase 2</rdfs:comment>
+    </owl:Ontology>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Individuals
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#e -->
+
+    <owl:NamedIndividual rdf:about="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#e"/>
+    
+
+
+    <!-- file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#rf -->
+
+    <owl:NamedIndividual rdf:about="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#rf"/>
+    
+
+
+    <!-- file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#rf1 -->
+
+    <owl:NamedIndividual rdf:about="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#rf1"/>
+    
+
+
+    <!-- file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#rf2 -->
+
+    <owl:NamedIndividual rdf:about="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#rf2"/>
+    
+
+
+    <!-- file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#s -->
+
+    <owl:NamedIndividual rdf:about="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#s"/>
+    
+
+
+    <!-- file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#sym -->
+
+    <owl:NamedIndividual rdf:about="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#sym"/>
+    
+
+
+    <!-- file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#sym1 -->
+
+    <owl:NamedIndividual rdf:about="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#sym1"/>
+    
+
+
+    <!-- file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#sym2 -->
+
+    <owl:NamedIndividual rdf:about="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#sym2"/>
+    
+
+
+    <!-- file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#t -->
+
+    <owl:NamedIndividual rdf:about="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#t"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Rules
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    <rdf:Description>
+        <rdfs:comment>Purpose: Detect long-term overload patterns (chronic exposure, not intensity)</rdfs:comment>
+        <rdfs:comment>Rule ID: R_BRN_01 - Burnout Risk</rdfs:comment>
+        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#Imp"/>
+        <swrl:body>
+            <rdf:Description>
+                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                <rdf:first>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                        <swrl:classPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Student"/>
+                        <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#s"/>
+                    </rdf:Description>
+                </rdf:first>
+                <rdf:rest>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                        <rdf:first>
+                            <rdf:Description>
+                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
+                                <swrl:propertyPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#experiencesEmotion"/>
+                                <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#s"/>
+                                <swrl:argument2 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#e"/>
+                            </rdf:Description>
+                        </rdf:first>
+                        <rdf:rest>
+                            <rdf:Description>
+                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                <rdf:first>
+                                    <rdf:Description>
+                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                                        <swrl:classPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Emotional_Overwhelm"/>
+                                        <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#e"/>
+                                    </rdf:Description>
+                                </rdf:first>
+                                <rdf:rest>
+                                    <rdf:Description>
+                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                        <rdf:first>
+                                            <rdf:Description>
+                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
+                                                <swrl:propertyPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#triggeredBy"/>
+                                                <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#s"/>
+                                                <swrl:argument2 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#t"/>
+                                            </rdf:Description>
+                                        </rdf:first>
+                                        <rdf:rest>
+                                            <rdf:Description>
+                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                                <rdf:first>
+                                                    <rdf:Description>
+                                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                                                        <swrl:classPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Academic_Workload"/>
+                                                        <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#t"/>
+                                                    </rdf:Description>
+                                                </rdf:first>
+                                                <rdf:rest>
+                                                    <rdf:Description>
+                                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                                        <rdf:first>
+                                                            <rdf:Description>
+                                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
+                                                                <swrl:propertyPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#hasRiskFactor"/>
+                                                                <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#s"/>
+                                                                <swrl:argument2 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#rf"/>
+                                                            </rdf:Description>
+                                                        </rdf:first>
+                                                        <rdf:rest>
+                                                            <rdf:Description>
+                                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                                                <rdf:first>
+                                                                    <rdf:Description>
+                                                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                                                                        <swrl:classPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#RepeatedStressExposure"/>
+                                                                        <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#rf"/>
+                                                                    </rdf:Description>
+                                                                </rdf:first>
+                                                                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                                            </rdf:Description>
+                                                        </rdf:rest>
+                                                    </rdf:Description>
+                                                </rdf:rest>
+                                            </rdf:Description>
+                                        </rdf:rest>
+                                    </rdf:Description>
+                                </rdf:rest>
+                            </rdf:Description>
+                        </rdf:rest>
+                    </rdf:Description>
+                </rdf:rest>
+            </rdf:Description>
+        </swrl:body>
+        <swrl:head>
+            <rdf:Description>
+                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                <rdf:first>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                        <swrl:classPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#BurnoutRisk"/>
+                        <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#s"/>
+                    </rdf:Description>
+                </rdf:first>
+                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+            </rdf:Description>
+        </swrl:head>
+    </rdf:Description>
+    <rdf:Description>
+        <rdfs:comment>Purpose: Detect anxiety emerging from sleep disruption + academic pressure</rdfs:comment>
+        <rdfs:comment>Rule ID: R_ANX_01 - Anxiety Risk</rdfs:comment>
+        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#Imp"/>
+        <swrl:body>
+            <rdf:Description>
+                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                <rdf:first>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                        <swrl:classPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Student"/>
+                        <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#s"/>
+                    </rdf:Description>
+                </rdf:first>
+                <rdf:rest>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                        <rdf:first>
+                            <rdf:Description>
+                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
+                                <swrl:propertyPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#experiencesEmotion"/>
+                                <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#s"/>
+                                <swrl:argument2 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#e"/>
+                            </rdf:Description>
+                        </rdf:first>
+                        <rdf:rest>
+                            <rdf:Description>
+                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                <rdf:first>
+                                    <rdf:Description>
+                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                                        <swrl:classPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Stress"/>
+                                        <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#e"/>
+                                    </rdf:Description>
+                                </rdf:first>
+                                <rdf:rest>
+                                    <rdf:Description>
+                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                        <rdf:first>
+                                            <rdf:Description>
+                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
+                                                <swrl:propertyPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#hasSymptom"/>
+                                                <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#s"/>
+                                                <swrl:argument2 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#sym"/>
+                                            </rdf:Description>
+                                        </rdf:first>
+                                        <rdf:rest>
+                                            <rdf:Description>
+                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                                <rdf:first>
+                                                    <rdf:Description>
+                                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                                                        <swrl:classPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Insomnia"/>
+                                                        <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#sym"/>
+                                                    </rdf:Description>
+                                                </rdf:first>
+                                                <rdf:rest>
+                                                    <rdf:Description>
+                                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                                        <rdf:first>
+                                                            <rdf:Description>
+                                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
+                                                                <swrl:propertyPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#triggeredBy"/>
+                                                                <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#s"/>
+                                                                <swrl:argument2 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#t"/>
+                                                            </rdf:Description>
+                                                        </rdf:first>
+                                                        <rdf:rest>
+                                                            <rdf:Description>
+                                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                                                <rdf:first>
+                                                                    <rdf:Description>
+                                                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                                                                        <swrl:classPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Exam_Pressure"/>
+                                                                        <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#t"/>
+                                                                    </rdf:Description>
+                                                                </rdf:first>
+                                                                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                                            </rdf:Description>
+                                                        </rdf:rest>
+                                                    </rdf:Description>
+                                                </rdf:rest>
+                                            </rdf:Description>
+                                        </rdf:rest>
+                                    </rdf:Description>
+                                </rdf:rest>
+                            </rdf:Description>
+                        </rdf:rest>
+                    </rdf:Description>
+                </rdf:rest>
+            </rdf:Description>
+        </swrl:body>
+        <swrl:head>
+            <rdf:Description>
+                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                <rdf:first>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                        <swrl:classPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#AnxietyRisk"/>
+                        <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#s"/>
+                    </rdf:Description>
+                </rdf:first>
+                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+            </rdf:Description>
+        </swrl:head>
+    </rdf:Description>
+    <rdf:Description>
+        <rdfs:comment>Purpose: Detect academic-context stress patterns with exam triggers</rdfs:comment>
+        <rdfs:comment>Rule ID: R_ACS_01a - Academic Stress (ExamStressor)</rdfs:comment>
+        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#Imp"/>
+        <swrl:body>
+            <rdf:Description>
+                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                <rdf:first>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                        <swrl:classPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Student"/>
+                        <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#s"/>
+                    </rdf:Description>
+                </rdf:first>
+                <rdf:rest>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                        <rdf:first>
+                            <rdf:Description>
+                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
+                                <swrl:propertyPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#experiencesEmotion"/>
+                                <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#s"/>
+                                <swrl:argument2 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#e"/>
+                            </rdf:Description>
+                        </rdf:first>
+                        <rdf:rest>
+                            <rdf:Description>
+                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                <rdf:first>
+                                    <rdf:Description>
+                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                                        <swrl:classPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Stress"/>
+                                        <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#e"/>
+                                    </rdf:Description>
+                                </rdf:first>
+                                <rdf:rest>
+                                    <rdf:Description>
+                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                        <rdf:first>
+                                            <rdf:Description>
+                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
+                                                <swrl:propertyPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#triggeredBy"/>
+                                                <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#s"/>
+                                                <swrl:argument2 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#t"/>
+                                            </rdf:Description>
+                                        </rdf:first>
+                                        <rdf:rest>
+                                            <rdf:Description>
+                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                                <rdf:first>
+                                                    <rdf:Description>
+                                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                                                        <swrl:classPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Exam_Pressure"/>
+                                                        <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#t"/>
+                                                    </rdf:Description>
+                                                </rdf:first>
+                                                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                            </rdf:Description>
+                                        </rdf:rest>
+                                    </rdf:Description>
+                                </rdf:rest>
+                            </rdf:Description>
+                        </rdf:rest>
+                    </rdf:Description>
+                </rdf:rest>
+            </rdf:Description>
+        </swrl:body>
+        <swrl:head>
+            <rdf:Description>
+                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                <rdf:first>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                        <swrl:classPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#AcademicStress"/>
+                        <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#s"/>
+                    </rdf:Description>
+                </rdf:first>
+                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+            </rdf:Description>
+        </swrl:head>
+    </rdf:Description>
+    <rdf:Description>
+        <rdfs:comment>Purpose: Capture physical + emotional depletion leading to burnout</rdfs:comment>
+        <rdfs:comment>Rule ID: R_BRN_02 - Burnout Risk (Physical + Emotional)</rdfs:comment>
+        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#Imp"/>
+        <swrl:body>
+            <rdf:Description>
+                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                <rdf:first>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                        <swrl:classPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Student"/>
+                        <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#s"/>
+                    </rdf:Description>
+                </rdf:first>
+                <rdf:rest>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                        <rdf:first>
+                            <rdf:Description>
+                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
+                                <swrl:propertyPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#experiencesEmotion"/>
+                                <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#s"/>
+                                <swrl:argument2 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#e"/>
+                            </rdf:Description>
+                        </rdf:first>
+                        <rdf:rest>
+                            <rdf:Description>
+                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                <rdf:first>
+                                    <rdf:Description>
+                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                                        <swrl:classPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Stress"/>
+                                        <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#e"/>
+                                    </rdf:Description>
+                                </rdf:first>
+                                <rdf:rest>
+                                    <rdf:Description>
+                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                        <rdf:first>
+                                            <rdf:Description>
+                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
+                                                <swrl:propertyPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#hasSymptom"/>
+                                                <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#s"/>
+                                                <swrl:argument2 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#sym"/>
+                                            </rdf:Description>
+                                        </rdf:first>
+                                        <rdf:rest>
+                                            <rdf:Description>
+                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                                <rdf:first>
+                                                    <rdf:Description>
+                                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                                                        <swrl:classPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Fatigue"/>
+                                                        <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#sym"/>
+                                                    </rdf:Description>
+                                                </rdf:first>
+                                                <rdf:rest>
+                                                    <rdf:Description>
+                                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                                        <rdf:first>
+                                                            <rdf:Description>
+                                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
+                                                                <swrl:propertyPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#hasRiskFactor"/>
+                                                                <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#s"/>
+                                                                <swrl:argument2 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#rf"/>
+                                                            </rdf:Description>
+                                                        </rdf:first>
+                                                        <rdf:rest>
+                                                            <rdf:Description>
+                                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                                                <rdf:first>
+                                                                    <rdf:Description>
+                                                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                                                                        <swrl:classPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#RepeatedStressExposure"/>
+                                                                        <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#rf"/>
+                                                                    </rdf:Description>
+                                                                </rdf:first>
+                                                                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                                            </rdf:Description>
+                                                        </rdf:rest>
+                                                    </rdf:Description>
+                                                </rdf:rest>
+                                            </rdf:Description>
+                                        </rdf:rest>
+                                    </rdf:Description>
+                                </rdf:rest>
+                            </rdf:Description>
+                        </rdf:rest>
+                    </rdf:Description>
+                </rdf:rest>
+            </rdf:Description>
+        </swrl:body>
+        <swrl:head>
+            <rdf:Description>
+                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                <rdf:first>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                        <swrl:classPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#BurnoutRisk"/>
+                        <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#s"/>
+                    </rdf:Description>
+                </rdf:first>
+                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+            </rdf:Description>
+        </swrl:head>
+    </rdf:Description>
+    <rdf:Description>
+        <rdfs:comment>Purpose: Identify behavioral + physiological convergence patterns</rdfs:comment>
+        <rdfs:comment>Rule ID: R_DEP_02 - Depressive Spectrum (Behavioral + Physiological)</rdfs:comment>
+        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#Imp"/>
+        <swrl:body>
+            <rdf:Description>
+                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                <rdf:first>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                        <swrl:classPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Student"/>
+                        <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#s"/>
+                    </rdf:Description>
+                </rdf:first>
+                <rdf:rest>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                        <rdf:first>
+                            <rdf:Description>
+                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
+                                <swrl:propertyPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#hasSymptom"/>
+                                <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#s"/>
+                                <swrl:argument2 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#sym1"/>
+                            </rdf:Description>
+                        </rdf:first>
+                        <rdf:rest>
+                            <rdf:Description>
+                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                <rdf:first>
+                                    <rdf:Description>
+                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                                        <swrl:classPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Fatigue"/>
+                                        <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#sym1"/>
+                                    </rdf:Description>
+                                </rdf:first>
+                                <rdf:rest>
+                                    <rdf:Description>
+                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                        <rdf:first>
+                                            <rdf:Description>
+                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
+                                                <swrl:propertyPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#hasSymptom"/>
+                                                <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#s"/>
+                                                <swrl:argument2 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#sym2"/>
+                                            </rdf:Description>
+                                        </rdf:first>
+                                        <rdf:rest>
+                                            <rdf:Description>
+                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                                <rdf:first>
+                                                    <rdf:Description>
+                                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                                                        <swrl:classPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Insomnia"/>
+                                                        <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#sym2"/>
+                                                    </rdf:Description>
+                                                </rdf:first>
+                                                <rdf:rest>
+                                                    <rdf:Description>
+                                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                                        <rdf:first>
+                                                            <rdf:Description>
+                                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
+                                                                <swrl:propertyPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#hasRiskFactor"/>
+                                                                <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#s"/>
+                                                                <swrl:argument2 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#rf"/>
+                                                            </rdf:Description>
+                                                        </rdf:first>
+                                                        <rdf:rest>
+                                                            <rdf:Description>
+                                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                                                <rdf:first>
+                                                                    <rdf:Description>
+                                                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                                                                        <swrl:classPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#SocialISolationRisk"/>
+                                                                        <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#rf"/>
+                                                                    </rdf:Description>
+                                                                </rdf:first>
+                                                                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                                            </rdf:Description>
+                                                        </rdf:rest>
+                                                    </rdf:Description>
+                                                </rdf:rest>
+                                            </rdf:Description>
+                                        </rdf:rest>
+                                    </rdf:Description>
+                                </rdf:rest>
+                            </rdf:Description>
+                        </rdf:rest>
+                    </rdf:Description>
+                </rdf:rest>
+            </rdf:Description>
+        </swrl:body>
+        <swrl:head>
+            <rdf:Description>
+                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                <rdf:first>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                        <swrl:classPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#DepressiveSpectrum"/>
+                        <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#s"/>
+                    </rdf:Description>
+                </rdf:first>
+                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+            </rdf:Description>
+        </swrl:head>
+    </rdf:Description>
+    <rdf:Description>
+        <rdfs:comment>Purpose: Flag acute patterns (still non-diagnostic)</rdfs:comment>
+        <rdfs:comment>Rule ID: R_RISK_02 - High Risk</rdfs:comment>
+        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#Imp"/>
+        <swrl:body>
+            <rdf:Description>
+                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                <rdf:first>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                        <swrl:classPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Student"/>
+                        <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#s"/>
+                    </rdf:Description>
+                </rdf:first>
+                <rdf:rest>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                        <rdf:first>
+                            <rdf:Description>
+                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                                <swrl:classPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#PanicRisk"/>
+                                <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#s"/>
+                            </rdf:Description>
+                        </rdf:first>
+                        <rdf:rest>
+                            <rdf:Description>
+                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                <rdf:first>
+                                    <rdf:Description>
+                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
+                                        <swrl:propertyPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#hasRiskFactor"/>
+                                        <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#s"/>
+                                        <swrl:argument2 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#rf"/>
+                                    </rdf:Description>
+                                </rdf:first>
+                                <rdf:rest>
+                                    <rdf:Description>
+                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                        <rdf:first>
+                                            <rdf:Description>
+                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                                                <swrl:classPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#RepeatedStressExposure"/>
+                                                <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#rf"/>
+                                            </rdf:Description>
+                                        </rdf:first>
+                                        <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                    </rdf:Description>
+                                </rdf:rest>
+                            </rdf:Description>
+                        </rdf:rest>
+                    </rdf:Description>
+                </rdf:rest>
+            </rdf:Description>
+        </swrl:body>
+        <swrl:head>
+            <rdf:Description>
+                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                <rdf:first>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                        <swrl:classPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#HighRisk"/>
+                        <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#s"/>
+                    </rdf:Description>
+                </rdf:first>
+                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+            </rdf:Description>
+        </swrl:head>
+    </rdf:Description>
+    <rdf:Description>
+        <rdfs:comment>Purpose: Detect academic-context stress patterns with workload triggers</rdfs:comment>
+        <rdfs:comment>Rule ID: R_ACS_01b - Academic Stress (WorkloadStressor)</rdfs:comment>
+        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#Imp"/>
+        <swrl:body>
+            <rdf:Description>
+                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                <rdf:first>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                        <swrl:classPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Student"/>
+                        <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#s"/>
+                    </rdf:Description>
+                </rdf:first>
+                <rdf:rest>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                        <rdf:first>
+                            <rdf:Description>
+                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
+                                <swrl:propertyPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#experiencesEmotion"/>
+                                <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#s"/>
+                                <swrl:argument2 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#e"/>
+                            </rdf:Description>
+                        </rdf:first>
+                        <rdf:rest>
+                            <rdf:Description>
+                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                <rdf:first>
+                                    <rdf:Description>
+                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                                        <swrl:classPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Stress"/>
+                                        <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#e"/>
+                                    </rdf:Description>
+                                </rdf:first>
+                                <rdf:rest>
+                                    <rdf:Description>
+                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                        <rdf:first>
+                                            <rdf:Description>
+                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
+                                                <swrl:propertyPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#triggeredBy"/>
+                                                <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#s"/>
+                                                <swrl:argument2 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#t"/>
+                                            </rdf:Description>
+                                        </rdf:first>
+                                        <rdf:rest>
+                                            <rdf:Description>
+                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                                <rdf:first>
+                                                    <rdf:Description>
+                                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                                                        <swrl:classPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Academic_Workload"/>
+                                                        <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#t"/>
+                                                    </rdf:Description>
+                                                </rdf:first>
+                                                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                            </rdf:Description>
+                                        </rdf:rest>
+                                    </rdf:Description>
+                                </rdf:rest>
+                            </rdf:Description>
+                        </rdf:rest>
+                    </rdf:Description>
+                </rdf:rest>
+            </rdf:Description>
+        </swrl:body>
+        <swrl:head>
+            <rdf:Description>
+                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                <rdf:first>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                        <swrl:classPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#AcademicStress"/>
+                        <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#s"/>
+                    </rdf:Description>
+                </rdf:first>
+                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+            </rdf:Description>
+        </swrl:head>
+    </rdf:Description>
+    <rdf:Description>
+        <rdfs:comment>Purpose: Detect panic as acute physiological escalation, not generalized anxiety</rdfs:comment>
+        <rdfs:comment>Rule ID: R_PAN_01 - Panic Risk</rdfs:comment>
+        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#Imp"/>
+        <swrl:body>
+            <rdf:Description>
+                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                <rdf:first>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                        <swrl:classPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Student"/>
+                        <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#s"/>
+                    </rdf:Description>
+                </rdf:first>
+                <rdf:rest>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                        <rdf:first>
+                            <rdf:Description>
+                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
+                                <swrl:propertyPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#experiencesEmotion"/>
+                                <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#s"/>
+                                <swrl:argument2 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#e"/>
+                            </rdf:Description>
+                        </rdf:first>
+                        <rdf:rest>
+                            <rdf:Description>
+                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                <rdf:first>
+                                    <rdf:Description>
+                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                                        <swrl:classPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Anxiety"/>
+                                        <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#e"/>
+                                    </rdf:Description>
+                                </rdf:first>
+                                <rdf:rest>
+                                    <rdf:Description>
+                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                        <rdf:first>
+                                            <rdf:Description>
+                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
+                                                <swrl:propertyPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#hasSymptom"/>
+                                                <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#s"/>
+                                                <swrl:argument2 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#sym1"/>
+                                            </rdf:Description>
+                                        </rdf:first>
+                                        <rdf:rest>
+                                            <rdf:Description>
+                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                                <rdf:first>
+                                                    <rdf:Description>
+                                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                                                        <swrl:classPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Rapid_Heart_Rate"/>
+                                                        <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#sym1"/>
+                                                    </rdf:Description>
+                                                </rdf:first>
+                                                <rdf:rest>
+                                                    <rdf:Description>
+                                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                                        <rdf:first>
+                                                            <rdf:Description>
+                                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
+                                                                <swrl:propertyPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#hasSymptom"/>
+                                                                <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#s"/>
+                                                                <swrl:argument2 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#sym2"/>
+                                                            </rdf:Description>
+                                                        </rdf:first>
+                                                        <rdf:rest>
+                                                            <rdf:Description>
+                                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                                                <rdf:first>
+                                                                    <rdf:Description>
+                                                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                                                                        <swrl:classPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Breathing_Difficulty"/>
+                                                                        <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#sym2"/>
+                                                                    </rdf:Description>
+                                                                </rdf:first>
+                                                                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                                            </rdf:Description>
+                                                        </rdf:rest>
+                                                    </rdf:Description>
+                                                </rdf:rest>
+                                            </rdf:Description>
+                                        </rdf:rest>
+                                    </rdf:Description>
+                                </rdf:rest>
+                            </rdf:Description>
+                        </rdf:rest>
+                    </rdf:Description>
+                </rdf:rest>
+            </rdf:Description>
+        </swrl:body>
+        <swrl:head>
+            <rdf:Description>
+                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                <rdf:first>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                        <swrl:classPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#PanicRisk"/>
+                        <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#s"/>
+                    </rdf:Description>
+                </rdf:first>
+                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+            </rdf:Description>
+        </swrl:head>
+    </rdf:Description>
+    <rdf:Description>
+        <rdfs:comment>Purpose: Capture persistence-driven anxiety, not single events</rdfs:comment>
+        <rdfs:comment>Rule ID: R_ANX_02 - Anxiety Risk (Persistence)</rdfs:comment>
+        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#Imp"/>
+        <swrl:body>
+            <rdf:Description>
+                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                <rdf:first>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                        <swrl:classPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Student"/>
+                        <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#s"/>
+                    </rdf:Description>
+                </rdf:first>
+                <rdf:rest>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                        <rdf:first>
+                            <rdf:Description>
+                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
+                                <swrl:propertyPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#experiencesEmotion"/>
+                                <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#s"/>
+                                <swrl:argument2 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#e"/>
+                            </rdf:Description>
+                        </rdf:first>
+                        <rdf:rest>
+                            <rdf:Description>
+                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                <rdf:first>
+                                    <rdf:Description>
+                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                                        <swrl:classPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Anxiety"/>
+                                        <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#e"/>
+                                    </rdf:Description>
+                                </rdf:first>
+                                <rdf:rest>
+                                    <rdf:Description>
+                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                        <rdf:first>
+                                            <rdf:Description>
+                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
+                                                <swrl:propertyPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#hasRiskFactor"/>
+                                                <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#s"/>
+                                                <swrl:argument2 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#rf"/>
+                                            </rdf:Description>
+                                        </rdf:first>
+                                        <rdf:rest>
+                                            <rdf:Description>
+                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                                <rdf:first>
+                                                    <rdf:Description>
+                                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                                                        <swrl:classPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#RepeatedStressExposure"/>
+                                                        <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#rf"/>
+                                                    </rdf:Description>
+                                                </rdf:first>
+                                                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                            </rdf:Description>
+                                        </rdf:rest>
+                                    </rdf:Description>
+                                </rdf:rest>
+                            </rdf:Description>
+                        </rdf:rest>
+                    </rdf:Description>
+                </rdf:rest>
+            </rdf:Description>
+        </swrl:body>
+        <swrl:head>
+            <rdf:Description>
+                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                <rdf:first>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                        <swrl:classPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#AnxietyRisk"/>
+                        <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#s"/>
+                    </rdf:Description>
+                </rdf:first>
+                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+            </rdf:Description>
+        </swrl:head>
+    </rdf:Description>
+    <rdf:Description>
+        <rdfs:comment>Purpose: Expose non-clinical risk stratification for explanations</rdfs:comment>
+        <rdfs:comment>Rule ID: R_RISK_01a - Moderate Risk (AnxietyRisk)</rdfs:comment>
+        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#Imp"/>
+        <swrl:body>
+            <rdf:Description>
+                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                <rdf:first>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                        <swrl:classPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Student"/>
+                        <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#s"/>
+                    </rdf:Description>
+                </rdf:first>
+                <rdf:rest>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                        <rdf:first>
+                            <rdf:Description>
+                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                                <swrl:classPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#AnxietyRisk"/>
+                                <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#s"/>
+                            </rdf:Description>
+                        </rdf:first>
+                        <rdf:rest>
+                            <rdf:Description>
+                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                <rdf:first>
+                                    <rdf:Description>
+                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
+                                        <swrl:propertyPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#hasRiskFactor"/>
+                                        <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#s"/>
+                                        <swrl:argument2 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#rf"/>
+                                    </rdf:Description>
+                                </rdf:first>
+                                <rdf:rest>
+                                    <rdf:Description>
+                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                        <rdf:first>
+                                            <rdf:Description>
+                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                                                <swrl:classPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#RepeatedStressExposure"/>
+                                                <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#rf"/>
+                                            </rdf:Description>
+                                        </rdf:first>
+                                        <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                    </rdf:Description>
+                                </rdf:rest>
+                            </rdf:Description>
+                        </rdf:rest>
+                    </rdf:Description>
+                </rdf:rest>
+            </rdf:Description>
+        </swrl:body>
+        <swrl:head>
+            <rdf:Description>
+                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                <rdf:first>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                        <swrl:classPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#ModerateRisk"/>
+                        <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#s"/>
+                    </rdf:Description>
+                </rdf:first>
+                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+            </rdf:Description>
+        </swrl:head>
+    </rdf:Description>
+    <rdf:Description>
+        <rdfs:comment>Purpose: Expose non-clinical risk stratification for explanations</rdfs:comment>
+        <rdfs:comment>Rule ID: R_RISK_01b - Moderate Risk (BurnoutRisk)</rdfs:comment>
+        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#Imp"/>
+        <swrl:body>
+            <rdf:Description>
+                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                <rdf:first>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                        <swrl:classPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Student"/>
+                        <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#s"/>
+                    </rdf:Description>
+                </rdf:first>
+                <rdf:rest>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                        <rdf:first>
+                            <rdf:Description>
+                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                                <swrl:classPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#BurnoutRisk"/>
+                                <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#s"/>
+                            </rdf:Description>
+                        </rdf:first>
+                        <rdf:rest>
+                            <rdf:Description>
+                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                <rdf:first>
+                                    <rdf:Description>
+                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
+                                        <swrl:propertyPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#hasRiskFactor"/>
+                                        <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#s"/>
+                                        <swrl:argument2 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#rf"/>
+                                    </rdf:Description>
+                                </rdf:first>
+                                <rdf:rest>
+                                    <rdf:Description>
+                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                        <rdf:first>
+                                            <rdf:Description>
+                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                                                <swrl:classPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#RepeatedStressExposure"/>
+                                                <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#rf"/>
+                                            </rdf:Description>
+                                        </rdf:first>
+                                        <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                    </rdf:Description>
+                                </rdf:rest>
+                            </rdf:Description>
+                        </rdf:rest>
+                    </rdf:Description>
+                </rdf:rest>
+            </rdf:Description>
+        </swrl:body>
+        <swrl:head>
+            <rdf:Description>
+                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                <rdf:first>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                        <swrl:classPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#ModerateRisk"/>
+                        <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#s"/>
+                    </rdf:Description>
+                </rdf:first>
+                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+            </rdf:Description>
+        </swrl:head>
+    </rdf:Description>
+    <rdf:Description>
+        <rdfs:comment>Purpose: Detect withdrawal-based low mood patterns (non-diagnostic)</rdfs:comment>
+        <rdfs:comment>Rule ID: R_DEP_01 - Depressive Spectrum (Withdrawal-based)</rdfs:comment>
+        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#Imp"/>
+        <swrl:body>
+            <rdf:Description>
+                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                <rdf:first>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                        <swrl:classPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Student"/>
+                        <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#s"/>
+                    </rdf:Description>
+                </rdf:first>
+                <rdf:rest>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                        <rdf:first>
+                            <rdf:Description>
+                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
+                                <swrl:propertyPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#hasRiskFactor"/>
+                                <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#s"/>
+                                <swrl:argument2 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#rf1"/>
+                            </rdf:Description>
+                        </rdf:first>
+                        <rdf:rest>
+                            <rdf:Description>
+                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                <rdf:first>
+                                    <rdf:Description>
+                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                                        <swrl:classPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#SocialISolationRisk"/>
+                                        <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#rf1"/>
+                                    </rdf:Description>
+                                </rdf:first>
+                                <rdf:rest>
+                                    <rdf:Description>
+                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                        <rdf:first>
+                                            <rdf:Description>
+                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
+                                                <swrl:propertyPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#experiencesEmotion"/>
+                                                <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#s"/>
+                                                <swrl:argument2 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#e"/>
+                                            </rdf:Description>
+                                        </rdf:first>
+                                        <rdf:rest>
+                                            <rdf:Description>
+                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                                <rdf:first>
+                                                    <rdf:Description>
+                                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                                                        <swrl:classPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#Emotional_Overwhelm"/>
+                                                        <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#e"/>
+                                                    </rdf:Description>
+                                                </rdf:first>
+                                                <rdf:rest>
+                                                    <rdf:Description>
+                                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                                        <rdf:first>
+                                                            <rdf:Description>
+                                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
+                                                                <swrl:propertyPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#hasRiskFactor"/>
+                                                                <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#s"/>
+                                                                <swrl:argument2 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#rf2"/>
+                                                            </rdf:Description>
+                                                        </rdf:first>
+                                                        <rdf:rest>
+                                                            <rdf:Description>
+                                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                                                <rdf:first>
+                                                                    <rdf:Description>
+                                                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                                                                        <swrl:classPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#RepeatedStressExposure"/>
+                                                                        <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#rf2"/>
+                                                                    </rdf:Description>
+                                                                </rdf:first>
+                                                                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                                            </rdf:Description>
+                                                        </rdf:rest>
+                                                    </rdf:Description>
+                                                </rdf:rest>
+                                            </rdf:Description>
+                                        </rdf:rest>
+                                    </rdf:Description>
+                                </rdf:rest>
+                            </rdf:Description>
+                        </rdf:rest>
+                    </rdf:Description>
+                </rdf:rest>
+            </rdf:Description>
+        </swrl:body>
+        <swrl:head>
+            <rdf:Description>
+                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                <rdf:first>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                        <swrl:classPredicate rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#DepressiveSpectrum"/>
+                        <swrl:argument1 rdf:resource="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#s"/>
+                    </rdf:Description>
+                </rdf:first>
+                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+            </rdf:Description>
+        </swrl:head>
+    </rdf:Description>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 4.5.29.2024-05-13T12:11:03Z) https://github.com/owlcs/owlapi -->
+
