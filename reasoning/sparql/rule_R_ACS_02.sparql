@@ -1,0 +1,18 @@
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX krr: <http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+INSERT { ?s rdf:type krr:AcademicStress }
+WHERE {
+    ?session krr:hasSessionStudent ?s .
+    ?session krr:hasEvidence ?e .
+    { ?e rdf:type krr:Stress } UNION 
+    { ?e rdf:type krr:Anxiety } UNION 
+    { ?e rdf:type krr:Panic } .
+    
+    ?session krr:hasEvidence ?t .
+    { ?t rdf:type krr:ExamPressure } UNION 
+    { ?t rdf:type krr:AcademicWorkload } UNION
+    { ?t rdf:type krr:Assignment_Deadline } UNION
+    { ?t rdf:type krr:Poor_Grades } .
+}

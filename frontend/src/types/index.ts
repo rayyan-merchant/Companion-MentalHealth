@@ -11,6 +11,11 @@ export interface SymbolicState {
     // No numeric confidence
 }
 
+export interface Intervention {
+    name: string;
+    reason: string;
+}
+
 export interface KrrResult {
     session_id: string;
     summary: string;
@@ -19,8 +24,8 @@ export interface KrrResult {
     escalation_guidance: string;
     disclaimer: string;
     audit_ref: string;
+    detected_symptoms?: string[];
+    detected_emotions?: string[];
+    detected_triggers?: string[];
+    recommended_interventions?: Intervention[];
 }
-
-// Legacy adapters for UI components if needed, or strictly use new types
-// We will try to rely on KrrResult
-

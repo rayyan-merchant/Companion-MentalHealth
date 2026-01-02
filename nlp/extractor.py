@@ -1,4 +1,5 @@
 import json
+import re
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -13,16 +14,17 @@ SYMPTOM_PATTERNS = load_patterns("symptom_patterns.json")
 TRIGGER_PATTERNS = load_patterns("trigger_patterns.json")
 
 def extract_concepts(text: str):
-    """
-    Extract ontology-relevant concepts from raw text using pattern matching.
-    """
     text = text.lower()
     results = []
 
     def match(patterns, category):
         for label, phrases in patterns.items():
             for phrase in phrases:
-                if phrase in text:
+                phrase = phrase.lower()
+
+                pattern = r'(?<!\w)' + re.escape(phrase) + r'(?!\w)'
+                
+                if re.search(pattern, text):
                     results.append({
                         "label": label,
                         "surface_text": phrase,

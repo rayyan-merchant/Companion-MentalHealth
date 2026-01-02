@@ -1,4 +1,5 @@
-@prefix mh: <http://example.org/mental-health#> .
+@prefix mh: <http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#> .
+@prefix krr: <http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
@@ -12,11 +13,17 @@
 mh:Insomnia mh:associatedWithMentalState mh:Anxiety .
 mh:Fatigue mh:associatedWithMentalState mh:Stress .
 mh:DifficultyConcentrating mh:associatedWithMentalState mh:Stress .
+mh:LossOfInterest mh:associatedWithMentalState mh:DepressiveSpectrum .
+mh:AppetiteChange mh:associatedWithMentalState mh:DepressiveSpectrum .
 
 # Trigger–Stressor mappings
 mh:ExamPressure mh:mapsToStressor mh:AcademicStressor .
 mh:AcademicWorkload mh:mapsToStressor mh:AcademicStressor .
+mh:AssignmentDeadline mh:mapsToStressor mh:AcademicStressor .
+mh:PoorGrades mh:mapsToStressor mh:AcademicStressor .
 mh:FamilyPressure mh:mapsToStressor mh:FamilyStressor .
+mh:FinancialConcern mh:mapsToStressor mh:SocialStressor .
+mh:SocialPressure mh:mapsToStressor mh:SocialStressor .
 
 # Stressor–MentalState relations
 mh:AcademicStressor mh:leadsToMentalState mh:AcademicStress .
@@ -29,6 +36,8 @@ mh:SocialIsolationRisk mh:leadsToMentalState mh:DepressiveSpectrum .
 # MentalState–RiskLevel
 mh:AcademicStress mh:hasRiskLevel mh:ModerateRisk .
 mh:AnxietyRisk mh:hasRiskLevel mh:HighRisk .
+mh:PanicRisk mh:hasRiskLevel mh:HighRisk .
+mh:DepressiveSpectrum mh:hasRiskLevel mh:HighRisk .
 
 # MentalState–Intervention knowledge
 mh:AcademicStress mh:recommendIntervention mh:TimeManagement .
@@ -37,3 +46,6 @@ mh:AnxietyRisk mh:recommendIntervention mh:BreathingExercise .
 mh:AnxietyRisk mh:recommendIntervention mh:GroundingTechnique .
 mh:DepressiveSpectrum mh:recommendIntervention mh:ConsultCounselor .
 mh:DepressiveSpectrum mh:recommendIntervention mh:SocialSupport .
+mh:PanicRisk mh:recommendIntervention mh:BreathingExercise .
+mh:PanicRisk mh:recommendIntervention mh:EmergencyContact .
+mh:RapidHeartRate mh:recommendIntervention mh:DeepBreathing .

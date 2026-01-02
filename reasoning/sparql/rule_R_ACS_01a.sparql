@@ -4,8 +4,10 @@ PREFIX krr: <http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_pro
 INSERT { ?s rdf:type krr:AcademicStress }
 WHERE {
     ?session krr:hasSessionStudent ?s .
-    ?session krr:hasEvidence ?e .
-    ?e rdf:type krr:Stress .
+    # Trigger implies stress in this context
     ?session krr:hasEvidence ?t .
-    ?t rdf:type krr:ExamPressure .
+    { ?t rdf:type krr:ExamPressure } UNION
+    { ?t rdf:type krr:AcademicWorkload } UNION
+    { ?t rdf:type krr:AssignmentDeadline } UNION
+    { ?t rdf:type krr:PoorGrades } .
 }

@@ -8,7 +8,7 @@ export function Settings() {
     const [notifications, setNotifications] = useState(true);
 
     return (
-        <div className="p-6 md:p-8 max-w-2xl mx-auto">
+        <div className="h-full overflow-y-auto pb-20 md:pb-0 p-4 md:p-6 max-w-2xl mx-auto">
             <h1 className="text-2xl font-semibold mb-6">Settings</h1>
 
             <div className="space-y-6">
@@ -54,8 +54,8 @@ export function Settings() {
                                         key={size}
                                         onClick={() => setFontSize(size)}
                                         className={`px-3 py-1 rounded-lg text-sm capitalize ${fontSize === size
-                                                ? 'bg-primary text-white'
-                                                : 'bg-gray-100 hover:bg-gray-200'
+                                            ? 'bg-primary text-white'
+                                            : 'bg-gray-100 hover:bg-gray-200'
                                             }`}
                                     >
                                         {size}

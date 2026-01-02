@@ -5,7 +5,10 @@ INSERT { ?s rdf:type krr:DepressiveSpectrum }
 WHERE {
     ?session krr:hasSessionStudent ?s .
     ?session krr:hasEvidence ?e .
-    ?e rdf:type krr:Stress .
-    ?s krr:hasRiskFactor ?rf .
-    ?rf rdf:type krr:SocialIsolationRisk .
+    ?e rdf:type krr:Sadness .
+    ?session krr:hasEvidence ?sym .
+    { ?sym rdf:type krr:SocialWithdrawal } UNION
+    { ?sym rdf:type krr:LossOfInterest } UNION
+    { ?sym rdf:type krr:AppetiteChange } UNION
+    { ?sym rdf:type krr:Fatigue } .
 }

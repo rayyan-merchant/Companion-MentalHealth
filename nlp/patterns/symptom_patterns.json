@@ -3,14 +3,121 @@
     "insomnia",
     "sleepless",
     "can't sleep",
+    "cannot sleep",
     "trouble sleeping",
-    "haven't slept"
+    "haven't slept",
+    "wake up early",
+    "waking up",
+    "tossing and turning",
+    "stay awake",
+    "awake all night",
+    "no sleep",
+    "up all night",
+    "can't fall asleep",
+    "sleep deprivation"
   ],
   "Fatigue": [
     "tired",
     "exhausted",
     "fatigue",
     "low energy",
-    "drained"
+    "drained",
+    "no energy",
+    "worn out",
+    "lethargic",
+    "sleepy",
+    "wiped out",
+    "zombie",
+    "can't get out of bed",
+    "sluggish"
+  ],
+  "RapidHeartRate": [
+    "heart racing",
+    "heart beating fast",
+    "heart pounding",
+    "palpitations",
+    "fast heart rate",
+    "heart beats very fast",
+    "fast heart beat",
+    "chest pounding",
+    "pulse racing"
+  ],
+  "BreathingDifficulty": [
+    "can't breathe",
+    "cannot breathe",
+    "short of breath",
+    "hard to breathe",
+    "gasping",
+    "choking sensation",
+    "breathless",
+    "tight chest",
+    "suffocating",
+    "hyperventilating"
+  ],
+  "Headache": [
+    "headache",
+    "head hurts",
+    "migraine",
+    "pounding head",
+    "throbbing head"
+  ],
+  "DifficultyConcentrating": [
+    "can't focus",
+    "cannot focus",
+    "hard to focus",
+    "mind wandering",
+    "distracted",
+    "brain fog",
+    "can't concentrate",
+    "unable to concentrate",
+    "blank mind",
+    "can't think straight",
+    "confused"
+  ],
+  "SocialWithdrawal": [
+    "don't want to see anyone",
+    "staying in my room",
+    "avoiding friends",
+    "isolating",
+    "alone",
+    "lonely",
+    "withdrawn",
+    "don't go out",
+    "avoiding people",
+    "hiding",
+    "shut in"
+  ],
+  "AppetiteChange": [
+    "not eating",
+    "eating too much",
+    "no appetite",
+    "lost my appetite",
+    "binge eating",
+    "starving",
+    "overeating",
+    "weight loss",
+    "weight gain",
+    "not hungry",
+    "eating disorder"
+  ],
+  "Restlessness": [
+    "restless",
+    "can't sit still",
+    "fidgeting",
+    "agitated",
+    "pacing",
+    "jumping out of my skin",
+    "shaking",
+    "trembling"
+  ],
+  "LossOfInterest": [
+    "bored",
+    "don't care anymore",
+    "lost interest",
+    "nothing matters",
+    "apathy",
+    "numb",
+    "what's the point",
+    "unmotivated"
   ]
 }

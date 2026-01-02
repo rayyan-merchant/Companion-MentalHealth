@@ -1,16 +1,88 @@
 {
   "Stress": [
+    "stress",
     "stressed",
     "overwhelmed",
-    "pressure"
+    "pressure",
+    "tense",
+    "tension",
+    "burdened",
+    "strained",
+    "burned out",
+    "burnout",
+    "frantic",
+    "frazzled",
+    "under pressure"
   ],
   "Anxiety": [
     "anxious",
     "nervous",
-    "worried"
+    "worried",
+    "worry",
+    "scared",
+    "fear",
+    "afraid",
+    "uneasy",
+    "on edge",
+    "dread",
+    "apprehensive",
+    "butterflies"
+  ],
+  "Panic": [
+    "panic",
+    "panicking",
+    "terrified",
+    "freaking out",
+    "terror",
+    "paralyzed"
   ],
   "Sadness": [
+    "sad",
+    "unhappy",
+    "down",
+    "blue",
+    "crying",
+    "tearful",
+    "miserable",
+    "heartbroken",
+    "grief",
+    "grieving",
+    "low mood",
+    "empty",
+    "hollow",
+    "melancholy"
+  ],
+  "Depression": [
+    "depression",
     "depressed",
-    "hopeless"
+    "hopeless",
+    "despair",
+    "suicidal",
+    "kill myself",
+    "end it all",
+    "no will to live"
+  ],
+  "Irritability": [
+    "irritated",
+    "angry",
+    "annoyed",
+    "frustrated",
+    "mad",
+    "furious",
+    "short fuse",
+    "losing my temper",
+    "agitated",
+    "snapped",
+    "grumpy"
+  ],
+  "Emotional_Overwhelm": [
+    "overwhelmed",
+    "too much",
+    "can't handle it",
+    "breaking point",
+    "can't cope",
+    "falling apart",
+    "at my wits end",
+    "can't take it anymore"
   ]
 }

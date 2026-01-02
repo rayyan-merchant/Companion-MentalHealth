@@ -3,7 +3,7 @@ import { Heart, Shield, BookOpen, ExternalLink } from 'lucide-react';
 
 export function About() {
     return (
-        <div className="p-6 md:p-8 max-w-3xl mx-auto">
+        <div className="h-full overflow-y-auto pb-20 md:pb-0 p-4 md:p-6 max-w-3xl mx-auto">
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}

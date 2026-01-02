@@ -1,11 +1,3 @@
-# =============================================================================
-# EXPLANATION QUERIES
-# Mental Health KRR System - Phase 3
-# =============================================================================
-# Purpose: Retrieve evidence for WHY-based explanations of inferred states
-# Note: These queries return the evidence that led to each mental state
-#       inference. No ranking, scoring, or interpretation is performed.
-# =============================================================================
 
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>

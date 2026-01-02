@@ -22,7 +22,7 @@ export function Session() {
     };
 
     return (
-        <div className="p-6 md:p-8 max-w-4xl mx-auto">
+        <div className="h-full overflow-y-auto pb-20 md:pb-0 p-4 md:p-6 max-w-4xl mx-auto">
             <h1 className="text-2xl font-semibold mb-6">Session History</h1>
 
             <div className="space-y-4">

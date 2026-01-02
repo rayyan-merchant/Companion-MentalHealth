@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { Home, MessageCircle, BarChart3, History, Settings, Info, Menu, X } from 'lucide-react';
 import { useState } from 'react';
+import { Logo } from './Logo';
 
 interface NavItem {
     path: string;
@@ -22,22 +23,22 @@ export function LeftNav() {
     const [isCollapsed, setIsCollapsed] = useState(false);
 
     return (
-        <nav className={`hidden md:flex flex-col h-full bg-card border-r border-gray-100 transition-all duration-300 ${isCollapsed ? 'w-16' : 'w-56'}`}>
-            <div className="flex items-center justify-between p-4 border-b border-gray-100">
+        <nav className={`hidden md:flex flex-col h-full bg-card border-r border-gray-100/50 shadow-sm transition-all duration-300 ${isCollapsed ? 'w-20' : 'w-64'}`}>
+            <div className="flex items-center justify-between p-6 border-b border-gray-100/50">
                 {!isCollapsed && (
-                    <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center">
-                            <span className="text-white text-sm font-bold">CK</span>
-                        </div>
-                        <span className="font-semibold text-slate-header">Calm KG</span>
+                    <div className="flex items-center gap-3">
+                        <Logo size={32} />
+                        <span className="font-bold text-xl bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">
+                            Companion
+                        </span>
                     </div>
                 )}
                 <button
                     onClick={() => setIsCollapsed(!isCollapsed)}
-                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                    className={`p-2 hover:bg-primary/10 text-slate-text/70 hover:text-primary rounded-xl transition-all duration-200 ${isCollapsed ? 'mx-auto' : ''}`}
                     aria-label={isCollapsed ? 'Expand navigation' : 'Collapse navigation'}
                 >
-                    {isCollapsed ? <Menu size={20} /> : <X size={18} />}
+                    {isCollapsed ? <Menu size={24} /> : <X size={20} />}
                 </button>
             </div>
 

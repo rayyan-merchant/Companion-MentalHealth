@@ -1,6 +1,7 @@
 import { Menu, Moon, Sun, HelpCircle } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Logo } from './Logo';
 
 interface TopNavProps {
     onMenuClick?: () => void;
@@ -10,7 +11,7 @@ export function TopNav({ onMenuClick }: TopNavProps) {
     const [isDarkMode, setIsDarkMode] = useState(false);
 
     return (
-        <header className="flex items-center justify-between px-4 md:px-6 py-3 bg-card border-b border-gray-100">
+        <header className="flex items-center justify-between px-4 py-2 bg-white border-b border-gray-100">
             <div className="flex items-center gap-4">
                 <button
                     onClick={onMenuClick}
@@ -20,11 +21,13 @@ export function TopNav({ onMenuClick }: TopNavProps) {
                     <Menu size={24} />
                 </button>
 
-                <Link to="/" className="flex items-center gap-2">
-                    <div className="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center md:hidden">
-                        <span className="text-white text-sm font-bold">CK</span>
+                <Link to="/" className="flex items-center gap-2 group">
+                    <div className="md:hidden">
+                        <Logo size={32} />
                     </div>
-                    <span className="font-semibold text-slate-header hidden sm:block">Calm KG Wellness</span>
+                    <span className="font-bold text-xl bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary hidden sm:block">
+                        Companion
+                    </span>
                 </Link>
             </div>
 

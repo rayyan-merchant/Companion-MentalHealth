@@ -1,11 +1,3 @@
-# =============================================================================
-# ESCALATION CHECK QUERIES
-# Mental Health KRR System - Phase 3
-# =============================================================================
-# Purpose: Detect high-risk persisted states that may require escalation
-# Note: These queries identify students in critical states for potential
-#       intervention. No diagnosis or treatment decisions are made.
-# =============================================================================
 
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>

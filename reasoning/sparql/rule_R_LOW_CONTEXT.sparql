@@ -1,0 +1,15 @@
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX krr: <http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#>
+
+INSERT { ?s rdf:type krr:NeedsMoreContext }
+WHERE {
+    ?session krr:hasSessionStudent ?s .
+    ?session krr:hasEvidence ?any .
+    
+    FILTER NOT EXISTS { ?s rdf:type krr:AnxietyRisk }
+    FILTER NOT EXISTS { ?s rdf:type krr:DepressiveSpectrum }
+    FILTER NOT EXISTS { ?s rdf:type krr:PanicRisk }
+    FILTER NOT EXISTS { ?s rdf:type krr:AcademicStress }
+    FILTER NOT EXISTS { ?s rdf:type krr:SocialIsolationState }
+    FILTER NOT EXISTS { ?s rdf:type krr:SleepDisturbance }
+}

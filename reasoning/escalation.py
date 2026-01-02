@@ -1,46 +1,17 @@
-"""
-Safety, Escalation & Audit Layer
-Phase 6 - Mental Health KRR System (Final Symbolic Layer)
-
-This module produces escalation decisions, safety justifications, and audit trails.
-It consumes outputs from Phase-5 (ranker.py) and SPARQL escalation checks.
-
-RESPONSIBILITY:
-- Does NOT infer mental states (SWRL does that)
-- Does NOT materialize facts (SPARQL does that)
-- Does NOT explain (explainer.py does that)
-- Does NOT rank (ranker.py does that)
-- ONLY produces escalation decisions with full audit trail
-
-CONSTRAINTS:
-- Symbolic logic only
-- No ML/probabilistic models
-- No diagnosis or treatment
-- Advisory escalation only
-- Always include disclaimer
-"""
-
 from typing import Dict, List, Any, Optional
 from dataclasses import dataclass
 from enum import Enum
 
 
-# =============================================================================
-# CONSTANTS & ENUMS
-# =============================================================================
-
 class EscalationLevel(Enum):
-    """Escalation levels - advisory only, not diagnostic."""
     NONE = "NONE"
     MODERATE = "MODERATE"
     HIGH = "HIGH"
     CRITICAL = "CRITICAL"
 
 
-# Mandatory disclaimer
 DISCLAIMER = "This system does not provide medical diagnosis or treatment."
 
-# Support recommendations by escalation level
 SUPPORT_RECOMMENDATIONS = {
     EscalationLevel.CRITICAL: (
         "Immediate support may be beneficial. Please consider reaching out to a counselor, "
@@ -60,49 +31,25 @@ SUPPORT_RECOMMENDATIONS = {
 }
 
 
-# =============================================================================
-# ESCALATION LOGIC (SYMBOLIC ONLY)
-# =============================================================================
-
 def _determine_escalation_level(
     escalation_findings: Dict[str, bool]
 ) -> EscalationLevel:
-    """
-    Determine escalation level based on symbolic conditions.
-    
-    Escalation Logic (from specification):
-    | Condition                          | Escalation |
-    | ---------------------------------- | ---------- |
-    | HighRisk present                   | CRITICAL   |
-    | PanicRisk + RepeatedStressExposure | HIGH       |
-    | DepressiveSpectrum                 | HIGH       |
-    | Multiple mental states             | MODERATE   |
-    | ModerateRisk only                  | MODERATE   |
-    | Else                               | NONE       |
-    
-    ⚠️ Escalation is advisory, not diagnostic.
-    """
-    # CRITICAL: HighRisk present
+
     if escalation_findings.get("high_risk", False):
         return EscalationLevel.CRITICAL
     
-    # HIGH: PanicRisk + RepeatedStressExposure
     if escalation_findings.get("panic_with_persistence", False):
         return EscalationLevel.HIGH
     
-    # HIGH: DepressiveSpectrum
     if escalation_findings.get("depressive_spectrum", False):
         return EscalationLevel.HIGH
     
-    # MODERATE: Multiple mental states
     if escalation_findings.get("multiple_states", False):
         return EscalationLevel.MODERATE
     
-    # MODERATE: ModerateRisk only
     if escalation_findings.get("moderate_risk", False):
         return EscalationLevel.MODERATE
     
-    # NONE: Default
     return EscalationLevel.NONE
 
 
@@ -110,10 +57,7 @@ def _build_escalation_reasons(
     escalation_findings: Dict[str, bool],
     escalation_level: EscalationLevel
 ) -> List[str]:
-    """
-    Build list of reasons for the escalation decision.
-    Each reason is traceable to a SPARQL query.
-    """
+
     reasons = []
     
     if escalation_findings.get("high_risk", False):
@@ -142,11 +86,7 @@ def _build_audit_trail(
     ranking_result: Dict[str, Any],
     escalation_level: EscalationLevel
 ) -> Dict[str, Any]:
-    """
-    Build complete audit trail for the escalation decision.
-    This ensures the decision is fully traceable and auditable.
-    """
-    # Identify which SPARQL queries were triggered
+
     triggered_queries = []
     query_map = {
         "high_risk": "SELECT ?student WHERE { ?student rdf:type krr:HighRisk }",
@@ -164,7 +104,6 @@ def _build_audit_trail(
                 "result": True
             })
     
-    # Check for safety override
     aggregated_safety = ranking_result.get("aggregated_safety", "NONE")
     safety_override = aggregated_safety == "HIGH"
     
@@ -180,54 +119,19 @@ def _build_audit_trail(
     }
 
 
-# =============================================================================
-# MAIN ESCALATION FUNCTION
-# =============================================================================
-
+# main esclatiom
 def evaluate_escalation(
     student_id: str,
     ranking_result: Dict[str, Any],
     escalation_findings: Dict[str, bool]
 ) -> Dict[str, Any]:
-    """
-    Evaluate escalation for a student based on ranking and SPARQL findings.
-    
-    This function DOES NOT infer, rank, or explain.
-    It ONLY produces escalation decisions with full audit trail.
-    
-    Args:
-        student_id: Student identifier
-        ranking_result: Output from ranker.py containing:
-            - ranked_states
-            - primary_concern
-            - aggregated_safety
-            - summary_rationale
-        escalation_findings: Boolean flags from SPARQL escalation queries:
-            - high_risk: bool
-            - panic_with_persistence: bool
-            - multiple_states: bool
-            - depressive_spectrum: bool
-            - moderate_risk: bool
-    
-    Returns:
-        Escalation result with:
-        - student_id
-        - escalation_level: CRITICAL | HIGH | MODERATE | NONE
-        - escalation_reasons: List of traceable reasons
-        - support_recommendation: Support-oriented language
-        - audit_trail: Full symbolic audit trail
-        - disclaimer: Mandatory non-diagnostic disclaimer
-    """
-    # Determine escalation level
+
     escalation_level = _determine_escalation_level(escalation_findings)
     
-    # Build escalation reasons
     escalation_reasons = _build_escalation_reasons(escalation_findings, escalation_level)
     
-    # Build audit trail
     audit_trail = _build_audit_trail(escalation_findings, ranking_result, escalation_level)
     
-    # Get support recommendation
     support_recommendation = SUPPORT_RECOMMENDATIONS.get(
         escalation_level,
         SUPPORT_RECOMMENDATIONS[EscalationLevel.NONE]
@@ -246,17 +150,7 @@ def evaluate_escalation(
 def evaluate_batch(
     student_data: Dict[str, Dict[str, Any]]
 ) -> Dict[str, Dict[str, Any]]:
-    """
-    Evaluate escalation for multiple students.
-    
-    Args:
-        student_data: Dict mapping student_id to:
-            - ranking_result: Output from ranker.py
-            - escalation_findings: SPARQL query results
-    
-    Returns:
-        Dict mapping student_id to escalation result
-    """
+
     results = {}
     for student_id, data in student_data.items():
         results[student_id] = evaluate_escalation(
@@ -267,26 +161,10 @@ def evaluate_batch(
     return results
 
 
-# =============================================================================
-# SPARQL RESULT PARSER
-# =============================================================================
 
 def parse_sparql_escalation_results(
     sparql_results: Dict[str, Any]
 ) -> Dict[str, bool]:
-    """
-    Parse raw SPARQL query results into escalation findings.
-    
-    This transforms SPARQL SELECT results into boolean flags
-    that can be consumed by evaluate_escalation().
-    
-    Args:
-        sparql_results: Dict containing results from escalation_checks.sparql
-            Expected keys: high_risk_results, panic_persistence_results, etc.
-    
-    Returns:
-        Dict with boolean flags for each escalation condition
-    """
     def has_results(key: str) -> bool:
         results = sparql_results.get(key, [])
         if isinstance(results, list):
@@ -305,15 +183,8 @@ def parse_sparql_escalation_results(
     }
 
 
-# =============================================================================
-# EXAMPLE OUTPUT
-# =============================================================================
 
 def generate_example_output() -> Dict[str, Any]:
-    """
-    Generate example demonstrating escalation evaluation.
-    """
-    # Synthetic ranking result
     ranking_result = {
         "ranked_states": [
             {"risk_state": "PanicRisk", "rank": 1, "safety_flag": "HIGH"},
@@ -324,7 +195,6 @@ def generate_example_output() -> Dict[str, Any]:
         "summary_rationale": "PanicRisk ranked highest due to HIGH safety flag"
     }
     
-    # Synthetic escalation findings (from SPARQL)
     escalation_findings = {
         "high_risk": True,
         "panic_with_persistence": True,

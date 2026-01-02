@@ -11,66 +11,53 @@
      xmlns:swrlb="http://www.w3.org/2003/11/swrlb#">
     <owl:Ontology rdf:about="http://www.semanticweb.org/mental_health/swrl_rules">
         <owl:imports rdf:resource="http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project"/>
-        <rdfs:comment>Implements symbolic inference from observed evidence to mental/risk states</rdfs:comment>
-        <rdfs:comment>SWRL Rules for Mental Health KRR System - Phase 2</rdfs:comment>
+        <rdfs:comment>SWRL Rules for Mental Health KRR System </rdfs:comment>
     </owl:Ontology>
     
 
 
     <!-- 
-    ///////////////////////////////////////////////////////////////////////////////////////
-    //
-    // Individuals
-    //
-    ///////////////////////////////////////////////////////////////////////////////////////
+    Individuals
      -->
 
     
 
 
-    <!-- file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#e -->
 
     <owl:NamedIndividual rdf:about="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#e"/>
     
 
 
-    <!-- file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#rf -->
 
     <owl:NamedIndividual rdf:about="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#rf"/>
     
 
 
-    <!-- file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#rf1 -->
 
     <owl:NamedIndividual rdf:about="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#rf1"/>
     
 
 
-    <!-- file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#rf2 -->
 
     <owl:NamedIndividual rdf:about="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#rf2"/>
     
 
 
-    <!-- file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#s -->
 
     <owl:NamedIndividual rdf:about="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#s"/>
     
 
 
-    <!-- file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#sym -->
 
     <owl:NamedIndividual rdf:about="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#sym"/>
     
 
 
-    <!-- file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#sym1 -->
 
     <owl:NamedIndividual rdf:about="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#sym1"/>
     
 
 
-    <!-- file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#sym2 -->
 
     <owl:NamedIndividual rdf:about="file:/C:/Users/Me/Downloads/Mental%20Health%20KRR/Mental%20Health%20KRR/reasoning/rules/swrl_rules.owl#sym2"/>
     
@@ -83,15 +70,11 @@
 
 
     <!-- 
-    ///////////////////////////////////////////////////////////////////////////////////////
-    //
-    // Rules
-    //
-    ///////////////////////////////////////////////////////////////////////////////////////
+    Rules
      -->
 
     <rdf:Description>
-        <rdfs:comment>Purpose: Detect long-term overload patterns (chronic exposure, not intensity)</rdfs:comment>
+        <rdfs:comment>Purpose: Detect long term overload patterns (chronic exposure, not intensity</rdfs:comment>
         <rdfs:comment>Rule ID: R_BRN_01 - Burnout Risk</rdfs:comment>
         <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#Imp"/>
         <swrl:body>
@@ -303,7 +286,7 @@
         </swrl:head>
     </rdf:Description>
     <rdf:Description>
-        <rdfs:comment>Purpose: Detect academic-context stress patterns with exam triggers</rdfs:comment>
+        <rdfs:comment>Purpose: Detect academic context stress patterns with exam triggers</rdfs:comment>
         <rdfs:comment>Rule ID: R_ACS_01a - Academic Stress (ExamStressor)</rdfs:comment>
         <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#Imp"/>
         <swrl:body>

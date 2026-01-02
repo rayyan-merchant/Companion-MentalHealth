@@ -18,7 +18,7 @@ export function Dashboard() {
     ];
 
     return (
-        <div className="p-6 md:p-8 max-w-6xl mx-auto">
+        <div className="h-full overflow-y-auto pb-20 md:pb-0 p-4 md:p-6 max-w-6xl mx-auto">
             <h1 className="text-2xl font-semibold mb-6">Dashboard</h1>
 
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -31,8 +31,8 @@ export function Dashboard() {
                         className="card"
                     >
                         <div className={`w-10 h-10 rounded-lg flex items-center justify-center mb-3 ${stat.color === 'primary' ? 'bg-primary/10 text-primary' :
-                                stat.color === 'secondary' ? 'bg-secondary/10 text-secondary' :
-                                    'bg-warning/30 text-amber-600'
+                            stat.color === 'secondary' ? 'bg-secondary/10 text-secondary' :
+                                'bg-warning/30 text-amber-600'
                             }`}>
                             {stat.icon}
                         </div>

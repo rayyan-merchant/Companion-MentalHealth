@@ -1,0 +1,11 @@
+@prefix mh: <http://www.semanticweb.org/hunaizanaveed/ontologies/2025/11/krr_project#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+mh:sess-1767213679619 a mh:Session ;
+    mh:hasEvidence mh:ev_0_0 ;
+    mh:hasSessionStudent mh:student_web_user ;
+    mh:sessionId "sess-1767213679619"^^xsd:string ;
+    mh:sessionTimestamp "2025-12-31T20:41:24.843723+00:00"^^xsd:dateTime .
+
+mh:ev_0_0 a mh:ExamPressure .
+
