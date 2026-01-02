@@ -29,38 +29,24 @@ cd Companion-MentalHealth
 
 ---
 
-### 2️⃣ Backend Setup (Python)
-
+### 1. Backend (FastAPI)
 ```bash
-cd backend
-python -m venv venv
-source venv/bin/activate   # Windows: venv\Scripts\activate
 pip install -r requirements.txt
+uvicorn main:app --reload --port 8000
 ```
+*Logic orchestrated in `reasoning/orchestrator.py`.*
 
-Run the backend:
+The API will be available at `http://localhost:8000
 
-```bash
-python main.py
-```
-
-Backend will run locally (e.g. `http://localhost:8000`).
-
----
-
-### 3️⃣ Frontend Setup (React)
-
+### 2. Frontend (React + Vite)
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
 
-Frontend will be available at:
+The frontend will be available at `http://localhost:3000`
 
-```
-http://localhost:5173
-```
 
 ---
 
