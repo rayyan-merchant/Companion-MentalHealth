@@ -83,7 +83,7 @@ This project demonstrates:
 * Ethical and safety-aware AI design
 
 Designed for **Knowledge Representation & Reasoning coursework**.
-
+---
 
 ## 👥 Project Contributors  
 
