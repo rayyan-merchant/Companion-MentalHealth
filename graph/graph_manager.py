@@ -186,6 +186,7 @@ class GraphManager:
             except Exception:
                 continue
                 
-            if count >= 1: 
+            if count >= 1:
+                return True
                 
         return False

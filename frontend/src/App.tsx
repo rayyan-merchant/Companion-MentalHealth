@@ -15,7 +15,7 @@ export default function App() {
 
     return (
         <BrowserRouter>
-            <div className="flex h-screen bg-slate-50 relative overflow-hidden">
+            <div className="fixed inset-0 flex bg-slate-50 overflow-hidden">
                 {/* Background Decoration */}
                 <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-primary/10 blur-[100px] pointer-events-none animate-float" />
                 <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-secondary/10 blur-[100px] pointer-events-none animate-float" style={{ animationDelay: '2s' }} />

@@ -41,15 +41,26 @@ export function useSession() {
             // Update symbolic state
             setKrrResult(response);
 
-            // Construct Bot Reply from Symbolic Output
-            // Priority: Escalation Guidance > Summary
-            const replyText = `${response.summary}\n\n${response.escalation_guidance}`;
+            // Construct Bot Reply from Hybrid Output
+            const replyText = response.response;
 
             const botMessage: Message = {
                 id: generateId(),
                 sender: 'bot',
                 text: replyText,
-                timestamp: new Date().toISOString()
+                timestamp: new Date().toISOString(),
+                metadata: {
+                    confidence: response.confidence === 'high' ? 0.9 : response.confidence === 'medium' ? 0.6 : 0.3,
+                    state: response.state,
+                    action: response.action,
+                    evidence: {
+                        emotions: response.evidence.emotions,
+                        symptoms: response.evidence.symptoms,
+                        triggers: response.evidence.triggers
+                    },
+                    clarificationQuestions: response.follow_up_questions,
+                    disclaimer: response.disclaimer
+                }
             };
 
             setMessages(prev => [...prev, botMessage]);

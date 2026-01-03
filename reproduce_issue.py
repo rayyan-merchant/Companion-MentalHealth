@@ -1,49 +1,104 @@
+"""
+Hybrid Pipeline Verification Script
+=====================================
+Tests the full agentic system against required test cases.
+"""
+
 import sys
 import os
 import uuid
-from typing import List, Dict
 
-# Add the current directory to sys.path to allow imports
-sys.path.append(os.getcwd())
+# Add project root to path
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from reasoning.orchestrator import run_krr_pipeline
+from agents.pipeline import process_message
 
-def run_tests():
+
+def run_verification():
+    """Run all required test cases."""
+    
+    # Reset singletons to pick up any pattern changes
+    import agents.ml_extractor as ml_ext
+    import agents.symbolic_reasoner as sym
+    import agents.llm_explainer as llm_exp
+    ml_ext._extractor_instance = None
+    sym._reasoner_instance = None
+    llm_exp._explainer_instance = None
+    
+    print("\n" + "=" * 80)
+    print("HYBRID AGENTIC SYSTEM VERIFICATION")
+    print("=" * 80)
+    
+    # Test cases from requirements
     test_cases = [
-        ("I can't sleep", "NeedsMoreContext"),
-        ("I feel stressed", "NeedsMoreContext"),
-        ("I am depressed", "DepressiveSpectrum"),
-        ("I panic when I have exams", "PanicRisk (if acute) or Anxiety"),
-        ("My heart races and I can't breathe", "PanicRisk"),
-        ("Finals are next week", "NeedsMoreContext (if no emotion)"),
-        ("I feel stressed about finals", "AcademicStress")
+        ("Anxious today", "ask_clarification", "Ask clarification"),
+        ("Finals are killing me", "explain", "Academic Stress"),
+        ("I can't sleep and feel restless", "explain", "Anxiety Risk"),
+        ("I feel empty and avoid everyone", "explain", "Depressive Spectrum"),
+        ("Heart racing, can't breathe", "explain", "Panic Risk")
     ]
-
-    print(f"{'Input':<40} | {'Expected':<30} | {'Actual State':<20} | {'Concerns':<30}")
-    print("-" * 130)
-
-    for text, expected in test_cases:
-        session_id = f"test_session_{uuid.uuid4().hex[:8]}"
-        student_id = "test_student"
+    
+    session_id = f"verify_{uuid.uuid4().hex[:8]}"
+    
+    print(f"\nSession: {session_id}")
+    print("-" * 80)
+    print(f"{'Input':<35} | {'Expected':<25} | {'Actual State':<20} | {'Action':<15} | {'PASS?'}")
+    print("-" * 80)
+    
+    passed = 0
+    failed = 0
+    
+    for text, expected_action, expected_state in test_cases:
+        result = process_message(session_id, text)
         
-        try:
-            result = run_krr_pipeline(session_id, student_id, text)
-            
-            # Extract relevant info
-            # The 'ranked_concerns' list contains the identified states
-            actual_concerns = result.get("ranked_concerns", [])
-            # In the current implementation, 'riskState' from sparql extraction is what determines the single state logic often
-            # We will inspect that but sticking to the public output 'ranked_concerns' is better for end-to-end test.
-            
-            concerns_str = ", ".join(actual_concerns) if actual_concerns else "None"
-            
-            # Determine primary state (simplified for this table)
-            primary_state = actual_concerns[0] if actual_concerns else "Unknown"
-            
-            print(f"{text:<40} | {expected:<30} | {primary_state:<20} | {concerns_str:<30}")
-            
-        except Exception as e:
-            print(f"{text:<40} | {expected:<30} | {'ERROR':<20} | {str(e):<30}")
+        actual_state = result.get("state", "None")
+        actual_action = result.get("action", "unknown")
+        
+        # Check if test passed
+        # For clarification cases, action must be ask_clarification
+        # For others, state should match
+        if expected_action == "ask_clarification":
+            test_passed = actual_action == "ask_clarification"
+        else:
+            # Flexible matching for state names
+            test_passed = (
+                expected_state.lower().replace(" ", "") in 
+                actual_state.lower().replace(" ", "").replace("_", "")
+            )
+        
+        status = "PASS" if test_passed else "FAIL"
+        
+        if test_passed:
+            passed += 1
+        else:
+            failed += 1
+        
+        print(f"{text:<35} | {expected_state:<25} | {actual_state:<20} | {actual_action:<15} | {status}")
+    
+    print("-" * 80)
+    print(f"\nResults: {passed}/{len(test_cases)} passed, {failed} failed")
+    
+    if failed == 0:
+        print("\n[OK] ALL TESTS PASSED - System is functioning correctly.")
+    else:
+        print("\n[WARN] SOME TESTS FAILED - Review the pipeline.")
+    
+    # Show a sample response
+    print("\n" + "=" * 80)
+    print("SAMPLE RESPONSE")
+    print("=" * 80)
+    
+    sample_result = process_message(f"sample_{uuid.uuid4().hex[:8]}", "I've been feeling stressed about my exams")
+    
+    print(f"\nInput: 'I've been feeling stressed about my exams'")
+    print(f"\nResponse:\n{sample_result['response']}")
+    print(f"\nState: {sample_result['state']}")
+    print(f"Confidence: {sample_result['confidence']}")
+    print(f"Evidence: {sample_result['evidence']}")
+    
+    if sample_result.get('disclaimer'):
+        print(f"\nDisclaimer: {sample_result['disclaimer']}")
+
 
 if __name__ == "__main__":
-    run_tests()
+    run_verification()

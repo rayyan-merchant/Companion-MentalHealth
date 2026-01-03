@@ -3,12 +3,16 @@
 @tailwind utilities;
 
 @layer base {
-  html {
-    scroll-behavior: smooth;
+  html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    -webkit-overflow-scrolling: touch;
   }
 
   body {
-    @apply bg-background text-slate-text leading-7;
+    @apply bg-background text-slate-text leading-7 antialiased;
   }
 
   h1 {

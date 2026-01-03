@@ -1,25 +1,25 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 import logging
 import traceback
 
 try:
-    from reasoning.orchestrator import run_krr_pipeline
+    from agents.pipeline import process_message
 except ImportError:
-    print("WARNING: KRR modules not found. Ensure PYTHONPATH is set correctly.")
-    run_krr_pipeline = None
+    print("WARNING: Hybrid pipeline modules not found. Ensure PYTHONPATH is set correctly.")
+    process_message = None
 
 # Logging Setup
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-app = FastAPI(title="Mental Health KRR System", version="1.0.0")
+app = FastAPI(title="Mental Health KRR System", version="2.0.0")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=["*"], # Broaden for dev
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -31,22 +31,22 @@ class KrrRequest(BaseModel):
     student_id: str
     text: str
 
-class Intervention(BaseModel):
-    name: str
-    reason: str
+class EvidenceSummary(BaseModel):
+    emotions: List[str]
+    symptoms: List[str]
+    triggers: List[str]
+    intensity: str
+    temporal: Optional[str] = None
 
 class KrrResponse(BaseModel):
     session_id: str
-    summary: str
-    explanations: List[str]
-    ranked_concerns: List[str]
-    escalation_guidance: str
+    response: str
+    state: Optional[str]
+    confidence: str
+    action: str
+    evidence: EvidenceSummary
+    follow_up_questions: List[str] = []
     disclaimer: str
-    audit_ref: str
-    detected_symptoms: List[str] = []
-    detected_emotions: List[str] = []
-    detected_triggers: List[str] = []
-    recommended_interventions: List[Intervention] = []
 
 class ErrorResponse(BaseModel):
     error: str
@@ -54,43 +54,26 @@ class ErrorResponse(BaseModel):
 
 @app.post("/api/krr/run", response_model=KrrResponse, responses={400: {"model": ErrorResponse}, 500: {"model": ErrorResponse}})
 async def run_reasoning_pipeline(request: KrrRequest):
-    """
-    Execute the symbolic Knowledge-Rich Reasoning pipeline.
-    Strictly symbolic. No ML. No numerics.
-    """
+
     if not request.text.strip():
         raise HTTPException(status_code=400, detail="Text input cannot be empty.")
     
-    if run_krr_pipeline is None:
-         raise HTTPException(status_code=500, detail="KRR backend modules not initialized.")
+    if process_message is None:
+         raise HTTPException(status_code=500, detail="Hybrid pipeline modules not initialized.")
 
     try:
-        logger.info(f"Starting KRR pipeline for session {request.session_id}")
+        logger.info(f"Starting Hybrid Pipeline for session {request.session_id}")
         
-        result = run_krr_pipeline(
+        # This now uses the full agentic pipeline
+        result = process_message(
             session_id=request.session_id,
-            student_uri_str=request.student_id,
-            raw_text=request.text
+            message=request.text
         )
         
-        response_data = KrrResponse(
-            session_id=result["session_id"],
-            summary=result["summary"],
-            explanations=result["explanations"],
-            ranked_concerns=result["ranked_concerns"],
-            escalation_guidance=result["escalation_guidance"],
-            disclaimer=result["disclaimer"],
-            audit_ref=result["audit_ref"],
-            detected_symptoms=result.get("detected_symptoms", []),
-            detected_emotions=result.get("detected_emotions", []),
-            detected_triggers=result.get("detected_triggers", []),
-            recommended_interventions=result.get("recommended_interventions", [])
-        )
-        
-        return response_data
+        return result
 
     except Exception as e:
-        logger.error(f"KRR Pipeline Error: {str(e)}")
+        logger.error(f"Pipeline Error: {str(e)}")
         traceback.print_exc()
         raise HTTPException(status_code=500, detail="Unable to process request at this time")
 

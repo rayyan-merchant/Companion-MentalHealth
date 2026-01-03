@@ -33,8 +33,11 @@ export function ChatShell({ messages, isLoading, onSelectMessage }: ChatShellPro
     const containerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        if (scrollRef.current) {
-            scrollRef.current.scrollIntoView({ behavior: 'smooth' });
+        if (containerRef.current) {
+            containerRef.current.scrollTo({
+                top: containerRef.current.scrollHeight,
+                behavior: 'smooth'
+            });
         }
     }, [messages, isLoading]);
 

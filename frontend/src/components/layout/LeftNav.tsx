@@ -57,7 +57,7 @@ export function LeftNav() {
             </div>
 
             {!isCollapsed && (
-                <div className="p-4 border-t border-gray-100">
+                <div className="px-4 pt-4 pb-2 border-t border-gray-100">
                     <div className="text-xs text-slate-text/50">
                         Session active
                     </div>

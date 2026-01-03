@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, ChevronUp, AlertCircle, ShieldCheck } from 'lucide-react';
+import { ChevronDown, ChevronUp, AlertCircle, ShieldCheck, Activity, Target, BrainCircuit } from 'lucide-react';
 import { useState } from 'react';
 import { KrrResult } from '../../types';
 
@@ -13,9 +13,9 @@ export function ExplanationPanel({ krrResult }: ExplanationPanelProps) {
     if (!krrResult) {
         return (
             <div className="card">
-                <h3 className="text-sm font-medium text-slate-text/50 mb-2">Symbolic Analysis</h3>
-                <p className="text-sm text-slate-text/40">
-                    Awaiting input to generate symbolic reasoning trace.
+                <h3 className="text-sm font-medium text-slate-text/50 mb-2">Hybrid Analysis</h3>
+                <p className="text-sm text-slate-text/40 italic">
+                    Waiting for your message to analyze signals...
                 </p>
             </div>
         );
@@ -30,7 +30,7 @@ export function ExplanationPanel({ krrResult }: ExplanationPanelProps) {
             <div className="flex items-center justify-between">
                 <h3 className="font-medium flex items-center gap-2">
                     <ShieldCheck size={18} className="text-primary" />
-                    Symbolic Analysis
+                    Hybrid Agentic Analysis
                 </h3>
                 <button
                     onClick={() => setIsExpanded(!isExpanded)}
@@ -48,115 +48,104 @@ export function ExplanationPanel({ krrResult }: ExplanationPanelProps) {
                         exit={{ height: 0, opacity: 0 }}
                         className="space-y-6"
                     >
-                        {/* Ranked Concerns */}
-                        <div>
-                            <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-text/50 mb-3">
-                                Ranked Concerns
+                        {/* Primary State & Confidence */}
+                        <div className="p-3 bg-primary/5 border border-primary/10 rounded-xl space-y-2">
+                            <div className="flex items-center justify-between">
+                                <span className="text-[10px] font-bold text-primary tracking-tight uppercase">Inferred Pattern</span>
+                                <span className={`text-[10px] font-bold uppercase px-1.5 py-0.5 rounded ${krrResult.confidence === 'high' ? 'bg-emerald-100 text-emerald-700' :
+                                        krrResult.confidence === 'medium' ? 'bg-amber-100 text-amber-700' : 'bg-blue-100 text-blue-700'
+                                    }`}>
+                                    {krrResult.confidence} confidence
+                                </span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <Activity size={16} className="text-primary" />
+                                <span className="font-semibold text-slate-text">{krrResult.state || 'Analyzing...'}</span>
+                            </div>
+                        </div>
+
+                        {/* Evidence Summary */}
+                        <div className="space-y-3">
+                            <h4 className="text-[10px] font-bold text-slate-text/40 uppercase tracking-wider flex items-center gap-1.5">
+                                <BrainCircuit size={12} />
+                                Extracted Signals (ML)
                             </h4>
-                            <div className="space-y-2">
-                                {krrResult.ranked_concerns.map((concern, idx) => (
-                                    <div key={idx} className="p-3 bg-red-50/50 border border-red-100 rounded-lg flex items-center gap-3">
-                                        <div className="w-6 h-6 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-xs font-bold">
-                                            {idx + 1}
+
+                            <div className="space-y-3 pl-1">
+                                {krrResult.evidence.emotions.length > 0 && (
+                                    <div className="space-y-1">
+                                        <span className="text-[9px] font-medium text-slate-400">EMOTIONS</span>
+                                        <div className="flex flex-wrap gap-1.5">
+                                            {krrResult.evidence.emotions.map(e => (
+                                                <span key={e} className="px-2 py-0.5 bg-purple-50 text-purple-700 text-[11px] rounded border border-purple-100 font-medium">
+                                                    {e}
+                                                </span>
+                                            ))}
                                         </div>
-                                        <span className="font-medium text-slate-text">{concern}</span>
                                     </div>
-                                ))}
-                                {krrResult.ranked_concerns.length === 0 && (
-                                    <p className="text-sm text-slate-text/60 italic">No specific concerns identified.</p>
+                                )}
+
+                                {krrResult.evidence.symptoms.length > 0 && (
+                                    <div className="space-y-1">
+                                        <span className="text-[9px] font-medium text-slate-400">SYMPTOMS</span>
+                                        <div className="flex flex-wrap gap-1.5">
+                                            {krrResult.evidence.symptoms.map(s => (
+                                                <span key={s} className="px-2 py-0.5 bg-orange-50 text-orange-700 text-[11px] rounded border border-orange-100 font-medium">
+                                                    {s}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {krrResult.evidence.triggers.length > 0 && (
+                                    <div className="space-y-1">
+                                        <span className="text-[9px] font-medium text-slate-400">CONTEXT/TRIGGERS</span>
+                                        <div className="flex flex-wrap gap-1.5">
+                                            {krrResult.evidence.triggers.map(t => (
+                                                <span key={t} className="px-2 py-0.5 bg-slate-100 text-slate-600 text-[11px] rounded border border-slate-200 font-medium">
+                                                    {t}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
                                 )}
                             </div>
                         </div>
 
-                        {/* Detected Evidence (New) */}
-                        {(krrResult.detected_symptoms?.length || krrResult.detected_emotions?.length || krrResult.detected_triggers?.length) ? (
-                            <div>
-                                <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-text/50 mb-3">
-                                    Detected Evidence
-                                </h4>
-                                <div className="space-y-3">
-                                    {/* Symptoms */}
-                                    {krrResult.detected_symptoms && krrResult.detected_symptoms.length > 0 && (
-                                        <div className="flex flex-col gap-1">
-                                            <span className="text-[10px] font-medium text-slate-400">SYMPTOMS</span>
-                                            <div className="flex flex-wrap gap-2">
-                                                {krrResult.detected_symptoms.map(s => (
-                                                    <span key={s} className="px-2 py-1 bg-orange-50 text-orange-700 text-xs rounded-md border border-orange-100">
-                                                        {s}
-                                                    </span>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
-                                    {/* Emotions */}
-                                    {krrResult.detected_emotions && krrResult.detected_emotions.length > 0 && (
-                                        <div className="flex flex-col gap-1">
-                                            <span className="text-[10px] font-medium text-slate-400">EMOTIONS</span>
-                                            <div className="flex flex-wrap gap-2">
-                                                {krrResult.detected_emotions.map(s => (
-                                                    <span key={s} className="px-2 py-1 bg-purple-50 text-purple-700 text-xs rounded-md border border-purple-100">
-                                                        {s}
-                                                    </span>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
-                                    {/* Triggers */}
-                                    {krrResult.detected_triggers && krrResult.detected_triggers.length > 0 && (
-                                        <div className="flex flex-col gap-1">
-                                            <span className="text-[10px] font-medium text-slate-400">TRIGGERS</span>
-                                            <div className="flex flex-wrap gap-2">
-                                                {krrResult.detected_triggers.map(s => (
-                                                    <span key={s} className="px-2 py-1 bg-slate-100 text-slate-600 text-xs rounded-md border border-slate-200">
-                                                        {s}
-                                                    </span>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        ) : null}
-
-                        {/* Interventions (New) */}
-                        {krrResult.recommended_interventions && krrResult.recommended_interventions.length > 0 && (
-                            <div>
-                                <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-text/50 mb-3">
-                                    Suggested Actions
-                                </h4>
-                                <div className="space-y-2">
-                                    {krrResult.recommended_interventions.map((int, idx) => (
-                                        <div key={idx} className="p-3 bg-emerald-50/50 border border-emerald-100 rounded-lg">
-                                            <div className="font-medium text-emerald-800 text-sm">{int.name}</div>
-                                            <div className="text-xs text-emerald-600/70 mt-1">Target: {int.reason}</div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Explanations */}
-                        <div>
-                            <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-text/50 mb-3">
-                                Reasoning Trace
+                        {/* Action Taken */}
+                        <div className="space-y-3">
+                            <h4 className="text-[10px] font-bold text-slate-text/40 uppercase tracking-wider flex items-center gap-1.5">
+                                <Target size={12} />
+                                Reasoning Action
                             </h4>
-                            <div className="bg-background rounded-xl p-4 border border-gray-100/50 shadow-sm text-sm space-y-3 leading-relaxed text-slate-text/80">
-                                {krrResult.explanations.map((exp, idx) => (
-                                    <p key={idx}>{exp}</p>
-                                ))}
+                            <div className="p-3 bg-background border border-slate-100 rounded-xl flex items-center gap-3">
+                                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${krrResult.action === 'explain' ? 'bg-emerald-100 text-emerald-600' :
+                                        krrResult.action === 'explain_cautious' ? 'bg-amber-100 text-amber-600' : 'bg-blue-100 text-blue-600'
+                                    }`}>
+                                    <Activity size={16} />
+                                </div>
+                                <div className="flex flex-col">
+                                    <span className="text-xs font-bold text-slate-text capitalize">
+                                        {krrResult.action.replace('_', ' ')}
+                                    </span>
+                                    <span className="text-[10px] text-slate-text/50">Symbolic Gate Resolution</span>
+                                </div>
                             </div>
                         </div>
 
                         {/* Disclaimer */}
-                        <div className="flex gap-3 p-3 bg-slate-50 rounded-lg border border-slate-100">
-                            <AlertCircle size={16} className="text-slate-400 flex-shrink-0 mt-0.5" />
-                            <p className="text-xs text-slate-text/60 leading-relaxed">
-                                {krrResult.disclaimer}
-                            </p>
-                        </div>
+                        {krrResult.disclaimer && (
+                            <div className="flex gap-3 p-3 bg-slate-50 rounded-lg border border-slate-100">
+                                <AlertCircle size={14} className="text-slate-400 flex-shrink-0 mt-0.5" />
+                                <p className="text-[11px] text-slate-text/60 leading-relaxed italic">
+                                    {krrResult.disclaimer}
+                                </p>
+                            </div>
+                        )}
 
-                        <div className="pt-2 text-[10px] text-slate-300 font-mono text-center">
-                            Audit Ref: {krrResult.audit_ref}
+                        <div className="pt-2 text-[9px] text-slate-300 font-mono text-center opacity-50">
+                            Hybrid Pipeline v2.0 • Deterministic Symbolic Trace
                         </div>
                     </motion.div>
                 )}
@@ -164,4 +153,3 @@ export function ExplanationPanel({ krrResult }: ExplanationPanelProps) {
         </motion.div>
     );
 }
-

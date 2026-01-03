@@ -1,8 +1,22 @@
+export interface MessageMetadata {
+    confidence?: number;
+    state?: string;
+    action?: 'explain' | 'explain_cautious' | 'ask_clarification';
+    evidence?: {
+        emotions: string[];
+        symptoms: string[];
+        triggers: string[];
+    };
+    clarificationQuestions?: string[];
+    disclaimer?: string;
+}
+
 export interface Message {
     id: string;
     sender: 'user' | 'bot' | 'system';
     text: string;
     timestamp: string;
+    metadata?: MessageMetadata;
 }
 
 // Symbolic KRR Types
@@ -18,14 +32,17 @@ export interface Intervention {
 
 export interface KrrResult {
     session_id: string;
-    summary: string;
-    explanations: string[];
-    ranked_concerns: string[];
-    escalation_guidance: string;
+    response: string;
+    state: string;
+    confidence: string;
+    action: 'explain' | 'explain_cautious' | 'ask_clarification';
+    evidence: {
+        emotions: string[];
+        symptoms: string[];
+        triggers: string[];
+        intensity: string;
+        temporal?: string;
+    };
+    follow_up_questions: string[];
     disclaimer: string;
-    audit_ref: string;
-    detected_symptoms?: string[];
-    detected_emotions?: string[];
-    detected_triggers?: string[];
-    recommended_interventions?: Intervention[];
 }

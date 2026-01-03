@@ -30,7 +30,7 @@ export function Composer({ onSend, disabled, placeholder = "Type your message...
         <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="border-t border-gray-100 bg-card p-4"
+            className="border-t border-gray-100 bg-card px-4 pt-4 pb-2"
         >
             <div className="flex items-end gap-3">
                 <div className="flex-1 relative">
@@ -57,7 +57,7 @@ export function Composer({ onSend, disabled, placeholder = "Type your message...
                 </button>
             </div>
 
-            <p className="text-xs text-slate-text/40 mt-2 text-center">
+            <p className="text-[10px] text-slate-text/30 mt-1 text-center font-medium">
                 Press Enter to send, Shift+Enter for new line
             </p>
         </motion.div>

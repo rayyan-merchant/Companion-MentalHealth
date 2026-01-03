@@ -28,7 +28,7 @@ export function Chat() {
                 <Composer onSend={sendUserMessage} disabled={isLoading} />
             </div>
 
-            <aside className="hidden lg:block w-80 xl:w-96 border-l border-gray-100 bg-background overflow-y-auto p-4 space-y-4">
+            <aside className="hidden lg:block w-80 xl:w-96 border-l border-gray-100 bg-background overflow-y-auto p-4 pb-2 space-y-4">
                 <ExplanationPanel krrResult={krrResult} />
             </aside>
         </div>

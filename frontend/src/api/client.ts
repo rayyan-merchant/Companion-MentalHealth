@@ -8,12 +8,19 @@ export interface KrrRequest {
 
 export interface KrrResponse {
     session_id: string;
-    summary: string;
-    explanations: string[];
-    ranked_concerns: string[];
-    escalation_guidance: string;
+    response: string;
+    state: string;
+    confidence: string;
+    action: 'explain' | 'explain_cautious' | 'ask_clarification';
+    evidence: {
+        emotions: string[];
+        symptoms: string[];
+        triggers: string[];
+        intensity: string;
+        temporal?: string;
+    };
+    follow_up_questions: string[];
     disclaimer: string;
-    audit_ref: string;
 }
 
 export interface ErrorResponse {
