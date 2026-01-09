@@ -10,6 +10,7 @@ The system provides **transparent, human-readable “why” explanations** for i
 
 ---
 
+
 ## Key Features
 
 * **Emotion & Symptom Extraction** from user text
@@ -74,10 +75,10 @@ Access the app at **[http://localhost:3000](http://localhost:3000)**.
 ```
 agents/            Conversational logic modules
 backend/           FastAPI backend & reasoning integration
-frontend/          React (TypeScript) chat UI
+frontend/          React chat UI
 nlp/               Emotion & symptom extraction
-ontology/          Mental health ontology (OWL/RDF)
-reasoning/          SWRL rules & orchestrator
+ontology/          Mental health ontology (OWL and RDF)
+reasoning/         SWRL rules & orchestrator
 data/session_graphs/ Session-level knowledge graphs
 ```
 
@@ -87,4 +88,13 @@ data/session_graphs/ Session-level knowledge graphs
 
 All rights are reserved by the project authors.
 Permission is required for reuse, modification, or distribution.
+
+---
+
+## 👥 Project Contributors  
+
+<div align="center">  <a href="https://www.linkedin.com/in/rayyanmerchant2004/" target="_blank">    <img src="https://img.shields.io/badge/Rayyan%20Merchant-%230077B5.svg?style=for-the-badge&logo=linkedin&logoColor=white" alt="Rayyan Merchant"/>  </a>  <a href="https://www.linkedin.com/in/rija-ali-731095296" target="_blank">    <img src="https://img.shields.io/badge/Syeda%20Rija%20Ali-%230077B5.svg?style=for-the-badge&logo=linkedin&logoColor=white" alt="Syeda Rija Ali"/>  </a>  <a href="https://www.linkedin.com/in/riya-bhart-339036287/" target="_blank">    <img src="https://img.shields.io/badge/Riya%20Bhart-%230077B5.svg?style=for-the-badge&logo=linkedin&logoColor=white" alt="Riya Bhart"/>  </a></div>
+
+
+
 
