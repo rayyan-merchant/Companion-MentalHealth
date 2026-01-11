@@ -1,0 +1,45 @@
+{
+  "session_id": "23e1b282-7ae2-4ae5-9002-be75488dd709",
+  "user_id": "b7c99467-c6a3-4f11-8a12-473dd3d96292",
+  "title": "My friend just left the country. I am feeling...",
+  "created_at": "2026-01-11T14:06:47.964332Z",
+  "updated_at": "2026-01-11T14:09:59.934158Z",
+  "messages": [
+    {
+      "id": "5b2c5d58-ce8c-4b8d-8cf5-03d529ac1a13",
+      "role": "user",
+      "content": "My friend just left the country. I am feeling very lonely",
+      "timestamp": "2026-01-11T14:09:58.790302Z",
+      "metadata": null
+    },
+    {
+      "id": "f5b3e703-d6a9-4e64-b79c-0e345111a6e0",
+      "role": "assistant",
+      "content": "I'm so sorry to hear that. It sounds like social might be involved. How has this been impacting your daily life?",
+      "timestamp": "2026-01-11T14:09:59.928715Z",
+      "metadata": {
+        "state": "NeedsMoreContext",
+        "confidence": "low",
+        "action": "ask_clarification",
+        "evidence": {
+          "emotions": [],
+          "symptoms": [],
+          "triggers": [
+            "social"
+          ],
+          "intensity": "high",
+          "temporal": null
+        },
+        "follow_up_questions": [
+          "It sounds like social might be involved. How has this been impacting your daily life?"
+        ],
+        "disclaimer": ""
+      }
+    }
+  ],
+  "inferred_states": [
+    "NeedsMoreContext"
+  ],
+  "risk_level": "low",
+  "is_deleted": false
+}

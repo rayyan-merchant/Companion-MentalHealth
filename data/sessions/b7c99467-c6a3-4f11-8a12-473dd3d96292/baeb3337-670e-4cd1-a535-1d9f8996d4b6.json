@@ -1,0 +1,75 @@
+{
+  "session_id": "baeb3337-670e-4cd1-a535-1d9f8996d4b6",
+  "user_id": "b7c99467-c6a3-4f11-8a12-473dd3d96292",
+  "title": "hi my name is rayyan. And i facing some issues...",
+  "created_at": "2026-01-11T14:06:47.977127Z",
+  "updated_at": "2026-01-11T14:08:29.603259Z",
+  "messages": [
+    {
+      "id": "5c3c73c1-6c5f-4a11-a545-c1e32bddc592",
+      "role": "user",
+      "content": "hi my name is rayyan. And i facing some issues in my life",
+      "timestamp": "2026-01-11T14:07:25.805039Z",
+      "metadata": null
+    },
+    {
+      "id": "9e1bdf2d-fc6e-482b-b9fa-780c6ac7ab6a",
+      "role": "assistant",
+      "content": "Hi Rayyan, thanks for sharing. I'd like to understand what's on your mind. Could you share a bit more about how you're feeling?",
+      "timestamp": "2026-01-11T14:07:52.466359Z",
+      "metadata": {
+        "state": null,
+        "confidence": "low",
+        "action": "ask_clarification",
+        "evidence": {
+          "emotions": [],
+          "symptoms": [],
+          "triggers": [],
+          "intensity": "high",
+          "temporal": null
+        },
+        "follow_up_questions": [
+          "I'd like to understand what's on your mind. Could you share a bit more about how you're feeling?",
+          "What's been going on lately that brought you here?"
+        ],
+        "disclaimer": ""
+      }
+    },
+    {
+      "id": "d455b8f2-98a1-45c1-9043-47d1e056cbf0",
+      "role": "user",
+      "content": "I had exams last week and it didnt go as well as i expected",
+      "timestamp": "2026-01-11T14:08:28.866082Z",
+      "metadata": null
+    },
+    {
+      "id": "33b35aa6-3bae-465d-97c3-dfb54c6fc756",
+      "role": "assistant",
+      "content": "That can be really tough. It sounds like academics might be involved. How has this been impacting your daily life?",
+      "timestamp": "2026-01-11T14:08:29.574791Z",
+      "metadata": {
+        "state": "NeedsMoreContext",
+        "confidence": "low",
+        "action": "ask_clarification",
+        "evidence": {
+          "emotions": [],
+          "symptoms": [],
+          "triggers": [
+            "academic"
+          ],
+          "intensity": "medium",
+          "temporal": null
+        },
+        "follow_up_questions": [
+          "It sounds like academic might be involved. How has this been impacting your daily life?"
+        ],
+        "disclaimer": ""
+      }
+    }
+  ],
+  "inferred_states": [
+    "NeedsMoreContext"
+  ],
+  "risk_level": "low",
+  "is_deleted": false
+}

@@ -4,12 +4,25 @@ from pydantic import BaseModel
 from typing import List, Optional
 import logging
 import traceback
+import sys
+from pathlib import Path
+
+# Add parent directory to path for imports
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 try:
     from agents.pipeline import process_message
 except ImportError:
     print("WARNING: Hybrid pipeline modules not found. Ensure PYTHONPATH is set correctly.")
     process_message = None
+
+# Import routers - try relative imports first, fall back to absolute
+try:
+    from .auth_routes import router as auth_router
+    from .session_routes import router as session_router
+except ImportError:
+    from backend.auth_routes import router as auth_router
+    from backend.session_routes import router as session_router
 
 # Logging Setup
 logging.basicConfig(level=logging.INFO)
@@ -24,6 +37,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Include routers with /api prefix
+app.include_router(auth_router, prefix="/api")
+app.include_router(session_router, prefix="/api")
 
 
 class KrrRequest(BaseModel):

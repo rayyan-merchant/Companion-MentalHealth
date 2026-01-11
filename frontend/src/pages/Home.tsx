@@ -1,9 +1,28 @@
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { MessageCircle, Brain, Heart, Shield } from 'lucide-react';
+import { MessageCircle, Brain, Shield, Loader2 } from 'lucide-react';
 import { Logo } from '../components/layout/Logo';
+import { createSession } from '../api/sessions';
+import { useState } from 'react';
 
 export function Home() {
+    const navigate = useNavigate();
+    const [isCreating, setIsCreating] = useState(false);
+
+    const handleStartConversation = async () => {
+        try {
+            setIsCreating(true);
+            const session = await createSession();
+            navigate(`/chat/${session.session_id}`);
+        } catch (error) {
+            console.error('Failed to create session:', error);
+            // Fall back to navigating to /chat which will create a session
+            navigate('/chat');
+        } finally {
+            setIsCreating(false);
+        }
+    };
+
     return (
         <div className="h-full overflow-y-auto flex flex-col">
             <section className="flex-1 flex flex-col items-center justify-center px-4 py-2">
@@ -28,10 +47,23 @@ export function Home() {
                         Let's have a conversation about how you're doing.
                     </p>
 
-                    <Link to="/chat" className="btn-primary inline-flex items-center gap-2 text-lg px-8 py-3">
-                        <MessageCircle size={22} />
-                        Start Conversation
-                    </Link>
+                    <button
+                        onClick={handleStartConversation}
+                        disabled={isCreating}
+                        className="btn-primary inline-flex items-center gap-2 text-lg px-8 py-3 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        {isCreating ? (
+                            <>
+                                <Loader2 size={22} className="animate-spin" />
+                                Starting...
+                            </>
+                        ) : (
+                            <>
+                                <MessageCircle size={22} />
+                                Start Conversation
+                            </>
+                        )}
+                    </button>
                 </motion.div>
             </section>
 
