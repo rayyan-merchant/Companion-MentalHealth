@@ -246,3 +246,68 @@ def add_inferred_state(session: Session, state: str):
     if state and state not in session.inferred_states:
         session.inferred_states.append(state)
         update_session(session)
+
+
+def get_user_stats(user_id: str) -> Dict[str, Any]:
+    """
+    Calculate statistics for a user's sessions.
+    Returns total sessions, risk distribution, top symptoms, and trends.
+    """
+    user_dir = _get_user_sessions_dir(user_id)
+    
+    total_sessions = 0
+    risk_counts = {"low": 0, "medium": 0, "high": 0}
+    symptom_counts = {}
+    total_messages = 0
+    sessions_by_date = {}
+
+    for session_file in user_dir.glob("*.json"):
+        try:
+            data = json.loads(session_file.read_text())
+            session = Session(**data)
+            
+            # Skip deleted sessions from stats?
+            if session.is_deleted:
+                continue
+
+            total_sessions += 1
+            
+            # Risk level
+            risk = session.risk_level or "low"
+            risk_counts[risk] = risk_counts.get(risk, 0) + 1
+            
+            # Messages
+            total_messages += len(session.messages)
+            
+            # Symptoms/States
+            # Aggregate from inferred_states
+            for state in session.inferred_states:
+                symptom_counts[state] = symptom_counts.get(state, 0) + 1
+            
+            # Also check messages for evidence if inferred_states is empty
+            if not session.inferred_states:
+                for msg in session.messages:
+                    if msg.role == "assistant" and msg.metadata:
+                        evidence = msg.metadata.get("evidence", {})
+                        if isinstance(evidence, dict):
+                            for symptom in evidence.get("symptoms", []):
+                                symptom_counts[symptom] = symptom_counts.get(symptom, 0) + 1
+                            for emotion in evidence.get("emotions", []):
+                                symptom_counts[emotion] = symptom_counts.get(emotion, 0) + 1
+                                
+        except (json.JSONDecodeError, Exception):
+            continue
+
+    # Calculate top symptoms
+    top_symptoms = sorted(
+        [{"name": k, "count": v} for k, v in symptom_counts.items()],
+        key=lambda x: x["count"],
+        reverse=True
+    )[:5]
+
+    return {
+        "total_sessions": total_sessions,
+        "risk_distribution": risk_counts,
+        "top_symptoms": top_symptoms,
+        "total_messages": total_messages
+    }

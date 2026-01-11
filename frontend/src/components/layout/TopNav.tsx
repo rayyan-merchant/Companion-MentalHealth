@@ -1,4 +1,4 @@
-import { Menu, Moon, Sun, HelpCircle, LogOut, User } from 'lucide-react';
+import { Menu, HelpCircle, LogOut } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Logo } from './Logo';
@@ -11,7 +11,6 @@ interface TopNavProps {
 export function TopNav({ onMenuClick }: TopNavProps) {
     const navigate = useNavigate();
     const { user, logout, isAuthenticated } = useAuth();
-    const [isDarkMode, setIsDarkMode] = useState(false);
     const [showUserMenu, setShowUserMenu] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
 
@@ -60,14 +59,6 @@ export function TopNav({ onMenuClick }: TopNavProps) {
             </div>
 
             <div className="flex items-center gap-2">
-                <button
-                    onClick={() => setIsDarkMode(!isDarkMode)}
-                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                    aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
-                >
-                    {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
-                </button>
-
                 <Link
                     to="/about"
                     className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
@@ -106,16 +97,7 @@ export function TopNav({ onMenuClick }: TopNavProps) {
                                     </div>
                                 </div>
 
-                                <div className="py-1">
-                                    <Link
-                                        to="/settings"
-                                        onClick={() => setShowUserMenu(false)}
-                                        className="flex items-center gap-2 px-4 py-2 text-sm text-slate-text hover:bg-gray-50 transition-colors"
-                                    >
-                                        <User size={16} />
-                                        Settings
-                                    </Link>
-                                </div>
+
 
                                 <div className="border-t border-gray-100 py-1">
                                     <button

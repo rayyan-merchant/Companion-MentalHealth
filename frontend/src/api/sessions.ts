@@ -102,9 +102,38 @@ export interface SendMessageResponse {
     disclaimer?: string;
 }
 
+export interface SessionStats {
+    total_sessions: number;
+    risk_distribution: {
+        low: number;
+        medium: number;
+        high: number;
+    };
+    top_symptoms: Array<{
+        name: string;
+        count: number;
+    }>;
+    total_messages: number;
+}
+
+
 // ============================================================================
 // API Functions
 // ============================================================================
+
+/**
+ * Get session statistics for the dashboard
+ */
+export async function getSessionStats(): Promise<SessionStats> {
+    const response = await authFetch(`${API_BASE}/sessions/stats`);
+
+    if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
+        throw new Error(error.detail || 'Failed to fetch session stats');
+    }
+
+    return response.json();
+}
 
 /**
  * Get all sessions for the current user

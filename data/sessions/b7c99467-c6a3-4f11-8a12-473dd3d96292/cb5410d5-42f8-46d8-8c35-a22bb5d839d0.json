@@ -3,9 +3,9 @@
   "user_id": "b7c99467-c6a3-4f11-8a12-473dd3d96292",
   "title": "New Conversation",
   "created_at": "2026-01-11T14:10:07.888565Z",
-  "updated_at": "2026-01-11T14:10:07.888565Z",
+  "updated_at": "2026-01-11T15:28:23.361422Z",
   "messages": [],
   "inferred_states": [],
   "risk_level": "low",
-  "is_deleted": false
+  "is_deleted": true
 }

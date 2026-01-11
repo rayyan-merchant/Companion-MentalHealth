@@ -19,8 +19,13 @@ from .session_store import (
     delete_session,
     add_message_to_session,
     update_session_risk,
-    add_inferred_state
+    add_inferred_state,
+    get_user_stats
 )
+
+
+
+
 
 # Import the AI pipeline
 try:
@@ -32,6 +37,14 @@ except ImportError:
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/sessions", tags=["Sessions"])
+
+
+@router.get("/stats")
+async def get_session_statistics(current_user: User = Depends(get_current_user)):
+    """
+    Get statistics for the current user's sessions.
+    """
+    return get_user_stats(current_user.user_id)
 
 
 @router.get("", response_model=List[SessionSummary])

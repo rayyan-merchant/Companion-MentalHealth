@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Home, MessageCircle, BarChart3, History, Settings, Info, Menu, X } from 'lucide-react';
+import { Home, MessageCircle, BarChart3, History, Info, Menu, X } from 'lucide-react';
 import { useState } from 'react';
 import { Logo } from './Logo';
 
@@ -14,7 +14,6 @@ const navItems: NavItem[] = [
     { path: '/chat', label: 'Chat', icon: <MessageCircle size={20} /> },
     { path: '/dashboard', label: 'Dashboard', icon: <BarChart3 size={20} /> },
     { path: '/sessions', label: 'Sessions', icon: <History size={20} /> },
-    { path: '/settings', label: 'Settings', icon: <Settings size={20} /> },
     { path: '/about', label: 'About', icon: <Info size={20} /> }
 ];
 

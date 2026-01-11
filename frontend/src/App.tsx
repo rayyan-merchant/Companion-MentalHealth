@@ -9,7 +9,6 @@ import { Home } from './pages/Home';
 import { Chat } from './pages/Chat';
 import { Session } from './pages/Session';
 import { Dashboard } from './pages/Dashboard';
-import { Settings } from './pages/Settings';
 import { About } from './pages/About';
 import { Login } from './pages/Login';
 import { Signup } from './pages/Signup';
@@ -76,11 +75,7 @@ export default function App() {
                             <AppLayout><Dashboard /></AppLayout>
                         </ProtectedRoute>
                     } />
-                    <Route path="/settings" element={
-                        <ProtectedRoute>
-                            <AppLayout><Settings /></AppLayout>
-                        </ProtectedRoute>
-                    } />
+
                     <Route path="/about" element={
                         <ProtectedRoute>
                             <AppLayout><About /></AppLayout>
