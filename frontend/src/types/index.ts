@@ -26,9 +26,25 @@ export interface SymbolicState {
 }
 
 export interface Intervention {
-    name: string;
-    reason: string;
+  id?: string;
+
+  title: string;
+
+  description: string;
+
+  urgency: "low" | "medium" | "high";
+
+  duration?: string;
+
+  steps?: string[];
+
+  confidence?: number;
+
+  rationale?: string;
+
+  sourceRule?: string;
 }
+
 
 export interface KrrResult {
     session_id: string;

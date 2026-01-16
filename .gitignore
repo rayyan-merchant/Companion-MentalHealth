@@ -59,3 +59,10 @@ data/sessions/*
 # Logs
 logs/
 *.log
+
+# Runtime-generated session graphs (IMPORTANT)
+data/session_graphs/
+data/session_graphs/*.ttl
+
+# Root-level node artifacts (do not commit)
+package-lock.json

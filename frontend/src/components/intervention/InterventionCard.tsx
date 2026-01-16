@@ -9,11 +9,12 @@ interface InterventionCardProps {
 }
 
 export function InterventionCard({ intervention, onStart, onMarkTried }: InterventionCardProps) {
-    const urgencyColors = {
-        low: 'bg-secondary/10 text-secondary-dark',
-        medium: 'bg-warning/50 text-amber-700',
-        high: 'bg-error/10 text-error'
+    const urgencyColors: Record<"low" | "medium" | "high", string> = {
+        low: "green",
+        medium: "orange",
+        high: "red",
     };
+
 
     return (
         <motion.div
