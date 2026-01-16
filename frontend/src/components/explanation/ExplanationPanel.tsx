@@ -53,7 +53,7 @@ export function ExplanationPanel({ krrResult }: ExplanationPanelProps) {
                             <div className="flex items-center justify-between">
                                 <span className="text-[10px] font-bold text-primary tracking-tight uppercase">Inferred Pattern</span>
                                 <span className={`text-[10px] font-bold uppercase px-1.5 py-0.5 rounded ${krrResult.confidence === 'high' ? 'bg-emerald-100 text-emerald-700' :
-                                        krrResult.confidence === 'medium' ? 'bg-amber-100 text-amber-700' : 'bg-blue-100 text-blue-700'
+                                    krrResult.confidence === 'medium' ? 'bg-amber-100 text-amber-700' : 'bg-blue-100 text-blue-700'
                                     }`}>
                                     {krrResult.confidence} confidence
                                 </span>
@@ -121,7 +121,7 @@ export function ExplanationPanel({ krrResult }: ExplanationPanelProps) {
                             </h4>
                             <div className="p-3 bg-background border border-slate-100 rounded-xl flex items-center gap-3">
                                 <div className={`w-8 h-8 rounded-full flex items-center justify-center ${krrResult.action === 'explain' ? 'bg-emerald-100 text-emerald-600' :
-                                        krrResult.action === 'explain_cautious' ? 'bg-amber-100 text-amber-600' : 'bg-blue-100 text-blue-600'
+                                    krrResult.action === 'explain_cautious' ? 'bg-amber-100 text-amber-600' : 'bg-blue-100 text-blue-600'
                                     }`}>
                                     <Activity size={16} />
                                 </div>
@@ -132,6 +132,20 @@ export function ExplanationPanel({ krrResult }: ExplanationPanelProps) {
                                     <span className="text-[10px] text-slate-text/50">Symbolic Gate Resolution</span>
                                 </div>
                             </div>
+
+                            {/* Reasoning Trace */}
+                            {krrResult.reasoning_trace && krrResult.reasoning_trace.length > 0 && (
+                                <div className="pl-3 border-l-2 border-slate-100 space-y-2">
+                                    {krrResult.reasoning_trace.map((trace, idx) => (
+                                        <div key={idx} className="flex items-start gap-2">
+                                            <div className="mt-1 w-1.5 h-1.5 rounded-full bg-slate-300 flex-shrink-0" />
+                                            <p className="text-[10px] text-slate-text/70 leading-relaxed">
+                                                {trace}
+                                            </p>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
 
                         {/* Disclaimer */}

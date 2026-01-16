@@ -1,4 +1,6 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional
@@ -94,6 +96,33 @@ async def run_reasoning_pipeline(request: KrrRequest):
         traceback.print_exc()
         raise HTTPException(status_code=500, detail="Unable to process request at this time")
 
-@app.get("/")
-async def root():
-    return {"message": "Mental Health KRR Symbolic Reasoning Engine", "status": "active"}
+@app.get("/api/health")
+async def health_check():
+    return {"status": "active", "service": "Mental Health KRR System"}
+
+# Serve Frontend Static Files
+# Ensure the 'dist' folder exists (it is created by the build process)
+static_path = Path(__file__).parent.parent / "frontend" / "dist"
+if static_path.exists():
+    app.mount("/assets", StaticFiles(directory=str(static_path / "assets")), name="assets")
+    
+    # Catch-all route for SPA (React Router)
+    @app.get("/{full_path:path}")
+    async def serve_spa(full_path: str):
+        # API requests are already handled by routers above (prefix /api)
+        # If it's a file request that exists, StaticFiles would handle it if we mounted root purely,
+        # but for SPA we want everything else to go to index.html unless it's an API call.
+        
+        # Check if it matches a static file explicitly (like favicon, manifest)
+        file_path = static_path / full_path
+        if file_path.exists() and file_path.is_file():
+             return FileResponse(file_path)
+             
+        # Otherwise serve index.html
+        return FileResponse(static_path / "index.html")
+else:
+    print(f"WARNING: Frontend static files not found at {static_path}. Run 'npm run build' in frontend/.")
+    
+    @app.get("/")
+    async def root():
+        return {"message": "Backend Active. Frontend not built.", "status": "active"}

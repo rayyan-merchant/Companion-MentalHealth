@@ -98,6 +98,7 @@ export interface SendMessageResponse {
         intensity?: string;
         temporal?: string;
     };
+    reasoning_trace?: string[];
     follow_up_questions?: string[];
     disclaimer?: string;
 }

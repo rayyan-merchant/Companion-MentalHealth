@@ -1,7 +1,7 @@
 export interface MessageMetadata {
     confidence?: number;
     state?: string;
-    action?: 'explain' | 'explain_cautious' | 'ask_clarification';
+    action?: 'explain' | 'explain_cautious' | 'ask_clarification' | 'crisis_intervention';
     evidence?: {
         emotions: string[];
         symptoms: string[];
@@ -35,7 +35,7 @@ export interface KrrResult {
     response: string;
     state: string;
     confidence: string;
-    action: 'explain' | 'explain_cautious' | 'ask_clarification';
+    action: 'explain' | 'explain_cautious' | 'ask_clarification' | 'crisis_intervention';
     evidence: {
         emotions: string[];
         symptoms: string[];
@@ -43,6 +43,7 @@ export interface KrrResult {
         intensity: string;
         temporal?: string;
     };
+    reasoning_trace?: string[];
     follow_up_questions: string[];
     disclaimer: string;
 }

@@ -24,7 +24,10 @@ function AppLayout({ children }: { children: React.ReactNode }) {
             <div className="absolute top-[20%] right-[10%] w-[20%] h-[20%] rounded-full bg-accent/5 blur-[80px] pointer-events-none animate-float" style={{ animationDelay: '4s' }} />
 
             <div className="relative z-10 flex h-full w-full">
-                <LeftNav />
+                <LeftNav
+                    isOpen={mobileMenuOpen}
+                    onClose={() => setMobileMenuOpen(false)}
+                />
 
                 <div className="flex-1 flex flex-col min-w-0">
                     <TopNav onMenuClick={() => setMobileMenuOpen(!mobileMenuOpen)} />

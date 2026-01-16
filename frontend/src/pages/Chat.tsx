@@ -7,6 +7,7 @@ import { ExplanationPanel } from '../components/explanation/ExplanationPanel';
 import { Message, KrrResult } from '../types';
 import { getSession, sendMessage, createSession, Session } from '../api/sessions';
 import { Loader2, Plus, AlertCircle } from 'lucide-react';
+import { CrisisAlert } from '../components/chat/CrisisAlert';
 
 function generateId(): string {
     return `msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -127,7 +128,8 @@ export function Chat() {
                     temporal: response.evidence?.temporal
                 },
                 follow_up_questions: response.follow_up_questions || [],
-                disclaimer: response.disclaimer || ''
+                disclaimer: response.disclaimer || '',
+                reasoning_trace: response.reasoning_trace || []
             });
 
             // Add bot response to messages
@@ -235,6 +237,13 @@ export function Chat() {
                     messages={messages}
                     isLoading={isLoading}
                 />
+
+                {krrResult?.action === 'crisis_intervention' && (
+                    <div className="px-4">
+                        <CrisisAlert />
+                    </div>
+                )}
+
                 <QuickPrompts onSelect={handleQuickPrompt} />
                 <Composer onSend={sendUserMessage} disabled={isLoading} />
             </div>

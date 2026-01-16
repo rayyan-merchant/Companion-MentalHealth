@@ -133,10 +133,16 @@ async def send_message(
         )
     
     try:
+        # Prepare message history for hydration
+        # Exclude the message we just added (the user's current message)
+        # because the pipeline adds it to memory itself
+        history = [m.model_dump() for m in session.messages if m != user_msg]
+
         # Run the AI pipeline
         result = process_message(
             session_id=session_id,
-            message=message.text
+            message=message.text,
+            previous_messages=history
         )
         
         # Add assistant response to session
@@ -170,6 +176,25 @@ async def send_message(
             elif any(ind in state_lower for ind in medium_risk_indicators):
                 update_session_risk(session, "medium")
         
+        # specific mappings for rules to human readable explanations
+        rule_explanations = {
+            "R_ANX_physio": "Physiological symptoms (insomnia, restlessness) indicate anxiety pattern.",
+            "R_ANX_life": "Life stressors (financial, social) align with anxiety triggers.",
+            "R_DEP_complex": "Combination of withdrawal and mood indicators suggests depressive spectrum.",
+            "R_DEP_explicit": "Explicit mention of depression keywords.",
+            "R_PAN_acute": "Acute physical symptoms (racing heart, breathing) match panic profile.",
+            "R_ACS_02": "Stress markers combined with academic triggers.",
+            "R_SLEEP_01": "Isolated sleep disturbance pattern detected.",
+            "R_ISO_01": "Social withdrawal indicators present without other severe symptoms."
+        }
+
+        reasoning_trace = []
+        if result.get("debug") and "reasoning" in result["debug"]:
+            rules = result["debug"]["reasoning"].get("rules_fired", [])
+            for rule in rules:
+                if rule in rule_explanations:
+                    reasoning_trace.append(rule_explanations[rule])
+        
         # Return the full pipeline result plus message IDs
         return {
             "user_message_id": user_msg.id,
@@ -180,6 +205,7 @@ async def send_message(
             "confidence": result.get("confidence"),
             "action": result.get("action"),
             "evidence": result.get("evidence"),
+            "reasoning_trace": reasoning_trace,
             "follow_up_questions": result.get("follow_up_questions", []),
             "disclaimer": result.get("disclaimer")
         }

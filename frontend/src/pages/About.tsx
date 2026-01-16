@@ -131,7 +131,7 @@ export function About() {
                         },
                         {
                             name: "Syeda Rija Ali",
-                            email: "rija.ali@gmail.com",
+                            email: "rijaali287@gmail.com",
                             github: "https://github.com/Srijaali",
                             linkedin: "https://www.linkedin.com/in/rija-ali-731095296/"
                         }

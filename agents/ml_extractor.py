@@ -97,10 +97,23 @@ class MLSignalExtractor:
             self._precompute_embeddings()
     
     def _load_model(self):
+        # Strategy 1: Try offline/cache first to avoid unnecessary network calls
         try:
-            self.model = SentenceTransformer('all-MiniLM-L6-v2')
+            self.model = SentenceTransformer('all-MiniLM-L6-v2', device='cpu', local_files_only=True)
+            print("Loaded ML model from local cache.")
+            return
+        except Exception:
+            # Not in cache, proceed to download
+            pass
+
+        # Strategy 2: Download with explicit error handling
+        try:
+            print("Downloading ML model (this may take a moment)...")
+            self.model = SentenceTransformer('all-MiniLM-L6-v2', device='cpu')
+            print("Model download complete.")
         except Exception as e:
-            print(f"Failed to load embedding model: {e}")
+            print(f"CRITICAL: Failed to load ML model (Network Error: {e}).")
+            print("System switching to KEYWORD-ONLY mode. Core functionality will remain active.")
             self.use_embeddings = False
     
     def _precompute_embeddings(self):

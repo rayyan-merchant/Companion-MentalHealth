@@ -109,6 +109,84 @@ class SessionMemoryAgent:
             self._add_to_vector_store(entry)
         
         return entry
+
+    def hydrate(self, messages: List[Dict[str, Any]]):
+        """
+        Re-populate memory from persistent message history.
+        This handles server restarts/statelessness.
+        """
+        from agents.ml_extractor import extract_signals # Import here to avoid circular dependencies if any
+        
+        # Clear current volatile memory
+        self.memory = []
+        self.turn_count = 0
+        self._accumulated = {"emotions": [], "symptoms": [], "triggers": []}
+        
+        # Process messages in order
+        # We need to pair User input with Bot response (for metadata)
+        
+        for i, msg in enumerate(messages):
+            if msg.get("role") == "user":
+                user_text = msg.get("content", "")
+                
+                # Check if there is a corresponding assistant response
+                assistant_data = {}
+                if i + 1 < len(messages) and messages[i+1].get("role") == "assistant":
+                    meta = messages[i+1].get("metadata", {}) or {}
+                    assistant_data = {
+                        "state": meta.get("state"),
+                        "confidence": meta.get("confidence", "low")
+                    }
+                
+                # Re-extract (fast)
+                extraction = extract_signals(user_text)
+                
+                # Add back to memory
+                self.add_turn(
+                    raw_text=user_text,
+                    extraction_result=extraction,
+                    inferred_states=[assistant_data.get("state")] if assistant_data.get("state") else [],
+                    confidence=assistant_data.get("confidence", "low")
+                )
+
+    def hydrate(self, messages: List[Dict[str, Any]]):
+        """
+        Re-populate memory from persistent message history.
+        This handles server restarts/statelessness.
+        """
+        from agents.ml_extractor import extract_signals # Import here to avoid circular dependencies if any
+        
+        # Clear current volatile memory
+        self.memory = []
+        self.turn_count = 0
+        self._accumulated = {"emotions": [], "symptoms": [], "triggers": []}
+        
+        # Process messages in order
+        # We need to pair User input with Bot response (for metadata)
+        
+        for i, msg in enumerate(messages):
+            if msg.get("role") == "user":
+                user_text = msg.get("content", "")
+                
+                # Check if there is a corresponding assistant response
+                assistant_data = {}
+                if i + 1 < len(messages) and messages[i+1].get("role") == "assistant":
+                    meta = messages[i+1].get("metadata", {}) or {}
+                    assistant_data = {
+                        "state": meta.get("state"),
+                        "confidence": meta.get("confidence", "low")
+                    }
+                
+                # Re-extract (fast)
+                extraction = extract_signals(user_text)
+                
+                # Add back to memory
+                self.add_turn(
+                    raw_text=user_text,
+                    extraction_result=extraction,
+                    inferred_states=[assistant_data.get("state")] if assistant_data.get("state") else [],
+                    confidence=assistant_data.get("confidence", "low")
+                )
     
     def _add_to_vector_store(self, entry: MemoryEntry):
         try:

@@ -21,44 +21,107 @@ except ImportError:
 RAG_SNIPPETS = {
     "AcademicStress": {
         "description": "Academic stress related to exams, coursework, or educational pressure.",
-        "coping": [
-            "Breaking tasks into smaller, manageable pieces can help reduce overwhelm.",
-            "Taking short breaks during study sessions helps maintain focus.",
-            "Reaching out to classmates or tutors for support is a sign of strength, not weakness."
-        ],
-        "empathy": "Academic pressure can feel relentless, especially during exam periods. What you're experiencing is valid."
+        "strategies": {
+            "default": [
+                "Breaking tasks into smaller, manageable pieces can help reduce overwhelm.",
+                "Reviewing your schedule to find small pockets of rest."
+            ],
+            "academic": [
+                "Try the **Pomodoro Technique**: 25 minutes of focused work followed by a 5-minute break.",
+                "Use **'Chunking'**: Break large assignments into tiny, actionable steps (e.g., 'Open laptop' -> 'Read title').",
+                "Practice **Active Recall**: Test yourself instead of just re-reading notes."
+            ],
+            "social": [
+                "Study groups can help, but ensure they are productive and supportive.",
+                "Set boundaries on when you are available to help others."
+            ]
+        },
+        "empathy": "Academic pressure can feel relentless. It makes sense that you're feeling this way."
     },
     "AnxietyRisk": {
         "description": "Signs of elevated anxiety including worry, restlessness, and sleep difficulties.",
-        "coping": [
-            "Grounding exercises like deep breathing or the 5-4-3-2-1 technique can help in the moment.",
-            "Regular physical activity, even short walks, can help reduce anxiety over time.",
-            "Limiting caffeine and ensuring consistent sleep patterns may help."
-        ],
-        "empathy": "Anxiety can make everything feel harder than it should. You're not alone in this."
+        "strategies": {
+            "default": [
+                "Practice **4-7-8 Breathing**: Inhale for 4, hold for 7, exhale for 8.",
+                "Try **Progressive Muscle Relaxation**: Tense and release muscle groups from toes to head."
+            ],
+            "financial": [
+                "Set a specific **'Worry Time'** (e.g., 20 mins at 4 PM) to process concerns, then distract yourself.",
+                "Focus on one small, actionable financial step you can take today."
+            ],
+            "health": [
+                "Limit Googling symptoms; set a timer if you must check.",
+                "Practice grounding: Name 5 things you can see and 4 things you can feel."
+            ]
+        },
+        "empathy": "Anxiety can be exhausting. You're doing the best you can."
     },
     "DepressiveSpectrum": {
         "description": "Patterns associated with low mood, withdrawal, and loss of interest.",
-        "coping": [
-            "Even small activities like a short walk or talking to someone can make a difference.",
-            "Setting tiny, achievable goals for each day can help build momentum.",
-            "Connecting with a counselor or support person is encouraged if feelings persist."
-        ],
-        "empathy": "Feeling empty or disconnected is hard to put into words. Your feelings are valid, and support is available."
+        "strategies": {
+            "default": [
+                "**Behavioral Activation**: Do one small thing you used to enjoy, even if you don't feel like it.",
+                "Get 10 minutes of **morning sunlight** to help regulate your mood."
+            ],
+            "social": [
+                "Send a low-pressure text (e.g., a meme) to one friend.",
+                "You don't have to 'perform' happiness; just being around others can help."
+            ],
+            "work": [
+                "Set the bar lower for 'good enough' today.",
+                "Focus on completing just one high-priority task."
+            ]
+        },
+        "empathy": "It takes a lot of strength just to keep going when you feel this way."
     },
     "PanicRisk": {
         "description": "Signs of acute panic or high anxiety with physical symptoms.",
-        "coping": [
-            "Focus on your breathing: breathe in for 4 counts, hold for 4, breathe out for 6.",
-            "Grounding yourself by naming 5 things you can see can help bring you back to the present.",
-            "If symptoms are severe or persist, speaking with a healthcare provider is recommended."
-        ],
-        "empathy": "Panic symptoms can be frightening, but they do pass. You're going to be okay."
+        "strategies": {
+            "default": [
+                "**5-4-3-2-1 Grounding**: 5 things you see, 4 you feel, 3 you hear, 2 you smell, 1 you taste.",
+                "Splash cold water on your face to activate the 'Mammalian Dive Reflex' and slow your heart."
+            ],
+            "social": [
+                "If in a crowd, find a quiet corner or restroom to center yourself for 5 minutes.",
+                "Focus on a single object in the room and describe it in detail."
+            ]
+        },
+        "empathy": "Panic attacks are terrifying, but they are temporary. You are safe."
+    },
+    "SleepDisturbance": {
+        "description": "Difficulties falling or staying asleep.",
+        "strategies": {
+            "default": [
+                "**Brain Dump**: Write down all your worries 1 hour before bed so your brain doesn't have to hold them.",
+                "Keep your room cool and dark to signal your body it's time to rest."
+            ],
+            "academic": [
+                "No studying in bed. Keep the bed strictly for sleep.",
+                "Set a firm 'shutdown time' for schoolwork at least 1 hour before sleep."
+            ]
+        },
+        "empathy": "Not sleeping well makes everything else feel harder."
+    },
+    "SocialIsolation": {
+        "description": "Pulling away from others or feeling disconnected.",
+        "strategies": {
+            "default": [
+                "Text one person just to say 'thinking of you'.",
+                "Go to a public place (like a cafe) just to be around people without pressure to interact."
+            ],
+            "social": [
+                "It's okay to say 'I'm not up for a big hangout, but can we grab coffee for 20 mins?'",
+                "Focus on quality over quantity of interactions."
+            ]
+        },
+        "empathy": "Loneliness is painful. Reaching out feels heavy, but small steps count."
     },
     "NeedsMoreContext": {
-        "description": "More information is needed to provide helpful guidance.",
-        "coping": [],
-        "empathy": "I want to make sure I understand what you're going through so I can be as helpful as possible."
+        "description": "More information is needed.",
+        "strategies": {
+            "default": []
+        },
+        "empathy": "I'm listening. Take your time."
     }
 }
 
@@ -83,14 +146,16 @@ REPHRASE_PROMPT = """Given the following assessment and evidence, create a warm,
 
 State Identified: {state}
 Evidence Used: {evidence}
-Coping Suggestions: {coping}
+Available Coping Strategies (Grouped by Category):
+{coping}
 Empathy Note: {empathy}
 
 Generate a response that:
 1. Acknowledges what the person shared (1-2 sentences)
 2. Gently reflects the identified pattern (1 sentence)
-3. Offers 1-2 coping suggestions naturally
-4. Ends with an open, supportive question
+3. Selects 1-2 MOST RELEVANT coping suggestions based on the evidence (e.g., if evidence mentions exams, pick ACADEMIC strategies).
+4. Do NOT list all strategies. Pick the best ones.
+5. Ends with an open, supportive question
 
 Keep the response under 100 words. Do NOT use clinical language."""
 
@@ -115,21 +180,25 @@ class ExplanationResult:
 
 class LLMExplanationAgent:
 
-    
     def __init__(self, api_key: Optional[str] = None):
-        self.client = None
-        self.use_llm = False
+        self.api_keys = []
         self.model = os.getenv("LLM_MODEL", "llama-3.3-70b-versatile")
+        self.use_llm = False
         
-        api_key = api_key or os.getenv("GROQ_API_KEY")
-        
-        if GROQ_AVAILABLE and api_key:
-            try:
-                self.client = Groq(api_key=api_key)
-                self.use_llm = True
-                print(f"LLM enabled with model: {self.model}")
-            except Exception as e:
-                print(f"Failed to initialize Groq client: {e}")
+        # Load keys from arg or env
+        if api_key:
+            self.api_keys = [k.strip() for k in api_key.split(",") if k.strip()]
+        else:
+            env_keys = os.getenv("GROQ_API_KEY", "")
+            self.api_keys = [k.strip() for k in env_keys.split(",") if k.strip()]
+            
+        if GROQ_AVAILABLE and self.api_keys:
+            self.use_llm = True
+            print(f"LLM enabled with {len(self.api_keys)} keys. Model: {self.model}")
+        elif not GROQ_AVAILABLE:
+            print("Warning: groq not installed. LLM explanations disabled.")
+        else:
+            print("Warning: No API keys found. LLM explanations disabled.")
         
         self.rag_db = RAG_SNIPPETS
         self.disclaimer = (
@@ -137,7 +206,21 @@ class LLMExplanationAgent:
             "If you're experiencing ongoing distress, please consider speaking with "
             "a counselor or mental health professional."
         )
-    
+
+    def _get_client(self):
+        """Get a Groq client with a random key from the pool."""
+        import random
+        if not self.api_keys:
+            return None
+        
+        # Simple random selection for load balancing
+        selected_key = random.choice(self.api_keys)
+        try:
+            return Groq(api_key=selected_key)
+        except Exception as e:
+            print(f"Failed to create client with key ...{selected_key[-4:]}: {e}")
+            return None
+
     def explain(
         self,
         primary_state: str,
@@ -149,12 +232,47 @@ class LLMExplanationAgent:
         action = confidence_decision.get("action", "explain")
         questions = confidence_decision.get("clarification_questions", [])
         
-        # Get RAG snippet for the state
-        rag_data = self.rag_db.get(primary_state, self.rag_db["NeedsMoreContext"])
+        # Get RAG snippet for the primary state
+        primary_rag = self.rag_db.get(primary_state, self.rag_db["NeedsMoreContext"])
+        
+        # Cross-Pollination: Gather strategies from other states based on evidence
+        aggregated_strategies = primary_rag.get("strategies", {}).copy()
+        
+        symptoms = set(evidence.get("symptoms", []))
+        emotions = set(evidence.get("emotions", []))
+        
+        # 1. Sleep Issues
+        if "insomnia" in symptoms or "fatigue" in symptoms:
+            sleep_rag = self.rag_db.get("SleepDisturbance", {})
+            if sleep_rag:
+                sleep_tips = sleep_rag.get("strategies", {}).get("default", [])
+                if sleep_tips:
+                    existing = aggregated_strategies.get("sleep", [])
+                    aggregated_strategies["sleep"] = existing + sleep_tips
+
+        # 2. Anxiety/Panic (if not primary)
+        if ("anxiety" in emotions or "restlessness" in symptoms) and primary_state != "AnxietyRisk":
+             anx_rag = self.rag_db.get("AnxietyRisk", {})
+             if anx_rag:
+                 anx_tips = anx_rag.get("strategies", {}).get("default", [])
+                 if anx_tips:
+                     aggregated_strategies["calming"] = aggregated_strategies.get("calming", []) + anx_tips
+        
+        # 3. Social Isolation (if not primary)
+        if "withdrawal" in symptoms or "loneliness" in emotions:
+            iso_rag = self.rag_db.get("SocialIsolation", {})
+            if iso_rag:
+                iso_tips = iso_rag.get("strategies", {}).get("default", [])
+                if iso_tips:
+                     aggregated_strategies["social_connection"] = aggregated_strategies.get("social_connection", []) + iso_tips
+
+        # Create a temporary RAG object with aggregated strategies for generation
+        generation_rag = primary_rag.copy()
+        generation_rag["strategies"] = aggregated_strategies
         
         # Handle clarification case
         if action == "ask_clarification":
-            response = self._generate_clarification(user_input, questions, rag_data)
+            response = self._generate_clarification(user_input, questions, generation_rag)
             return ExplanationResult(
                 response_text=response,
                 coping_suggestions=[],
@@ -165,16 +283,16 @@ class LLMExplanationAgent:
         
         # Generate explanation
         if self.use_llm:
-            response = self._generate_with_llm(primary_state, evidence, rag_data, action)
+            response = self._generate_with_llm(primary_state, evidence, generation_rag, action)
         else:
-            response = self._generate_template(primary_state, evidence, rag_data, action)
+            response = self._generate_template(primary_state, evidence, generation_rag, action)
         
         # Add disclaimer for cautious explanations
         disclaimer = self.disclaimer if action == "explain_cautious" else ""
         
         return ExplanationResult(
             response_text=response,
-            coping_suggestions=rag_data.get("coping", [])[:2],
+            coping_suggestions=generation_rag.get("strategies", {}).get("default", [])[:2],
             disclaimer=disclaimer,
             used_llm=self.use_llm,
             raw_state=primary_state
@@ -194,23 +312,35 @@ class LLMExplanationAgent:
             question = "Could you share a bit more about what's been on your mind?"
         
         if self.use_llm:
-            try:
-                prompt = CLARIFICATION_PROMPT.format(
-                    user_input=user_input,
-                    questions=questions
-                )
-                response = self.client.chat.completions.create(
-                    model=self.model,
-                    messages=[
-                        {"role": "system", "content": SYSTEM_PROMPT},
-                        {"role": "user", "content": prompt}
-                    ],
-                    max_tokens=100,
-                    temperature=0.7
-                )
-                return response.choices[0].message.content
-            except Exception as e:
-                print(f"LLM clarification failed: {e}")
+            # Retry logic for picking a working key
+            attempts = 0
+            max_attempts = len(self.api_keys) * 2 # Try a few times
+            
+            while attempts < max_attempts:
+                client = self._get_client()
+                if not client:
+                    break
+                    
+                try:
+                    prompt = CLARIFICATION_PROMPT.format(
+                        user_input=user_input,
+                        questions=questions
+                    )
+                    response = client.chat.completions.create(
+                        model=self.model,
+                        messages=[
+                            {"role": "system", "content": SYSTEM_PROMPT},
+                            {"role": "user", "content": prompt}
+                        ],
+                        max_tokens=100,
+                        temperature=0.7
+                    )
+                    return response.choices[0].message.content
+                except Exception as e:
+                    print(f"LLM clarification attempt {attempts+1} failed: {e}")
+                    attempts += 1
+            
+            print("All LLM keys failed for clarification. Falling back to template.")
         
         return f"{empathy}\n\n{question}"
     
@@ -221,11 +351,34 @@ class LLMExplanationAgent:
         rag_data: Dict,
         action: str
     ) -> str:
+        # Template logic (unchanged)
         empathy = rag_data.get("empathy", "I hear you.")
         description = rag_data.get("description", "")
-        coping = rag_data.get("coping", [])
+        # Get strategies dict
+        all_strategies = rag_data.get("strategies", {"default": []})
         
-        # Build evidence summary
+        # Select best category based on triggers
+        triggers = evidence.get("triggers", [])
+        selected_category = "default"
+        
+        for trigger in triggers:
+            if trigger in ["academic", "exam", "grades", "classes"]:
+                if "academic" in all_strategies:
+                    selected_category = "academic"
+                    break
+            elif trigger in ["social", "relationship", "family", "friends"]:
+                if "social" in all_strategies:
+                    selected_category = "social"
+                    break
+            elif trigger in ["financial", "money", "work", "job"]:
+                if "financial" in all_strategies:
+                    selected_category = "financial"
+                elif "work" in all_strategies:
+                    selected_category = "work"
+                    break
+                     
+        coping = all_strategies.get(selected_category, all_strategies.get("default", []))
+        
         evidence_parts = []
         if evidence.get("emotions"):
             evidence_parts.append(f"feeling {', '.join(evidence['emotions'])}")
@@ -236,7 +389,6 @@ class LLMExplanationAgent:
         
         evidence_summary = " and ".join(evidence_parts) if evidence_parts else "what you shared"
         
-        # Build response
         response = f"Thank you for sharing. {empathy}\n\n"
         response += f"Based on {evidence_summary}, this sounds like it may relate to {description.lower()}\n\n"
         
@@ -259,32 +411,49 @@ class LLMExplanationAgent:
         rag_data: Dict,
         action: str
     ) -> str:
-        if not self.client:
+        if not self.use_llm:
             return self._generate_template(state, evidence, rag_data, action)
         
-        try:
-            prompt = REPHRASE_PROMPT.format(
-                state=state,
-                evidence=str(evidence),
-                coping=rag_data.get("coping", []),
-                empathy=rag_data.get("empathy", "")
-            )
-            
-            response = self.client.chat.completions.create(
-                model=self.model,
-                messages=[
-                    {"role": "system", "content": SYSTEM_PROMPT},
-                    {"role": "user", "content": prompt}
-                ],
-                max_tokens=150,
-                temperature=0.7
-            )
-            
-            return response.choices[0].message.content
-            
-        except Exception as e:
-            print(f"LLM generation failed: {e}")
-            return self._generate_template(state, evidence, rag_data, action)
+        # Flatten strategies for LLM awareness
+        all_strategies = rag_data.get("strategies", {})
+        flat_strategies = []
+        for cat, tips in all_strategies.items():
+            flat_strategies.append(f"{cat.upper()}: {', '.join(tips)}")
+        
+        prompt = REPHRASE_PROMPT.format(
+            state=state,
+            evidence=str(evidence),
+            coping="\n".join(flat_strategies),
+            empathy=rag_data.get("empathy", "")
+        )
+        
+        # Retry logic
+        attempts = 0
+        max_attempts = len(self.api_keys) * 2
+        
+        while attempts < max_attempts:
+            client = self._get_client()
+            if not client:
+                break
+                
+            try:
+                response = client.chat.completions.create(
+                    model=self.model,
+                    messages=[
+                        {"role": "system", "content": SYSTEM_PROMPT},
+                        {"role": "user", "content": prompt}
+                    ],
+                    max_tokens=150,
+                    temperature=0.7
+                )
+                return response.choices[0].message.content
+                
+            except Exception as e:
+                print(f"LLM generation attempt {attempts+1} failed: {e}")
+                attempts += 1
+        
+        print("All LLM keys failed. Falling back to template.")
+        return self._generate_template(state, evidence, rag_data, action)
 
 
 _explainer_instance: Optional[LLMExplanationAgent] = None
