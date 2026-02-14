@@ -305,9 +305,80 @@ def get_user_stats(user_id: str) -> Dict[str, Any]:
         reverse=True
     )[:5]
 
+    # Calculate average sentiment (simple heuristic based on crisis/risk)
+    sentiment_score = 0.5  # Neutral default
+    if risk_counts["high"] > 0:
+        sentiment_score = 0.2
+    elif risk_counts["medium"] > 0:
+        sentiment_score = 0.4
+    elif risk_counts["low"] > 0:
+        sentiment_score = 0.8
+        
     return {
         "total_sessions": total_sessions,
         "risk_distribution": risk_counts,
         "top_symptoms": top_symptoms,
-        "total_messages": total_messages
+        "total_messages": total_messages,
+        "avg_sentiment": sentiment_score
     }
+
+
+def get_recent_chat_history(user_id: str, limit: int = 50) -> str:
+    """
+    Get recent chat history across all sessions for a user, 
+    formatted as a text transcript for LLM context.
+    
+    Args:
+        user_id: The user ID to fetch history for.
+        limit: Max number of messages to include.
+        
+    Returns:
+        String transcript of recent conversations.
+    """
+    user_dir = _get_user_sessions_dir(user_id)
+    if not user_dir.exists():
+        return ""
+        
+    all_messages = []
+    
+    # Collect all messages from all sessions
+    for session_file in user_dir.glob("*.json"):
+        try:
+            data = json.loads(session_file.read_text())
+            session = Session(**data)
+            
+            if session.is_deleted or not session.messages:
+                continue
+            
+            # Add session context to messages
+            for msg in session.messages:
+                all_messages.append({
+                    "timestamp": msg.timestamp,
+                    "role": msg.role,
+                    "content": msg.content,
+                    "session_title": session.title or "Untitled Session"
+                })
+        except (json.JSONDecodeError, Exception):
+            continue
+            
+    # Sort by timestamp descending (newest first)
+    all_messages.sort(key=lambda x: x["timestamp"], reverse=True)
+    
+    # Take top N
+    recent_msgs = all_messages[:limit]
+    
+    # Sort back to chronological for the transcript
+    recent_msgs.sort(key=lambda x: x["timestamp"])
+    
+    transcript = []
+    current_session = None
+    
+    for msg in recent_msgs:
+        if msg["session_title"] != current_session:
+            transcript.append(f"\n[Session: {msg['session_title']}]")
+            current_session = msg["session_title"]
+            
+        role_label = "User" if msg["role"] == "user" else "Companion"
+        transcript.append(f"{role_label}: {msg['content']}")
+        
+    return "\n".join(transcript)

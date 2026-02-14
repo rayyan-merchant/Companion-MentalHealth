@@ -2,15 +2,13 @@ fastapi>=0.104.0
 uvicorn>=0.24.0
 pydantic>=2.5.0
 rdflib>=7.0.0
-pytest
-
-sentence-transformers>=2.2.0
-numpy>=1.24.0
-
-chromadb>=0.4.0
-
-groq>=0.4.0
+groq>=0.4.2
 python-dotenv>=1.0.0
 
+requests>=2.31.0
 passlib[bcrypt]>=1.7.4
+bcrypt==4.0.1
 python-jose[cryptography]>=3.3.0
+qdrant-client>=1.7.0
+huggingface_hub>=0.20.0
+google-genai>=1.0.0

@@ -1,22 +1,28 @@
 import { motion } from 'framer-motion';
-import { TrendingUp, AlertTriangle, Activity, MessageSquare } from 'lucide-react';
+import { TrendingUp, AlertTriangle, Activity, MessageSquare, Sparkles, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { getSessionStats, SessionStats } from '../api/sessions';
+import { getSessionStats, SessionStats, getDashboardInsight } from '../api/sessions';
 
 export function Dashboard() {
     const [stats, setStats] = useState<SessionStats | null>(null);
+    const [insight, setInsight] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [showInsight, setShowInsight] = useState(true);
 
     useEffect(() => {
-        loadStats();
+        loadData();
     }, []);
 
-    const loadStats = async () => {
+    const loadData = async () => {
         try {
-            const data = await getSessionStats();
-            setStats(data);
+            const [statsData, insightData] = await Promise.all([
+                getSessionStats(),
+                getDashboardInsight().catch(() => ({ insight: null })) // Fail gracefully
+            ]);
+            setStats(statsData);
+            setInsight(insightData.insight);
         } catch (error) {
-            console.error("Failed to load dashboard stats", error);
+            console.error("Failed to load dashboard data", error);
         } finally {
             setIsLoading(false);
         }
@@ -75,6 +81,33 @@ export function Dashboard() {
     return (
         <div className="h-full overflow-y-auto pb-20 md:pb-0 p-4 md:p-6 max-w-6xl mx-auto">
             <h1 className="text-2xl font-semibold mb-6">Your Insights</h1>
+
+            {insight && showInsight && (
+                <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="bg-gradient-to-r from-primary/5 to-indigo-500/5 border border-primary/10 rounded-2xl p-6 mb-8 relative"
+                >
+                    <button
+                        onClick={() => setShowInsight(false)}
+                        className="absolute top-4 right-4 text-slate-text/40 hover:text-slate-text/70 transition-colors"
+                        title="Dismiss"
+                    >
+                        <X size={18} />
+                    </button>
+                    <div className="flex gap-4">
+                        <div className="p-3 bg-white rounded-xl shadow-sm text-primary h-fit">
+                            <Sparkles size={24} />
+                        </div>
+                        <div>
+                            <h3 className="font-semibold text-lg mb-1 text-primary-dark">Daily Observation</h3>
+                            <p className="text-slate-text/80 leading-relaxed max-w-3xl">
+                                {insight}
+                            </p>
+                        </div>
+                    </div>
+                </motion.div>
+            )}
 
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                 {statCards.map((stat, index) => (

@@ -2,15 +2,16 @@ from typing import Dict, List, Any, Optional
 from dataclasses import dataclass, field
 from datetime import datetime
 import json
+import os
 from pathlib import Path
 
 try:
-    import chromadb
-    from chromadb.config import Settings
+    from qdrant_client import QdrantClient
+    from qdrant_client.models import Distance, VectorParams, PointStruct
     VECTOR_STORE_AVAILABLE = True
 except ImportError:
     VECTOR_STORE_AVAILABLE = False
-    print("Warning: chromadb not installed. Vector memory disabled.")
+    print("Warning: qdrant-client not installed. Vector memory disabled.")
 
 
 @dataclass
@@ -38,7 +39,8 @@ class SessionContext:
 
 
 class SessionMemoryAgent:
-
+    
+    VECTOR_SIZE = 384  # Consistent with embedding model
     
     def __init__(self, session_id: str, persist_dir: Optional[str] = None):
         self.session_id = session_id
@@ -51,25 +53,37 @@ class SessionMemoryAgent:
             "triggers": []
         }
         
-        self.vector_store = None
-        self.collection = None
-        if VECTOR_STORE_AVAILABLE and persist_dir:
-            self._init_vector_store(persist_dir)
+        self.client = None
+        self.collection_name = f"session_{self.session_id}"
+        
+        if VECTOR_STORE_AVAILABLE:
+            self._init_vector_store()
     
-    def _init_vector_store(self, persist_dir: str):
+    def _init_vector_store(self):
         try:
-            self.vector_store = chromadb.Client(Settings(
-                chroma_db_impl="duckdb+parquet",
-                persist_directory=persist_dir,
-                anonymized_telemetry=False
-            ))
-            self.collection = self.vector_store.get_or_create_collection(
-                name=f"session_{self.session_id}",
-                metadata={"hnsw:space": "cosine"}
-            )
+            qdrant_url = os.getenv("QDRANT_URL")
+            qdrant_key = os.getenv("QDRANT_API_KEY")
+            
+            if qdrant_url and qdrant_key:
+                self.client = QdrantClient(url=qdrant_url, api_key=qdrant_key)
+                # Ensure session collection exists
+                collections = self.client.get_collections().collections
+                names = [c.name for c in collections]
+                
+                if self.collection_name not in names:
+                    self.client.create_collection(
+                        collection_name=self.collection_name,
+                        vectors_config=VectorParams(
+                            size=self.VECTOR_SIZE,
+                            distance=Distance.COSINE
+                        )
+                    )
+            else:
+                self.client = None
+                
         except Exception as e:
-            print(f"Failed to initialize vector store: {e}")
-            self.vector_store = None
+            print(f"Failed to initialize session vector store: {e}")
+            self.client = None
     
     def add_turn(
         self,
@@ -105,7 +119,7 @@ class SessionMemoryAgent:
         self._accumulated["triggers"].extend(triggers)
         
         # Add to vector store if available
-        if self.collection:
+        if self.client:
             self._add_to_vector_store(entry)
         
         return entry
@@ -115,7 +129,7 @@ class SessionMemoryAgent:
         Re-populate memory from persistent message history.
         This handles server restarts/statelessness.
         """
-        from agents.ml_extractor import extract_signals # Import here to avoid circular dependencies if any
+        from agents.ml_extractor import extract_signals # Import here to avoid circular dependencies
         
         # Clear current volatile memory
         self.memory = []
@@ -123,8 +137,6 @@ class SessionMemoryAgent:
         self._accumulated = {"emotions": [], "symptoms": [], "triggers": []}
         
         # Process messages in order
-        # We need to pair User input with Bot response (for metadata)
-        
         for i, msg in enumerate(messages):
             if msg.get("role") == "user":
                 user_text = msg.get("content", "")
@@ -138,7 +150,7 @@ class SessionMemoryAgent:
                         "confidence": meta.get("confidence", "low")
                     }
                 
-                # Re-extract (fast)
+                # Re-extract
                 extraction = extract_signals(user_text)
                 
                 # Add back to memory
@@ -149,59 +161,51 @@ class SessionMemoryAgent:
                     confidence=assistant_data.get("confidence", "low")
                 )
 
-    def hydrate(self, messages: List[Dict[str, Any]]):
-        """
-        Re-populate memory from persistent message history.
-        This handles server restarts/statelessness.
-        """
-        from agents.ml_extractor import extract_signals # Import here to avoid circular dependencies if any
-        
-        # Clear current volatile memory
-        self.memory = []
-        self.turn_count = 0
-        self._accumulated = {"emotions": [], "symptoms": [], "triggers": []}
-        
-        # Process messages in order
-        # We need to pair User input with Bot response (for metadata)
-        
-        for i, msg in enumerate(messages):
-            if msg.get("role") == "user":
-                user_text = msg.get("content", "")
-                
-                # Check if there is a corresponding assistant response
-                assistant_data = {}
-                if i + 1 < len(messages) and messages[i+1].get("role") == "assistant":
-                    meta = messages[i+1].get("metadata", {}) or {}
-                    assistant_data = {
-                        "state": meta.get("state"),
-                        "confidence": meta.get("confidence", "low")
-                    }
-                
-                # Re-extract (fast)
-                extraction = extract_signals(user_text)
-                
-                # Add back to memory
-                self.add_turn(
-                    raw_text=user_text,
-                    extraction_result=extraction,
-                    inferred_states=[assistant_data.get("state")] if assistant_data.get("state") else [],
-                    confidence=assistant_data.get("confidence", "low")
-                )
+    def get_formatted_history(self, limit: int = 5) -> str:
+        """Get recent conversation history formatted for LLM context."""
+        history_lines = []
+        recent_turns = self.memory[-limit:]
+        for turn in recent_turns:
+            history_lines.append(f"User: {turn.raw_text}")
+            
+        return "\n".join(history_lines)
+
     
     def _add_to_vector_store(self, entry: MemoryEntry):
         try:
-            self.collection.add(
-                documents=[entry.raw_text],
-                metadatas=[{
-                    "turn_id": entry.turn_id,
-                    "emotions": ",".join(entry.emotions),
-                    "symptoms": ",".join(entry.symptoms),
-                    "triggers": ",".join(entry.triggers)
-                }],
-                ids=[f"turn_{entry.turn_id}"]
+            # We need an embedding for the text
+            from agents.embedding_providers import get_embedding
+            
+            embedding = get_embedding(entry.raw_text)
+            if not embedding:
+                return
+
+            # Normalize dimensions if needed
+            if len(embedding) != self.VECTOR_SIZE:
+                 if len(embedding) > self.VECTOR_SIZE:
+                     embedding = embedding[:self.VECTOR_SIZE]
+                 else:
+                     embedding = embedding + [0.0] * (self.VECTOR_SIZE - len(embedding))
+            
+            payload = {
+                "turn_id": entry.turn_id,
+                "raw_text": entry.raw_text,
+                "emotions": ",".join(entry.emotions),
+                "symptoms": ",".join(entry.symptoms),
+                "triggers": ",".join(entry.triggers),
+                "timestamp": entry.timestamp
+            }
+            
+            self.client.upsert(
+                collection_name=self.collection_name,
+                points=[PointStruct(
+                    id=entry.turn_id,
+                    vector=embedding,
+                    payload=payload
+                )]
             )
         except Exception as e:
-            print(f"Failed to add to vector store: {e}")
+            print(f"Failed to add to session vector store: {e}")
     
     def get_context(self) -> SessionContext:
 
@@ -221,7 +225,7 @@ class SessionMemoryAgent:
             accumulated_triggers=unique_triggers,
             repeated_patterns=repeated,
             persistence_detected=persistence,
-            similar_past_messages=[]  # Populated by retrieve_similar
+            similar_past_messages=[]  # Populated by retrieve_similar? Or handled by caller.
         )
     
     def _detect_repeated_patterns(self) -> List[str]:
@@ -238,15 +242,33 @@ class SessionMemoryAgent:
     
     def retrieve_similar(self, query: str, n_results: int = 3) -> List[str]:
 
-        if not self.collection or self.turn_count == 0:
+        if not self.client or self.turn_count == 0:
             return []
         
         try:
-            results = self.collection.query(
-                query_texts=[query],
-                n_results=min(n_results, self.turn_count)
+            # Generate query embedding
+            from agents.embedding_providers import get_embedding
+            query_embedding = get_embedding(query)
+            if not query_embedding:
+                return []
+                
+            # Normalize dimensions
+            if len(query_embedding) != self.VECTOR_SIZE:
+                 if len(query_embedding) > self.VECTOR_SIZE:
+                     query_embedding = query_embedding[:self.VECTOR_SIZE]
+                 else:
+                     query_embedding = query_embedding + [0.0] * (self.VECTOR_SIZE - len(query_embedding))
+            
+            # Use query_points for search
+            results = self.client.query_points(
+                collection_name=self.collection_name,
+                query=query_embedding,
+                limit=n_results
             )
-            return results.get("documents", [[]])[0]
+            
+            # Extract text from payload
+            return [point.payload.get("raw_text", "") for point in results.points]
+            
         except Exception as e:
             print(f"Similarity retrieval failed: {e}")
             return []
@@ -265,7 +287,6 @@ class SessionMemoryAgent:
         }
 
 
-
 _sessions: Dict[str, SessionMemoryAgent] = {}
 
 
@@ -280,10 +301,13 @@ def clear_session(session_id: str):
         del _sessions[session_id]
 
 
-
 if __name__ == "__main__":
-    print("Session Memory Agent Test")
+    print("Session Memory Agent Test (Qdrant)")
     print("=" * 60)
+    
+    # Needs valid .env with QDRANT_API_KEY
+    from dotenv import load_dotenv
+    load_dotenv()
     
     session = get_session("test_session_001")
     
@@ -301,7 +325,10 @@ if __name__ == "__main__":
     print(f"\n--- Session Context ---")
     print(f"Turn count: {context.turn_count}")
     print(f"Accumulated emotions: {context.accumulated_emotions}")
-    print(f"Accumulated symptoms: {context.accumulated_symptoms}")
-    print(f"Accumulated triggers: {context.accumulated_triggers}")
     print(f"Repeated patterns: {context.repeated_patterns}")
-    print(f"Persistence detected: {context.persistence_detected}")
+    
+    # Test retrieval
+    print("\nSimilar to 'exam stress':")
+    similar = session.retrieve_similar("exam stress")
+    for s in similar:
+        print(f"- {s}")

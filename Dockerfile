@@ -24,13 +24,23 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies
+COPY requirements.txt ./requirements.txt
 COPY backend/requirements.txt ./backend/requirements.txt
-RUN pip install --no-cache-dir -r backend/requirements.txt
+RUN pip install --upgrade pip && \
+    pip install --default-timeout=1000 --no-cache-dir -r requirements.txt && \
+    pip install --default-timeout=1000 --no-cache-dir -r backend/requirements.txt
+
 
 # Copy backend code
 COPY backend/ ./backend/
 COPY agents/ ./agents/
 COPY data/ ./data/
+
+# Copy knowledge base directories (required by symbolic reasoner)
+COPY ontology/ ./ontology/
+COPY reasoning/ ./reasoning/
+COPY nlp/ ./nlp/
+COPY graph/ ./graph/
 
 # Copy built frontend from Stage 1
 COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
@@ -41,9 +51,10 @@ RUN chmod -R 777 ./data
 # Set Environment Variables
 ENV PYTHONPATH=/app
 ENV PORT=8000
+ENV JWT_SECRET_KEY=change-me-in-production
 
 # Expose port
-EXPOSE 8000
+EXPOSE 10000
 
 # Run Application
-CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "10000"]

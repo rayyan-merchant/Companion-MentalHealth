@@ -20,7 +20,9 @@ from .session_store import (
     add_message_to_session,
     update_session_risk,
     add_inferred_state,
-    get_user_stats
+    add_inferred_state,
+    get_user_stats,
+    get_recent_chat_history
 )
 
 
@@ -45,6 +47,32 @@ async def get_session_statistics(current_user: User = Depends(get_current_user))
     Get statistics for the current user's sessions.
     """
     return get_user_stats(current_user.user_id)
+
+
+@router.get("/insight")
+async def get_dashboard_insight(current_user: User = Depends(get_current_user)):
+    """
+    Get an AI-generated insight based on recent chat history.
+    """
+    try:
+        # Get recent history
+        history = get_recent_chat_history(current_user.user_id, limit=30)
+        
+        if not history:
+            return {"insight": None}
+            
+        # Generate insight
+        # We need to import generate_dashboard_insight helper
+        # Since it's not imported yet, we'll do it inside or fix imports
+        from agents.llm_explainer import generate_dashboard_insight
+        
+        insight = generate_dashboard_insight(history)
+        return {"insight": insight}
+        
+    except Exception as e:
+        logger.error(f"Error generating insight: {e}")
+        # Don't fail the dashboard load, just return no insight
+        return {"insight": None}
 
 
 @router.get("", response_model=List[SessionSummary])

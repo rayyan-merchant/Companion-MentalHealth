@@ -173,14 +173,6 @@ def evaluate_confidence(
         "clarification_questions": decision.clarification_questions,
         "reasoning": decision.reasoning
     }
-    
-    return {
-        "action": decision.action,
-        "confidence_level": decision.confidence_level,
-        "should_ask_clarification": decision.should_ask_clarification,
-        "clarification_questions": decision.clarification_questions,
-        "reasoning": decision.reasoning
-    }
 
 
 if __name__ == "__main__":

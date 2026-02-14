@@ -24,6 +24,7 @@ export function Chat() {
     const [isLoading, setIsLoading] = useState(false);
     const [isInitializing, setIsInitializing] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [showQuickPrompts, setShowQuickPrompts] = useState(true);
 
     // Initialize session
     useEffect(() => {
@@ -129,7 +130,8 @@ export function Chat() {
                 },
                 follow_up_questions: response.follow_up_questions || [],
                 disclaimer: response.disclaimer || '',
-                reasoning_trace: response.reasoning_trace || []
+                reasoning_trace: response.reasoning_trace || [],
+                crisis_type: response.crisis_type
             });
 
             // Add bot response to messages
@@ -240,11 +242,16 @@ export function Chat() {
 
                 {krrResult?.action === 'crisis_intervention' && (
                     <div className="px-4">
-                        <CrisisAlert />
+                        <CrisisAlert type={krrResult.crisis_type} />
                     </div>
                 )}
 
-                <QuickPrompts onSelect={handleQuickPrompt} />
+                {showQuickPrompts && (
+                    <QuickPrompts
+                        onSelect={handleQuickPrompt}
+                        onClose={() => setShowQuickPrompts(false)}
+                    />
+                )}
                 <Composer onSend={sendUserMessage} disabled={isLoading} />
             </div>
 
