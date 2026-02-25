@@ -28,6 +28,11 @@ export interface SymbolicState {
 export interface Intervention {
     name: string;
     reason: string;
+    title: string;
+    urgency: 'low' | 'medium' | 'high';
+    description: string;
+    duration?: string;
+    steps?: string[];
 }
 
 export interface KrrResult {
