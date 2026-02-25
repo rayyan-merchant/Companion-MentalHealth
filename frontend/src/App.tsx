@@ -4,7 +4,6 @@ import { AuthProvider } from './context/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { LeftNav } from './components/layout/LeftNav';
 import { TopNav } from './components/layout/TopNav';
-import { FooterBar } from './components/layout/FooterBar';
 import { Home } from './pages/Home';
 import { Chat } from './pages/Chat';
 import { Session } from './pages/Session';
@@ -36,7 +35,6 @@ function AppLayout({ children }: { children: React.ReactNode }) {
                         {children}
                     </main>
 
-                    <FooterBar />
                 </div>
             </div>
         </div>

@@ -127,9 +127,9 @@ async def run_reasoning_pipeline(request: KrrRequest):
         raise HTTPException(status_code=500, detail="Processing failed")
 
 
-@app.get("/api/health")
+@app.api_route("/api/health", methods=["GET", "HEAD"])
 async def health_check():
-    return {"status": "active"}
+    return {"status": "active", "service": "Mental Health KRR System"}
 
 # ==========================================
 # Frontend (React) Production Serving

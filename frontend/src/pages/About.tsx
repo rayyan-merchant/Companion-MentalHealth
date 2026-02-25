@@ -118,10 +118,10 @@ export function About() {
                 <div className="grid md:grid-cols-3 gap-6">
                     {[
                         {
-                            name: "Riya Bhart",
-                            email: "riyabhart02@gmail.com",
-                            github: "https://github.com/RiyaBhart",
-                            linkedin: "http://www.linkedin.com/in/riya-bhart-339036287"
+                            name: "Syeda Rija Ali",
+                            email: "rijaali287@gmail.com",
+                            github: "https://github.com/Srijaali",
+                            linkedin: "https://www.linkedin.com/in/rija-ali-731095296/"
                         },
                         {
                             name: "Rayyan Merchant",
@@ -130,10 +130,10 @@ export function About() {
                             linkedin: "https://www.linkedin.com/in/rayyanmerchant2004/"
                         },
                         {
-                            name: "Syeda Rija Ali",
-                            email: "rijaali287@gmail.com",
-                            github: "https://github.com/Srijaali",
-                            linkedin: "https://www.linkedin.com/in/rija-ali-731095296/"
+                            name: "Riya Bhart",
+                            email: "riyabhart02@gmail.com",
+                            github: "https://github.com/RiyaBhart",
+                            linkedin: "http://www.linkedin.com/in/riya-bhart-339036287"
                         }
                     ].map((dev) => (
                         <div key={dev.name} className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all">
