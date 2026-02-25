@@ -1,7 +1,8 @@
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any, Optional, Tuple
 from dataclasses import dataclass
 from pathlib import Path
 import os
+import random
 
 try:
     from dotenv import load_dotenv
@@ -14,7 +15,15 @@ try:
     GROQ_AVAILABLE = True
 except ImportError:
     GROQ_AVAILABLE = False
-    print("Warning: groq not installed. LLM explanations disabled.")
+    print("Warning: groq not installed. Groq LLM disabled.")
+
+try:
+    from google import genai
+    from google.genai import types as genai_types
+    GEMINI_AVAILABLE = True
+except ImportError:
+    GEMINI_AVAILABLE = False
+    print("Warning: google-genai not installed. Gemini LLM disabled.")
 
 
 
@@ -153,20 +162,46 @@ Empathy Note: {empathy}
 Generate a response that:
 1. Acknowledges what the person shared (1-2 sentences)
 2. Gently reflects the identified pattern (1 sentence)
-3. Selects 1-2 MOST RELEVANT coping suggestions based on the evidence (e.g., if evidence mentions exams, pick ACADEMIC strategies).
-4. Do NOT list all strategies. Pick the best ones.
-5. Ends with an open, supportive question
+
+REFERENCE EMPATHY:
+"{empathy}"
+
+TASK:
+Write a warm, empathetic response that validates the user's experience and seamlessly integrates 1-2 relevant coping strategies from the reference list.
+Do not explicitly say "I suggest strategies". Weave them into the conversation naturally.
 
 Keep the response under 100 words. Do NOT use clinical language."""
 
-CLARIFICATION_PROMPT = """The user said: "{user_input}"
+CLARIFICATION_PROMPT = """
+CONTEXT:
+{conversation_history}
 
-We need more information. Generate a warm, supportive response that:
-1. Acknowledges what they shared
-2. Asks ONE of these clarifying questions naturally: {questions}
+USER INPUT: "{user_input}"
 
-Keep it under 50 words. Be gentle and non-invasive."""
+The system needs more information to help. 
+Suggested questions from logic: {questions}
 
+TASK:
+Write a gentle, empathetic response that validates the user's input and naturally asks ONE of the suggested questions (or a better contextual one) to understand their situation better.
+Do not list the questions. Weave ONE into the conversation naturally.
+"""
+
+
+INSIGHT_PROMPT = """
+CONTEXT:
+{conversation_history}
+
+TASK:
+Based *strictly* on the recent conversation history above, provide a single, warm, psychological observation or insight for the user.
+Focus on:
+1. Validating their feelings (e.g., "It's understandable that exams are causing stress...")
+2. Noting positive traits or efforts (e.g., "...but your persistence in studying is evident.")
+3. Connecting patterns if visible (e.g., "You seem to feel more anxious late at night.")
+
+DO NOT diagnose. DO NOT give advice. Just a supportive observation.
+Keep it under 2 sentences.
+Speak directly to the user ("You...").
+"""
 
 @dataclass
 class ExplanationResult:
@@ -175,30 +210,50 @@ class ExplanationResult:
     coping_suggestions: List[str]
     disclaimer: str
     used_llm: bool
+    llm_provider: Optional[str] = None
     raw_state: Optional[str] = None
+    insight: Optional[str] = None  # Added for dashboard insights
 
 
 class LLMExplanationAgent:
 
     def __init__(self, api_key: Optional[str] = None):
-        self.api_keys = []
+        self.groq_keys = []
+        self.gemini_keys = []
         self.model = os.getenv("LLM_MODEL", "llama-3.3-70b-versatile")
-        self.use_llm = False
+        self.gemini_model = os.getenv("GEMINI_LLM_MODEL", "gemini-2.0-flash")
+        self.use_groq = False
+        self.use_gemini = False
         
-        # Load keys from arg or env
+        # Load Groq keys from arg or env
         if api_key:
-            self.api_keys = [k.strip() for k in api_key.split(",") if k.strip()]
+            self.groq_keys = [k.strip() for k in api_key.split(",") if k.strip()]
         else:
             env_keys = os.getenv("GROQ_API_KEY", "")
-            self.api_keys = [k.strip() for k in env_keys.split(",") if k.strip()]
-            
-        if GROQ_AVAILABLE and self.api_keys:
-            self.use_llm = True
-            print(f"LLM enabled with {len(self.api_keys)} keys. Model: {self.model}")
+            self.groq_keys = [k.strip() for k in env_keys.split(",") if k.strip()]
+        
+        if GROQ_AVAILABLE and self.groq_keys:
+            self.use_groq = True
+            print(f"[LLM] Groq: {len(self.groq_keys)} keys loaded. Model: {self.model}")
         elif not GROQ_AVAILABLE:
-            print("Warning: groq not installed. LLM explanations disabled.")
+            print("[LLM] Groq: SDK not installed.")
         else:
-            print("Warning: No API keys found. LLM explanations disabled.")
+            print("[LLM] Groq: No API keys found.")
+        
+        # Load Gemini keys from env
+        gemini_env = os.getenv("GEMINI_API_KEY", "")
+        self.gemini_keys = [k.strip() for k in gemini_env.split(",") if k.strip()]
+        
+        if GEMINI_AVAILABLE and self.gemini_keys:
+            self.use_gemini = True
+            print(f"[LLM] Gemini: {len(self.gemini_keys)} keys loaded. Model: {self.gemini_model}")
+        elif not GEMINI_AVAILABLE:
+            print("[LLM] Gemini: SDK not installed.")
+        else:
+            print("[LLM] Gemini: No API keys found.")
+        
+        if not self.use_groq and not self.use_gemini:
+            print("[LLM] WARNING: No LLM providers available! Using template fallback only.")
         
         self.rag_db = RAG_SNIPPETS
         self.disclaimer = (
@@ -207,26 +262,108 @@ class LLMExplanationAgent:
             "a counselor or mental health professional."
         )
 
-    def _get_client(self):
+    @property
+    def use_llm(self) -> bool:
+        """Backward compatibility: True if any LLM provider is available."""
+        return self.use_groq or self.use_gemini
+
+    # Keep backward-compat property for pipeline references to api_keys
+    @property
+    def api_keys(self):
+        return self.groq_keys
+
+    def _get_groq_client(self):
         """Get a Groq client with a random key from the pool."""
-        import random
-        if not self.api_keys:
+        if not self.groq_keys:
             return None
         
-        # Simple random selection for load balancing
-        selected_key = random.choice(self.api_keys)
+        selected_key = random.choice(self.groq_keys)
         try:
             return Groq(api_key=selected_key)
         except Exception as e:
-            print(f"Failed to create client with key ...{selected_key[-4:]}: {e}")
+            print(f"[LLM] Groq client creation failed (key ...{selected_key[-4:]}): {e}")
             return None
+
+    def _call_groq(self, system_prompt: str, user_prompt: str, max_tokens: int = 150, temperature: float = 0.7) -> Optional[str]:
+        """Try calling Groq with retry across keys. Returns response text or None."""
+        if not self.use_groq:
+            return None
+        
+        attempts = 0
+        max_attempts = min(len(self.groq_keys) * 2, 6)
+        
+        while attempts < max_attempts:
+            client = self._get_groq_client()
+            if not client:
+                break
+            
+            try:
+                response = client.chat.completions.create(
+                    model=self.model,
+                    messages=[
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": user_prompt}
+                    ],
+                    max_tokens=max_tokens,
+                    temperature=temperature
+                )
+                return response.choices[0].message.content
+            except Exception as e:
+                print(f"[LLM] Groq attempt {attempts+1} failed: {e}")
+                attempts += 1
+        
+        print("[LLM] All Groq keys exhausted.")
+        return None
+
+    def _call_gemini(self, system_prompt: str, user_prompt: str, max_tokens: int = 150, temperature: float = 0.7) -> Optional[str]:
+        """Try calling Gemini with retry across keys. Returns response text or None."""
+        if not self.use_gemini:
+            return None
+        
+        for i, key in enumerate(self.gemini_keys):
+            try:
+                client = genai.Client(api_key=key)
+                response = client.models.generate_content(
+                    model=self.gemini_model,
+                    contents=user_prompt,
+                    config=genai_types.GenerateContentConfig(
+                        system_instruction=system_prompt,
+                        max_output_tokens=max_tokens,
+                        temperature=temperature,
+                    )
+                )
+                if response and response.text:
+                    return response.text
+            except Exception as e:
+                print(f"[LLM] Gemini attempt {i+1} failed (key ...{key[-4:]}): {e}")
+        
+        print("[LLM] All Gemini keys exhausted.")
+        return None
+
+    def _call_llm(self, system_prompt: str, user_prompt: str, max_tokens: int = 150, temperature: float = 0.7) -> Tuple[Optional[str], Optional[str]]:
+        """Call LLM with Groq-first, Gemini-fallback strategy.
+        Returns (response_text, provider_name) or (None, None)."""
+        
+        # Try Groq first (faster, higher throughput)
+        result = self._call_groq(system_prompt, user_prompt, max_tokens, temperature)
+        if result:
+            return result, "groq"
+        
+        # Fallback to Gemini
+        print("[LLM] Falling back to Gemini...")
+        result = self._call_gemini(system_prompt, user_prompt, max_tokens, temperature)
+        if result:
+            return result, "gemini"
+        
+        return None, None
 
     def explain(
         self,
         primary_state: str,
         evidence: Dict[str, List[str]],
         confidence_decision: Dict[str, Any],
-        user_input: str = ""
+        user_input: str = "",
+        history_context: str = ""
     ) -> ExplanationResult:
 
         action = confidence_decision.get("action", "explain")
@@ -272,20 +409,22 @@ class LLMExplanationAgent:
         
         # Handle clarification case
         if action == "ask_clarification":
-            response = self._generate_clarification(user_input, questions, generation_rag)
+            response, provider = self._generate_clarification(user_input, questions, generation_rag, history_context)
             return ExplanationResult(
                 response_text=response,
                 coping_suggestions=[],
                 disclaimer="",
-                used_llm=self.use_llm,
+                used_llm=provider is not None,
+                llm_provider=provider,
                 raw_state=primary_state
             )
         
         # Generate explanation
         if self.use_llm:
-            response = self._generate_with_llm(primary_state, evidence, generation_rag, action)
+            response, provider = self._generate_with_llm(primary_state, evidence, generation_rag, action, history_context)
         else:
             response = self._generate_template(primary_state, evidence, generation_rag, action)
+            provider = None
         
         # Add disclaimer for cautious explanations
         disclaimer = self.disclaimer if action == "explain_cautious" else ""
@@ -294,7 +433,8 @@ class LLMExplanationAgent:
             response_text=response,
             coping_suggestions=generation_rag.get("strategies", {}).get("default", [])[:2],
             disclaimer=disclaimer,
-            used_llm=self.use_llm,
+            used_llm=provider is not None,
+            llm_provider=provider,
             raw_state=primary_state
         )
     
@@ -302,8 +442,9 @@ class LLMExplanationAgent:
         self,
         user_input: str,
         questions: List[str],
-        rag_data: Dict
-    ) -> str:
+        rag_data: Dict,
+        history_context: str = ""
+    ) -> Tuple[str, Optional[str]]:
         empathy = rag_data.get("empathy", "I want to understand what you're going through.")
         
         if questions:
@@ -312,37 +453,18 @@ class LLMExplanationAgent:
             question = "Could you share a bit more about what's been on your mind?"
         
         if self.use_llm:
-            # Retry logic for picking a working key
-            attempts = 0
-            max_attempts = len(self.api_keys) * 2 # Try a few times
+            prompt = CLARIFICATION_PROMPT.format(
+                conversation_history=history_context,
+                user_input=user_input,
+                questions=questions
+            )
+            result, provider = self._call_llm(SYSTEM_PROMPT, prompt, max_tokens=80, temperature=0.7)
+            if result:
+                return result, provider
             
-            while attempts < max_attempts:
-                client = self._get_client()
-                if not client:
-                    break
-                    
-                try:
-                    prompt = CLARIFICATION_PROMPT.format(
-                        user_input=user_input,
-                        questions=questions
-                    )
-                    response = client.chat.completions.create(
-                        model=self.model,
-                        messages=[
-                            {"role": "system", "content": SYSTEM_PROMPT},
-                            {"role": "user", "content": prompt}
-                        ],
-                        max_tokens=100,
-                        temperature=0.7
-                    )
-                    return response.choices[0].message.content
-                except Exception as e:
-                    print(f"LLM clarification attempt {attempts+1} failed: {e}")
-                    attempts += 1
-            
-            print("All LLM keys failed for clarification. Falling back to template.")
+            print("[LLM] All providers failed for clarification. Falling back to template.")
         
-        return f"{empathy}\n\n{question}"
+        return f"{empathy}\n\n{question}", None
     
     def _generate_template(
         self,
@@ -351,10 +473,8 @@ class LLMExplanationAgent:
         rag_data: Dict,
         action: str
     ) -> str:
-        # Template logic (unchanged)
         empathy = rag_data.get("empathy", "I hear you.")
         description = rag_data.get("description", "")
-        # Get strategies dict
         all_strategies = rag_data.get("strategies", {"default": []})
         
         # Select best category based on triggers
@@ -409,10 +529,11 @@ class LLMExplanationAgent:
         state: str,
         evidence: Dict[str, List[str]],
         rag_data: Dict,
-        action: str
-    ) -> str:
+        action: str,
+        history_context: str = ""
+    ) -> Tuple[str, Optional[str]]:
         if not self.use_llm:
-            return self._generate_template(state, evidence, rag_data, action)
+            return self._generate_template(state, evidence, rag_data, action), None
         
         # Flatten strategies for LLM awareness
         all_strategies = rag_data.get("strategies", {})
@@ -420,40 +541,39 @@ class LLMExplanationAgent:
         for cat, tips in all_strategies.items():
             flat_strategies.append(f"{cat.upper()}: {', '.join(tips)}")
         
+        # Truncate history if too long (safety mechanism)
+        if len(history_context) > 2000:
+            history_context = "..." + history_context[-2000:]
+            
         prompt = REPHRASE_PROMPT.format(
+            conversation_history=history_context,
             state=state,
             evidence=str(evidence),
             coping="\n".join(flat_strategies),
             empathy=rag_data.get("empathy", "")
         )
         
-        # Retry logic
-        attempts = 0
-        max_attempts = len(self.api_keys) * 2
+        result, provider = self._call_llm(SYSTEM_PROMPT, prompt, max_tokens=150, temperature=0.7)
+        if result:
+            return result, provider
         
-        while attempts < max_attempts:
-            client = self._get_client()
-            if not client:
-                break
-                
-            try:
-                response = client.chat.completions.create(
-                    model=self.model,
-                    messages=[
-                        {"role": "system", "content": SYSTEM_PROMPT},
-                        {"role": "user", "content": prompt}
-                    ],
-                    max_tokens=150,
-                    temperature=0.7
-                )
-                return response.choices[0].message.content
-                
-            except Exception as e:
-                print(f"LLM generation attempt {attempts+1} failed: {e}")
-                attempts += 1
+        print("[LLM] All providers failed. Falling back to template.")
+        return self._generate_template(state, evidence, rag_data, action), None
+
+    def generate_insight(self, conversation_history: str) -> Optional[str]:
+        """Generate a dashboard insight from chat history."""
+        if not self.use_llm:
+            return None
+            
+        # Truncate if too long
+        if len(conversation_history) > 3000:
+            conversation_history = "..." + conversation_history[-3000:]
+            
+        prompt = INSIGHT_PROMPT.format(conversation_history=conversation_history)
         
-        print("All LLM keys failed. Falling back to template.")
-        return self._generate_template(state, evidence, rag_data, action)
+        # Lower temperature for more grounded insights
+        result, _ = self._call_llm(SYSTEM_PROMPT, prompt, max_tokens=100, temperature=0.6)
+        return result
 
 
 _explainer_instance: Optional[LLMExplanationAgent] = None
@@ -471,24 +591,36 @@ def generate_explanation(
     evidence: Dict[str, List[str]],
     confidence_decision: Dict[str, Any],
     user_input: str = "",
-    api_key: Optional[str] = None
+    api_key: Optional[str] = None,
+    history_context: str = ""
 ) -> Dict[str, Any]:
     explainer = get_explainer(api_key)
-    result = explainer.explain(primary_state, evidence, confidence_decision, user_input)
+    result = explainer.explain(primary_state, evidence, confidence_decision, user_input, history_context)
     
     return {
         "response_text": result.response_text,
         "coping_suggestions": result.coping_suggestions,
         "disclaimer": result.disclaimer,
         "used_llm": result.used_llm,
+        "llm_provider": result.llm_provider,
         "raw_state": result.raw_state
     }
 
 
+def generate_dashboard_insight(conversation_history: str, api_key: Optional[str] = None) -> Optional[str]:
+    """Generate a standalone insight for the dashboard."""
+    explainer = get_explainer(api_key)
+    return explainer.generate_insight(conversation_history)
+
 
 if __name__ == "__main__":
-    print("LLM Explanation Agent Test (Groq)")
+    print("LLM Explanation Agent Test (Groq + Gemini)")
     print("=" * 60)
+    
+    explainer = get_explainer()
+    print(f"\nGroq available: {explainer.use_groq}")
+    print(f"Gemini available: {explainer.use_gemini}")
+    print(f"Any LLM available: {explainer.use_llm}")
     
     test_cases = [
         (
@@ -496,23 +628,12 @@ if __name__ == "__main__":
             {"emotions": ["stress"], "symptoms": [], "triggers": ["academic"]},
             {"action": "explain", "clarification_questions": []},
             "Academic stress case"
-        ),
-        (
-            "AnxietyRisk",
-            {"emotions": ["anxiety"], "symptoms": ["insomnia"], "triggers": []},
-            {"action": "explain_cautious", "clarification_questions": []},
-            "Anxiety with caution"
-        ),
-        (
-            "NeedsMoreContext",
-            {"emotions": [], "symptoms": [], "triggers": []},
-            {"action": "ask_clarification", "clarification_questions": ["What's been on your mind lately?"]},
-            "Clarification needed"
         )
     ]
     
     for state, evidence, decision, description in test_cases:
         result = generate_explanation(state, evidence, decision, user_input="I'm stressed")
         print(f"\n{description}")
-        print(f"Used LLM: {result['used_llm']}")
+        print(f"Used LLM: {result['used_llm']} (Provider: {result['llm_provider']})")
         print(f"Response:\n{result['response_text'][:300]}...")
+

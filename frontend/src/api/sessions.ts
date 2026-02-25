@@ -38,6 +38,10 @@ async function authFetch(url: string, options: RequestInit = {}): Promise<Respon
     return response;
 }
 
+export interface InsightResponse {
+    insight: string | null;
+}
+
 // ============================================================================
 // Types
 // ============================================================================
@@ -101,6 +105,7 @@ export interface SendMessageResponse {
     reasoning_trace?: string[];
     follow_up_questions?: string[];
     disclaimer?: string;
+    crisis_type?: 'suicidal_ideation' | 'self_harm' | 'harm_to_others';
 }
 
 export interface SessionStats {
@@ -121,6 +126,17 @@ export interface SessionStats {
 // ============================================================================
 // API Functions
 // ============================================================================
+
+/**
+ * Get an AI-generated dashboard insight
+ */
+export async function getDashboardInsight(): Promise<InsightResponse> {
+    const response = await authFetch(`${API_BASE}/sessions/insight`);
+    if (!response.ok) {
+        throw new Error('Failed to fetch dashboard insight');
+    }
+    return response.json();
+}
 
 /**
  * Get session statistics for the dashboard

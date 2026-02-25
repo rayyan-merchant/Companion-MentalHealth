@@ -62,6 +62,7 @@ STATE_PRIORITY = {
     "DepressiveSpectrum": 4,
     "AnxietyRisk": 3,
     "AcademicStress": 2,
+    "SocialIsolation": 1,
     "SleepDisturbance": 1,
     "NeedsMoreContext": 0
 }

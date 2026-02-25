@@ -8,6 +8,10 @@ import logging
 import traceback
 import sys
 from pathlib import Path
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -96,7 +100,7 @@ async def run_reasoning_pipeline(request: KrrRequest):
         traceback.print_exc()
         raise HTTPException(status_code=500, detail="Unable to process request at this time")
 
-@app.get("/api/health")
+@app.get("/api/health", methods=["GET", "HEAD"])
 async def health_check():
     return {"status": "active", "service": "Mental Health KRR System"}
 

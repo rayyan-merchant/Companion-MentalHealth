@@ -46,4 +46,5 @@ export interface KrrResult {
     reasoning_trace?: string[];
     follow_up_questions: string[];
     disclaimer: string;
+    crisis_type?: 'suicidal_ideation' | 'self_harm' | 'harm_to_others';
 }

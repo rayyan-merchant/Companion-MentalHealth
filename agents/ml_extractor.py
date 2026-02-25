@@ -2,15 +2,11 @@ from typing import Dict, List, Any, Optional
 from dataclasses import dataclass, field, asdict
 import re
 import json
+import os
 from pathlib import Path
 
 
-try:
-    from sentence_transformers import SentenceTransformer, util
-    EMBEDDINGS_AVAILABLE = True
-except ImportError:
-    EMBEDDINGS_AVAILABLE = False
-    print("Warning: sentence-transformers not installed. Using pattern-based fallback.")
+
 
 
 @dataclass
@@ -86,78 +82,70 @@ TEMPORAL_PERSISTENT = ["for weeks", "for months", "always", "constantly", "latel
 
 
 class MLSignalExtractor:
+    """
+    Production-grade signal extractor with multi-provider embeddings and Qdrant caching.
+    
+    Architecture:
+    1. Keyword matching (fast, always available)
+    2. Semantic matching via embeddings (more accurate)
+       - Uses multi-provider embedding service (HF -> Jina -> Gemini fallback)
+       - Caches concept embeddings in Qdrant for instant startup
+    """
 
     def __init__(self, use_embeddings: bool = True):
-        self.use_embeddings = use_embeddings and EMBEDDINGS_AVAILABLE
-        self.model = None
-        self.concept_embeddings = {}
+        self.use_embeddings = use_embeddings
+        self.embedding_service = None
+        self.vector_store = None
         
         if self.use_embeddings:
-            self._load_model()
-            self._precompute_embeddings()
+            self._initialize_embedding_infrastructure()
     
-    def _load_model(self):
-        # Strategy 1: Try offline/cache first to avoid unnecessary network calls
+    def _initialize_embedding_infrastructure(self):
+        """Initialize embedding providers and vector store."""
         try:
-            self.model = SentenceTransformer('all-MiniLM-L6-v2', device='cpu', local_files_only=True)
-            print("Loaded ML model from local cache.")
-            return
-        except Exception:
-            # Not in cache, proceed to download
-            pass
-
-        # Strategy 2: Download with explicit error handling
-        try:
-            print("Downloading ML model (this may take a moment)...")
-            self.model = SentenceTransformer('all-MiniLM-L6-v2', device='cpu')
-            print("Model download complete.")
+            from agents.embedding_providers import get_embedding_service, get_embedding
+            from agents.vector_store import get_vector_store
+            
+            self.embedding_service = get_embedding_service()
+            self.vector_store = get_vector_store()
+            
+            # Initialize concept embeddings in vector store (one-time)
+            if self.vector_store and not self.vector_store.is_initialized():
+                print("[MLExtractor] Initializing concept embeddings in vector store...")
+                self.vector_store.initialize_concepts(get_embedding)
+            
+            print("[MLExtractor] Production embedding infrastructure ready.")
+            
         except Exception as e:
-            print(f"CRITICAL: Failed to load ML model (Network Error: {e}).")
-            print("System switching to KEYWORD-ONLY mode. Core functionality will remain active.")
+            print(f"[MLExtractor] Failed to initialize embedding infrastructure: {e}")
+            print("[MLExtractor] Falling back to keyword-only mode.")
             self.use_embeddings = False
     
-    def _precompute_embeddings(self):
-        if not self.model:
-            return
-            
-        all_concepts = {
-            "emotion": EMOTION_CONCEPTS,
-            "symptom": SYMPTOM_CONCEPTS,
-            "trigger": TRIGGER_CONCEPTS
-        }
-        
-        for category, concepts in all_concepts.items():
-            for label, phrases in concepts.items():
-                for phrase in phrases:
-                    key = f"{category}:{label}:{phrase}"
-                    self.concept_embeddings[key] = {
-                        "embedding": self.model.encode(phrase, convert_to_tensor=True),
-                        "category": category,
-                        "label": label,
-                        "phrase": phrase
-                    }
-    
     def extract(self, text: str) -> ExtractionResult:
-
+        """Extract signals from text using keywords + semantic matching."""
         text_lower = text.lower()
         result = ExtractionResult()
         
+        # Basic NLP features
         result.negated_terms = self._extract_negations(text_lower)
-        
         result.intensity = self._detect_intensity(text_lower)
-        
         result.temporal = self._detect_temporal(text_lower)
         
+        # 1. Keyword matching (always runs)
         signals = self._extract_with_patterns(text_lower)
         
-        if self.use_embeddings and self.model:
-            embedding_signals = self._extract_with_embeddings(text_lower)
+        # 2. Semantic matching (if embeddings available)
+        if self.use_embeddings and self.embedding_service and self.vector_store:
+            semantic_signals = self._extract_with_embeddings(text_lower)
+            
+            # Merge signals (avoid duplicates)
             seen_labels = {s.label for s in signals}
-            for sig in embedding_signals:
+            for sig in semantic_signals:
                 if sig.label not in seen_labels:
                     signals.append(sig)
                     seen_labels.add(sig.label)
         
+        # Build result
         for signal in signals:
             signal_dict = {
                 "label": signal.label,
@@ -175,6 +163,31 @@ class MLSignalExtractor:
                 result.triggers.append(signal_dict)
         
         return result
+    
+    def _extract_with_embeddings(self, text: str) -> List[ExtractedSignal]:
+        """Use embedding service + vector store for semantic matching."""
+        from agents.embedding_providers import get_embedding
+        
+        # Get embedding for user text
+        text_embedding = get_embedding(text)
+        if not text_embedding:
+            return []
+        
+        # Search vector store for similar concepts
+        similar = self.vector_store.search_similar(text_embedding, top_k=5, threshold=0.5)
+        
+        signals = []
+        seen_labels = set()
+        
+        for concept in similar:
+            if concept.label not in seen_labels:
+                signals.append(ExtractedSignal(
+                    label=concept.label,
+                    category=concept.category
+                ))
+                seen_labels.add(concept.label)
+        
+        return signals
     
     def _extract_negations(self, text: str) -> List[str]:
         negated = []
@@ -201,25 +214,8 @@ class MLSignalExtractor:
                 return "acute"
         return None
     
-    def _extract_with_embeddings(self, text: str) -> List[ExtractedSignal]:
-        signals = []
-        text_embedding = self.model.encode(text, convert_to_tensor=True)
-        
-        seen_labels = set()
-        
-        for key, data in self.concept_embeddings.items():
-            similarity = util.cos_sim(text_embedding, data["embedding"]).item()
-            
-            if similarity > 0.5 and data["label"] not in seen_labels:
-                signals.append(ExtractedSignal(
-                    label=data["label"],
-                    category=data["category"]
-                ))
-                seen_labels.add(data["label"])
-        
-        return signals
-    
     def _extract_with_patterns(self, text: str) -> List[ExtractedSignal]:
+        """Keyword-based extraction (fast fallback)."""
         signals = []
         seen_labels = set()
         
@@ -232,7 +228,6 @@ class MLSignalExtractor:
         for category, concepts in all_concepts:
             for label, phrases in concepts.items():
                 for phrase in phrases:
-                    # Word boundary matching
                     pattern = r'(?<!\w)' + re.escape(phrase.lower()) + r'(?!\w)'
                     if re.search(pattern, text) and label not in seen_labels:
                         signals.append(ExtractedSignal(
@@ -244,7 +239,9 @@ class MLSignalExtractor:
         
         return signals
 
+
 _extractor_instance: Optional[MLSignalExtractor] = None
+
 
 def get_extractor() -> MLSignalExtractor:
     global _extractor_instance
