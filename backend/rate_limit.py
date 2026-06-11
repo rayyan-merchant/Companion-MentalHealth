@@ -34,6 +34,15 @@ async def get_redis() -> Redis | None:
     return _redis
 
 
+async def close_redis() -> None:
+    global _redis, _redis_unavailable
+    redis = _redis
+    _redis = None
+    _redis_unavailable = False
+    if redis is not None:
+        await redis.aclose()
+
+
 async def check_rate_limit(
     key: str,
     limit: int,

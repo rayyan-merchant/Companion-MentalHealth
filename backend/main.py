@@ -14,8 +14,8 @@ from sqlalchemy import text
 
 from .auth_routes import router as auth_router
 from .config import get_settings
-from .database import AsyncSessionFactory, create_dev_schema
-from .rate_limit import get_redis
+from .database import AsyncSessionFactory, close_database, create_dev_schema
+from .rate_limit import close_redis, get_redis
 from .security import set_public_csrf_cookie
 from .session_routes import router as session_router
 
@@ -30,14 +30,18 @@ logger = logging.getLogger("companion")
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     del app
-    await create_dev_schema()
-    if settings.is_production:
-        if not settings.allowed_origins or "*" in settings.allowed_origins:
-            raise RuntimeError("Production CORS origins must be explicit")
-        async with AsyncSessionFactory() as db:
-            await db.execute(text("SELECT 1"))
-        await get_redis()
-    yield
+    try:
+        await create_dev_schema()
+        if settings.is_production:
+            if not settings.allowed_origins or "*" in settings.allowed_origins:
+                raise RuntimeError("Production CORS origins must be explicit")
+            async with AsyncSessionFactory() as db:
+                await db.execute(text("SELECT 1"))
+            await get_redis()
+        yield
+    finally:
+        await close_redis()
+        await close_database()
 
 
 app = FastAPI(

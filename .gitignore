@@ -91,3 +91,9 @@ logs/
 .tmp/
 tmp/
 *.pid
+
+# Internal working documents (keep local)
+DEPLOY_RENDER.md
+Implementation Plan.md
+PROJECT_AUDIT.md
+report.md
