@@ -1,50 +1,9 @@
-/**
- * Session API client for the Mental Health Companion application.
- */
-
-const API_BASE = '/api';
-
-// Get token from localStorage
-function getAuthToken(): string | null {
-    return localStorage.getItem('companion_auth_token');
-}
-
-// Helper to make authenticated requests
-async function authFetch(url: string, options: RequestInit = {}): Promise<Response> {
-    const token = getAuthToken();
-
-    const headers: HeadersInit = {
-        'Content-Type': 'application/json',
-        ...options.headers,
-    };
-
-    if (token) {
-        (headers as Record<string, string>)['Authorization'] = `Bearer ${token}`;
-    }
-
-    const response = await fetch(url, {
-        ...options,
-        headers
-    });
-
-    if (response.status === 401) {
-        // Token expired or invalid
-        localStorage.removeItem('companion_auth_token');
-        localStorage.removeItem('companion_user');
-        window.location.href = '/login';
-        throw new Error('Session expired. Please log in again.');
-    }
-
-    return response;
-}
+import { apiFetch } from './client';
 
 export interface InsightResponse {
     insight: string | null;
+    status: 'ready' | 'generating';
 }
-
-// ============================================================================
-// Types
-// ============================================================================
 
 export interface SessionMessage {
     id: string;
@@ -55,13 +14,15 @@ export interface SessionMessage {
         state?: string;
         confidence?: string;
         action?: string;
-        evidence?: {
-            emotions: string[];
-            symptoms: string[];
-            triggers: string[];
-        };
+        evidence?: { emotions: string[]; symptoms: string[]; triggers: string[] };
+        reasoning_trace?: string[];
         follow_up_questions?: string[];
         disclaimer?: string;
+        crisis_type?: 'suicidal_ideation' | 'self_harm' | 'harm_to_others' | 'medical_emergency';
+        processing_ms?: number;
+        used_fallback?: boolean;
+        rules_fired?: string[];
+        rule_version?: string;
     };
 }
 
@@ -105,125 +66,50 @@ export interface SendMessageResponse {
     reasoning_trace?: string[];
     follow_up_questions?: string[];
     disclaimer?: string;
-    crisis_type?: 'suicidal_ideation' | 'self_harm' | 'harm_to_others';
+    crisis_type?: 'suicidal_ideation' | 'self_harm' | 'harm_to_others' | 'medical_emergency';
+    processing_ms: number;
+    used_fallback: boolean;
+    rules_fired: string[];
+    rule_version: string;
 }
 
 export interface SessionStats {
     total_sessions: number;
-    risk_distribution: {
-        low: number;
-        medium: number;
-        high: number;
-    };
-    top_symptoms: Array<{
-        name: string;
-        count: number;
-    }>;
+    risk_distribution: { low: number; medium: number; high: number };
+    top_symptoms: Array<{ name: string; count: number }>;
     total_messages: number;
 }
 
+export const sessionKeys = {
+    all: ['sessions'] as const,
+    detail: (id: string) => ['sessions', id] as const,
+    stats: ['session-stats'] as const,
+    insight: ['dashboard-insight'] as const
+};
 
-// ============================================================================
-// API Functions
-// ============================================================================
-
-/**
- * Get an AI-generated dashboard insight
- */
-export async function getDashboardInsight(): Promise<InsightResponse> {
-    const response = await authFetch(`${API_BASE}/sessions/insight`);
-    if (!response.ok) {
-        throw new Error('Failed to fetch dashboard insight');
-    }
-    return response.json();
-}
-
-/**
- * Get session statistics for the dashboard
- */
-export async function getSessionStats(): Promise<SessionStats> {
-    const response = await authFetch(`${API_BASE}/sessions/stats`);
-
-    if (!response.ok) {
-        const error = await response.json().catch(() => ({}));
-        throw new Error(error.detail || 'Failed to fetch session stats');
-    }
-
-    return response.json();
-}
-
-/**
- * Get all sessions for the current user
- */
-export async function getSessions(): Promise<SessionSummary[]> {
-    const response = await authFetch(`${API_BASE}/sessions`);
-
-    if (!response.ok) {
-        const error = await response.json().catch(() => ({}));
-        throw new Error(error.detail || 'Failed to fetch sessions');
-    }
-
-    return response.json();
-}
-
-/**
- * Get a specific session with full messages
- */
-export async function getSession(sessionId: string): Promise<Session> {
-    const response = await authFetch(`${API_BASE}/sessions/${sessionId}`);
-
-    if (!response.ok) {
-        const error = await response.json().catch(() => ({}));
-        throw new Error(error.detail || 'Failed to fetch session');
-    }
-
-    return response.json();
-}
-
-/**
- * Create a new session
- */
-export async function createSession(title?: string): Promise<Session> {
-    const response = await authFetch(`${API_BASE}/sessions`, {
+export const getDashboardInsight = () =>
+    apiFetch<InsightResponse>('/sessions/insight');
+export const getSessionStats = () => apiFetch<SessionStats>('/sessions/stats');
+export const getSessions = () => apiFetch<SessionSummary[]>('/sessions');
+export const getSession = (sessionId: string) =>
+    apiFetch<Session>(`/sessions/${encodeURIComponent(sessionId)}`);
+export const createSession = (title?: string) =>
+    apiFetch<Session>('/sessions', {
         method: 'POST',
         body: JSON.stringify({ title })
     });
-
-    if (!response.ok) {
-        const error = await response.json().catch(() => ({}));
-        throw new Error(error.detail || 'Failed to create session');
-    }
-
-    return response.json();
-}
-
-/**
- * Send a message to a session and get AI response
- */
-export async function sendMessage(sessionId: string, text: string): Promise<SendMessageResponse> {
-    const response = await authFetch(`${API_BASE}/sessions/${sessionId}/message`, {
+export const sendMessage = (
+    sessionId: string,
+    text: string,
+    clientMessageId: string
+) => apiFetch<SendMessageResponse>(
+    `/sessions/${encodeURIComponent(sessionId)}/message`,
+    {
         method: 'POST',
-        body: JSON.stringify({ text })
-    });
-
-    if (!response.ok) {
-        const error = await response.json().catch(() => ({}));
-        throw new Error(error.detail || 'Failed to send message');
+        body: JSON.stringify({ text, client_message_id: clientMessageId })
     }
-
-    return response.json();
-}
-
-/**
- * Delete a session (soft delete)
- */
-export async function deleteSession(sessionId: string): Promise<void> {
-    const response = await authFetch(`${API_BASE}/sessions/${sessionId}`, {
+);
+export const deleteSession = (sessionId: string) =>
+    apiFetch<void>(`/sessions/${encodeURIComponent(sessionId)}`, {
         method: 'DELETE'
     });
-
-    if (!response.ok) {
-        const error = await response.json().catch(() => ({}));
-        throw new Error(error.detail || 'Failed to delete session');
-    }
-}

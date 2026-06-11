@@ -1,12 +1,7 @@
-from typing import Dict, List, Any, Optional
-from dataclasses import dataclass, field, asdict
-import re
-import json
 import os
-from pathlib import Path
-
-
-
+import re
+from dataclasses import asdict, dataclass, field
+from typing import Any, Dict, List, Optional
 
 
 @dataclass
@@ -92,27 +87,50 @@ class MLSignalExtractor:
        - Caches concept embeddings in Qdrant for instant startup
     """
 
-    def __init__(self, use_embeddings: bool = True):
+    def __init__(self, use_embeddings: Optional[bool] = None):
+        if use_embeddings is None:
+            use_embeddings = os.getenv("ENABLE_EMBEDDINGS", "false").lower() == "true"
+
         self.use_embeddings = use_embeddings
         self.embedding_service = None
         self.vector_store = None
+        self._embedding_initialization_attempted = False
         
-        if self.use_embeddings:
-            self._initialize_embedding_infrastructure()
-    
     def _initialize_embedding_infrastructure(self):
         """Initialize embedding providers and vector store."""
+        if self._embedding_initialization_attempted:
+            return
+
+        self._embedding_initialization_attempted = True
+
         try:
-            from agents.embedding_providers import get_embedding_service, get_embedding
+            from agents.embedding_providers import get_embedding, get_embedding_service
             from agents.vector_store import get_vector_store
             
             self.embedding_service = get_embedding_service()
             self.vector_store = get_vector_store()
-            
-            # Initialize concept embeddings in vector store (one-time)
+
+            if not self.embedding_service.providers:
+                self.use_embeddings = False
+                return
+
+            # Prewarming can make many external API calls. Keep it an explicit
+            # deployment step instead of doing it during app startup.
             if self.vector_store and not self.vector_store.is_initialized():
-                print("[MLExtractor] Initializing concept embeddings in vector store...")
-                self.vector_store.initialize_concepts(get_embedding)
+                should_prewarm = os.getenv(
+                    "PREWARM_CONCEPT_EMBEDDINGS", "false"
+                ).lower() == "true"
+                if should_prewarm:
+                    print("[MLExtractor] Prewarming concept embeddings...")
+                    self.vector_store.initialize_concepts(get_embedding)
+                else:
+                    print(
+                        "[MLExtractor] Concept index is empty; using keyword-only "
+                        "extraction. Set PREWARM_CONCEPT_EMBEDDINGS=true in a "
+                        "controlled setup job to initialize it."
+                    )
+                    self.use_embeddings = False
+                    return
             
             print("[MLExtractor] Production embedding infrastructure ready.")
             
@@ -127,14 +145,19 @@ class MLSignalExtractor:
         result = ExtractionResult()
         
         # Basic NLP features
-        result.negated_terms = self._extract_negations(text_lower)
         result.intensity = self._detect_intensity(text_lower)
         result.temporal = self._detect_temporal(text_lower)
         
         # 1. Keyword matching (always runs)
         signals = self._extract_with_patterns(text_lower)
+        result.negated_terms = sorted({
+            signal.label for signal in signals if signal.negated
+        })
         
         # 2. Semantic matching (if embeddings available)
+        if self.use_embeddings and not self._embedding_initialization_attempted:
+            self._initialize_embedding_infrastructure()
+
         if self.use_embeddings and self.embedding_service and self.vector_store:
             semantic_signals = self._extract_with_embeddings(text_lower)
             
@@ -150,7 +173,7 @@ class MLSignalExtractor:
             signal_dict = {
                 "label": signal.label,
                 "intensity": result.intensity,
-                "negated": signal.label in result.negated_terms,
+                "negated": signal.negated,
                 "temporal": result.temporal
             }
             result.raw_signals.append(signal.label)
@@ -189,12 +212,16 @@ class MLSignalExtractor:
         
         return signals
     
-    def _extract_negations(self, text: str) -> List[str]:
-        negated = []
-        for pattern in NEGATION_PATTERNS:
-            matches = re.findall(pattern, text)
-            negated.extend(matches)
-        return negated
+    def _is_phrase_negated(self, text: str, phrase_start: int) -> bool:
+        """Detect a nearby negation that scopes over a matched concept phrase."""
+        prefix = text[max(0, phrase_start - 50):phrase_start]
+        return bool(re.search(
+            r"(?:\bnot\b|\bnever\b|\bno longer\b|\bdon't\b|\bdo not\b|"
+            r"\bdidn't\b|\bdid not\b|\bisn't\b|\bis not\b|\bwasn't\b|"
+            r"\bwas not\b|\baren't\b|\bare not\b|\bwithout\b)"
+            r"(?:\s+\w+){0,4}\s*$",
+            prefix
+        ))
     
     def _detect_intensity(self, text: str) -> str:
         for marker in INTENSITY_HIGH:
@@ -229,10 +256,12 @@ class MLSignalExtractor:
             for label, phrases in concepts.items():
                 for phrase in phrases:
                     pattern = r'(?<!\w)' + re.escape(phrase.lower()) + r'(?!\w)'
-                    if re.search(pattern, text) and label not in seen_labels:
+                    match = re.search(pattern, text)
+                    if match and label not in seen_labels:
                         signals.append(ExtractedSignal(
                             label=label,
-                            category=category
+                            category=category,
+                            negated=self._is_phrase_negated(text, match.start())
                         ))
                         seen_labels.add(label)
                         break

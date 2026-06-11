@@ -1,0 +1,61 @@
+version: "1.0.0"
+states:
+  PanicRisk:
+    priority: 5
+  DepressiveSpectrum:
+    priority: 4
+  AnxietyRisk:
+    priority: 3
+  AcademicStress:
+    priority: 2
+  SocialIsolation:
+    priority: 1
+  SleepDisturbance:
+    priority: 1
+  NeedsMoreContext:
+    priority: 0
+rules:
+  - id: R_PAN_acute
+    state: PanicRisk
+    all:
+      emotions: [panic]
+    any:
+      symptoms: [heart_symptoms, breathing]
+  - id: R_DEP_complex
+    state: DepressiveSpectrum
+    any:
+      emotions: [depression, sadness]
+      symptoms: [withdrawal, anhedonia, fatigue]
+    require_categories: [emotions, symptoms]
+  - id: R_DEP_explicit
+    state: DepressiveSpectrum
+    any:
+      emotions: [depression]
+  - id: R_ANX_physio
+    state: AnxietyRisk
+    all:
+      emotions: [anxiety]
+    any:
+      symptoms: [insomnia, restlessness]
+  - id: R_ANX_life
+    state: AnxietyRisk
+    all:
+      emotions: [anxiety]
+    any:
+      triggers: [financial, family, social, work]
+  - id: R_ACS_02
+    state: AcademicStress
+    any:
+      emotions: [stress, anxiety, panic]
+      triggers: [academic, work]
+    require_categories: [emotions, triggers]
+  - id: R_SLEEP_01
+    state: SleepDisturbance
+    any:
+      symptoms: [insomnia]
+    unless_states: [AnxietyRisk]
+  - id: R_ISO_01
+    state: SocialIsolation
+    any:
+      symptoms: [withdrawal]
+    unless_states: [DepressiveSpectrum]

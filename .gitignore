@@ -1,8 +1,15 @@
 # General
 .env
 .env.local
+.env.*.local
+!.env.example
 .DS_Store
 Thumbs.db
+Desktop.ini
+*.tmp
+*.temp
+*.bak
+*.orig
 
 # Python
 __pycache__/
@@ -10,6 +17,16 @@ __pycache__/
 *$py.class
 *.so
 .Python
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+.hypothesis/
+.tox/
+.nox/
 build/
 develop-eggs/
 dist/
@@ -39,6 +56,7 @@ env/
 .idea/
 *.swp
 *.swo
+*.code-workspace
 
 # Node / Frontend
 node_modules/
@@ -49,13 +67,27 @@ pnpm-debug.log*
 frontend/dist/
 frontend/build/
 frontend/coverage/
+frontend/.vite/
+frontend/playwright-report/
+frontend/test-results/
+frontend/blob-report/
 
 # Project Data (Keep directories, ignore content)
 data/users/*.json
 data/sessions/*
+data/*.db
+data/*.db-*
+data/*.sqlite
+data/*.sqlite3
 !data/users/.gitkeep
 !data/sessions/.gitkeep
 
 # Logs
 logs/
 *.log
+
+# Local tooling and runtime artifacts
+.cache/
+.tmp/
+tmp/
+*.pid

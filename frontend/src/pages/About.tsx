@@ -1,189 +1,171 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Heart, Shield, Phone, ExternalLink, Code2, Cpu } from 'lucide-react';
+import {
+    Check,
+    Code2,
+    Copy,
+    Cpu,
+    ExternalLink,
+    Heart,
+    Phone,
+    Shield
+} from 'lucide-react';
+
+function CopyNumber({ value }: { value: string }) {
+    const [copied, setCopied] = useState(false);
+    async function copy() {
+        await navigator.clipboard.writeText(value);
+        setCopied(true);
+        window.setTimeout(() => setCopied(false), 1500);
+    }
+    return (
+        <div className="flex flex-wrap items-center gap-2">
+            <span className="select-all text-sm font-medium break-all">{value}</span>
+            <button onClick={copy} className="p-1.5 rounded-lg hover:bg-primary/10 text-primary"
+                aria-label={`Copy ${value}`}>
+                {copied ? <Check size={16} /> : <Copy size={16} />}
+            </button>
+        </div>
+    );
+}
+
+const developers = [
+    {
+        name: 'Syeda Rija Ali',
+        email: 'rijaali287@gmail.com',
+        github: 'https://github.com/Srijaali',
+        linkedin: 'https://www.linkedin.com/in/rija-ali-731095296/'
+    },
+    {
+        name: 'Rayyan Merchant',
+        email: 'merchantrayyan43@gmail.com',
+        github: 'https://github.com/rayyan-merchant',
+        linkedin: 'https://www.linkedin.com/in/rayyanmerchant2004/'
+    },
+    {
+        name: 'Riya Bhart',
+        email: 'riyabhart02@gmail.com',
+        github: 'https://github.com/RiyaBhart',
+        linkedin: 'https://www.linkedin.com/in/riya-bhart-339036287'
+    }
+];
 
 export function About() {
     return (
-        <div className="h-full overflow-y-auto pb-20 md:pb-0 p-4 md:p-6 max-w-4xl mx-auto">
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="text-center mb-12"
-            >
-                <div className="w-16 h-16 bg-gradient-to-br from-primary to-secondary rounded-2xl flex items-center justify-center mx-auto mb-4">
+        <div className="pb-20 md:pb-8 p-4 md:p-6 max-w-4xl mx-auto min-w-0">
+            <motion.header initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+                className="text-center mb-10">
+                <div className="w-16 h-16 bg-gradient-to-br from-primary to-secondary rounded-2xl grid place-items-center mx-auto mb-4">
                     <Heart className="text-white" size={32} />
                 </div>
                 <h1 className="text-3xl font-semibold mb-3">About Companion</h1>
-                <p className="text-slate-text/60 max-w-lg mx-auto leading-relaxed">
-                    A symbolic mental health support system designed to help you reflect on your emotional well-being through structured reasoning and safe guidance.
+                <p className="text-slate-text/60 max-w-2xl mx-auto leading-relaxed">
+                    A supportive reflection tool for Pakistani university students. It uses a
+                    versioned rule catalog and deterministic guidance when optional AI phrasing
+                    providers are unavailable.
                 </p>
-            </motion.div>
+            </motion.header>
 
             <div className="grid md:grid-cols-2 gap-6">
-                <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 }}
-                    className="card space-y-4"
-                >
-                    <div className="flex items-center gap-3 mb-2">
-                        <div className="p-2 bg-primary/10 rounded-lg">
-                            <Heart className="text-primary" size={24} />
-                        </div>
-                        <h2 className="font-semibold text-lg">Our Mission</h2>
+                <section className="card space-y-4 min-w-0">
+                    <div className="flex items-center gap-3">
+                        <Heart className="text-primary" />
+                        <h2>Our mission</h2>
                     </div>
-                    <p className="text-slate-text/70 leading-relaxed text-sm">
-                        Companion focuses on understanding patterns of stress, anxiety, and emotional distress using symbolic reasoning.
-                        We aim to encourage self-awareness and support-seeking behavior through thoughtful conversation.
+                    <p className="text-sm text-slate-text/70">
+                        Companion helps students reflect on stress, anxiety, sleep, and social
+                        patterns while encouraging healthy coping and support-seeking.
                     </p>
-                    <div className="p-3 bg-secondary/10 rounded-lg text-sm text-secondary-dark">
-                        ⚠️ <strong>Not a replacement for professional care.</strong> This is a supportive tool to help you understand your experiences.
+                    <div className="p-3 bg-secondary/10 rounded-lg text-sm">
+                        <strong>Not a replacement for professional care.</strong> The system can
+                        miss context and does not provide a diagnosis.
                     </div>
-                </motion.div>
-
-                <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                    className="card space-y-4"
-                >
-                    <div className="flex items-center gap-3 mb-2">
-                        <div className="p-2 bg-success/10 rounded-lg">
-                            <Shield className="text-success" size={24} />
-                        </div>
-                        <h2 className="font-semibold text-lg">Health & Safety</h2>
+                </section>
+                <section className="card space-y-4 min-w-0">
+                    <div className="flex items-center gap-3">
+                        <Shield className="text-success" />
+                        <h2>Health and safety</h2>
                     </div>
-                    <ul className="text-sm text-slate-text/70 space-y-2 list-disc pl-4">
-                        <li>System does not diagnose medical conditions</li>
-                        <li>Not for use in emergencies</li>
-                        <li>Avoids harmful content</li>
-                        <li>Encourages healthy coping strategies</li>
+                    <ul className="text-sm text-slate-text/70 space-y-2 list-disc pl-5">
+                        <li>Not for emergencies or clinical decisions</li>
+                        <li>External AI processing is optional and disclosed</li>
+                        <li>Safety rules take priority over conversational phrasing</li>
+                        <li>Clinician review is required before unrestricted release</li>
                     </ul>
-                    <p className="text-xs text-slate-text/50 italic mt-2">
-                        If you feel overwhelmed, please reach out to a professional.
-                    </p>
-                </motion.div>
+                </section>
             </div>
 
-            <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="card mt-6"
-            >
+            <section className="card mt-6 min-w-0">
                 <div className="flex items-center gap-3 mb-6">
-                    <div className="p-2 bg-warning/10 rounded-lg">
-                        <Phone className="text-amber-600" size={24} />
-                    </div>
-                    <h2 className="font-semibold text-lg">Mental Health Helplines (Pakistan)</h2>
+                    <Phone className="text-amber-600" />
+                    <h2>Mental health resources in Pakistan</h2>
                 </div>
-
-                <div className="grid md:grid-cols-2 gap-4">
-                    <div className="p-4 bg-background rounded-xl">
-                        <h3 className="font-medium mb-1">Rozan Counseling Helpline</h3>
-                        <a href="tel:+924235761999" className="text-primary hover:underline text-sm flex items-center gap-1">
-                            Use phone: +92 42 35761999
-                        </a>
+                <div className="grid sm:grid-cols-2 gap-4">
+                    <div className="p-4 bg-background rounded-xl min-w-0">
+                        <h3 className="font-medium mb-2">Rozan Counseling Helpline</h3>
+                        <CopyNumber value="+92 42 35761999" />
                     </div>
-                    <div className="p-4 bg-background rounded-xl">
-                        <h3 className="font-medium mb-1">Umang Pakistan</h3>
-                        <a href="https://umang.com.pk" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline text-sm flex items-center gap-1">
-                            Visit Website <ExternalLink size={12} />
-                        </a>
-                    </div>
-                    <div className="p-4 bg-background rounded-xl">
-                        <h3 className="font-medium mb-1">Taskeen Mental Health</h3>
-                        <a href="https://taskeen.org" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline text-sm flex items-center gap-1">
-                            Visit Website <ExternalLink size={12} />
-                        </a>
-                    </div>
+                    <ResourceLink name="Umang Pakistan" href="https://umang.com.pk" />
+                    <ResourceLink name="Taskeen Mental Health" href="https://taskeen.org" />
                     <div className="p-4 bg-error/5 rounded-xl border border-error/10">
-                        <h3 className="font-medium text-error mb-1">Emergency Services</h3>
-                        <a href="tel:15" className="text-error font-bold hover:underline text-lg">
-                            Dial 15
-                        </a>
+                        <h3 className="font-medium text-error mb-1">Emergency services</h3>
+                        <p className="text-sm text-error mb-2">Dial from your phone:</p>
+                        <CopyNumber value="1122" />
                     </div>
                 </div>
-            </motion.div>
+            </section>
 
-            <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-                className="mt-8"
-            >
-                <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
-                    <Code2 className="text-slate-text/50" />
-                    Developers
-                </h2>
-                <div className="grid md:grid-cols-3 gap-6">
-                    {[
-                        {
-                            name: "Syeda Rija Ali",
-                            email: "rijaali287@gmail.com",
-                            github: "https://github.com/Srijaali",
-                            linkedin: "https://www.linkedin.com/in/rija-ali-731095296/"
-                        },
-                        {
-                            name: "Rayyan Merchant",
-                            email: "merchantrayyan43@gmail.com",
-                            github: "https://github.com/rayyan-merchant",
-                            linkedin: "https://www.linkedin.com/in/rayyanmerchant2004/"
-                        },
-                        {
-                            name: "Riya Bhart",
-                            email: "riyabhart02@gmail.com",
-                            github: "https://github.com/RiyaBhart",
-                            linkedin: "http://www.linkedin.com/in/riya-bhart-339036287"
-                        }
-                    ].map((dev) => (
-                        <div key={dev.name} className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all">
-                            <div className="w-12 h-12 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-full flex items-center justify-center text-primary font-bold mb-3">
-                                {dev.name.charAt(0)}
+            <section className="mt-8">
+                <h2 className="mb-5 flex items-center gap-2"><Code2 /> Developers</h2>
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {developers.map((developer) => (
+                        <article key={developer.name} className="bg-white p-5 rounded-xl border border-gray-100 min-w-0">
+                            <div className="w-12 h-12 bg-primary/10 rounded-full grid place-items-center text-primary font-bold mb-3">
+                                {developer.name.charAt(0)}
                             </div>
-                            <h3 className="font-medium">{dev.name}</h3>
-                            <a href={`mailto:${dev.email}`} className="text-xs text-slate-text/50 hover:text-primary block mb-3 truncate">
-                                {dev.email}
+                            <h3 className="font-medium break-words">{developer.name}</h3>
+                            <a href={`mailto:${developer.email}`} className="text-xs text-slate-text/50 break-all">
+                                {developer.email}
                             </a>
-                            <div className="flex gap-3 mt-auto">
-                                <a href={dev.github} target="_blank" rel="noopener noreferrer" className="text-sm text-slate-text hover:text-black">GitHub</a>
-                                <div className="w-px h-4 bg-gray-200"></div>
-                                <a href={dev.linkedin} target="_blank" rel="noopener noreferrer" className="text-sm text-slate-text hover:text-[#0077b5]">LinkedIn</a>
+                            <div className="flex gap-3 mt-3 text-sm">
+                                <a href={developer.github} target="_blank" rel="noopener noreferrer">GitHub</a>
+                                <a href={developer.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn</a>
                             </div>
-                        </div>
+                        </article>
                     ))}
                 </div>
-            </motion.div>
+            </section>
 
-            <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 }}
-                className="mt-8"
-            >
-                <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
-                    <Cpu className="text-slate-text/50" />
-                    Technologies Used
-                </h2>
-
-                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div className="p-4 bg-white border border-gray-100 rounded-xl">
-                        <h3 className="font-medium mb-2 text-sm text-primary">Frontend</h3>
-                        <p className="text-xs text-slate-text/60">React, TailwindCSS, Framer Motion</p>
-                    </div>
-                    <div className="p-4 bg-white border border-gray-100 rounded-xl">
-                        <h3 className="font-medium mb-2 text-sm text-secondary">Backend</h3>
-                        <p className="text-xs text-slate-text/60">FastAPI, RESTful APIs</p>
-                    </div>
-                    <div className="p-4 bg-white border border-gray-100 rounded-xl">
-                        <h3 className="font-medium mb-2 text-sm text-accent">AI & Reasoning</h3>
-                        <p className="text-xs text-slate-text/60">KRR, Ontology Inference (OWL), SPARQL</p>
-                    </div>
-                    <div className="p-4 bg-white border border-gray-100 rounded-xl">
-                        <h3 className="font-medium mb-2 text-sm text-slate-header">Data</h3>
-                        <p className="text-xs text-slate-text/60">RDFLib, JSON Storage</p>
-                    </div>
+            <section className="mt-8">
+                <h2 className="mb-5 flex items-center gap-2"><Cpu /> Technologies used</h2>
+                <div className="grid sm:grid-cols-2 gap-4">
+                    <Tech title="Frontend" text="React, TypeScript, TanStack Query, Tailwind CSS" />
+                    <Tech title="Backend" text="FastAPI, async SQLAlchemy, PostgreSQL, Redis" />
+                    <Tech title="Runtime reasoning" text="Versioned YAML rules and deterministic response templates" />
+                    <Tech title="Research validation" text="OWL, RDFLib, and SPARQL artifacts outside the production request path" />
                 </div>
-            </motion.div>
+            </section>
+        </div>
+    );
+}
+
+function ResourceLink({ name, href }: { name: string; href: string }) {
+    return (
+        <div className="p-4 bg-background rounded-xl">
+            <h3 className="font-medium mb-2">{name}</h3>
+            <a href={href} target="_blank" rel="noopener noreferrer"
+                className="text-primary text-sm inline-flex items-center gap-1">
+                Visit website <ExternalLink size={12} />
+            </a>
+        </div>
+    );
+}
+
+function Tech({ title, text }: { title: string; text: string }) {
+    return (
+        <div className="p-4 bg-white border border-gray-100 rounded-xl min-w-0">
+            <h3 className="font-medium mb-2 text-sm text-primary">{title}</h3>
+            <p className="text-xs text-slate-text/60 break-words">{text}</p>
         </div>
     );
 }

@@ -1,5 +1,9 @@
 # Companion: Technical Implementation Report
 
+> Historical report: several architecture claims below describe the intended
+> design rather than the current production path. See `README.md` for current
+> behavior and `PROJECT_AUDIT.md` for the verified gap analysis.
+
 ## 1. Executive Summary
 
 **Companion** is an ontology-driven **Knowledge Representation & Reasoning (KRR)** chatbot designed to promote explainable mental health risk awareness for university students. Unlike standard "black box" AI chatbots, Companion uses a hybrid neuro-symbolic approach: it combines **symbolic AI** (OWL Ontology, SWRL rules, SPARQL) for deterministic reasoning with **LLMs** (Large Language Models) for natural language generation and empathy.

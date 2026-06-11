@@ -24,7 +24,7 @@ export function Home() {
     };
 
     return (
-        <div className="h-full overflow-y-auto flex flex-col">
+        <div className="min-h-[calc(100vh-57px)] flex flex-col">
             <section className="flex-1 flex flex-col items-center justify-center px-4 py-2">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}

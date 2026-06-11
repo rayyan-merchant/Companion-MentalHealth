@@ -1,12 +1,12 @@
 # ==========================================
 # Stage 1: Build Frontend
 # ==========================================
-FROM node:18-alpine as frontend-builder
+FROM node:22-alpine as frontend-builder
 
 WORKDIR /app/frontend
 
 COPY frontend/package.json frontend/package-lock.json* ./
-RUN npm install
+RUN npm ci
 
 COPY frontend/ .
 RUN npm run build
@@ -25,16 +25,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Install Python dependencies
 COPY requirements.txt ./requirements.txt
-COPY backend/requirements.txt ./backend/requirements.txt
 RUN pip install --upgrade pip && \
-    pip install --default-timeout=1000 --no-cache-dir -r requirements.txt && \
-    pip install --default-timeout=1000 --no-cache-dir -r backend/requirements.txt
+    pip install --default-timeout=1000 --no-cache-dir -r requirements.txt
 
 
 # Copy backend code
 COPY backend/ ./backend/
 COPY agents/ ./agents/
-COPY data/ ./data/
+COPY alembic/ ./alembic/
+COPY alembic.ini ./alembic.ini
 
 # Copy knowledge base directories (required by symbolic reasoner)
 COPY ontology/ ./ontology/
@@ -45,16 +44,19 @@ COPY graph/ ./graph/
 # Copy built frontend from Stage 1
 COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
 
-# Set permissions for data directory (Important for SQLite/JSON persistence in Docker)
-RUN chmod -R 777 ./data
+# Run as a non-root user.
+RUN useradd --create-home --uid 10001 appuser && \
+    chown -R appuser:appuser /app
 
 # Set Environment Variables
 ENV PYTHONPATH=/app
-ENV PORT=8000
-ENV JWT_SECRET_KEY=change-me-in-production
+ENV PORT=10000
+ENV APP_ENV=production
 
 # Expose port
 EXPOSE 10000
 
-# Run Application
-CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "10000"]
+USER appuser
+
+# Database migrations run as Render's pre-deploy command in production.
+CMD ["sh", "-c", "exec uvicorn backend.main:app --host 0.0.0.0 --port ${PORT:-10000}"]

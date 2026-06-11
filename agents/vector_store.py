@@ -8,8 +8,9 @@ Features:
 """
 
 import os
-from typing import List, Optional, Dict, Any
 from dataclasses import dataclass
+from typing import Any, Dict, List, Optional
+
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -17,7 +18,11 @@ load_dotenv()
 
 try:
     from qdrant_client import QdrantClient
-    from qdrant_client.models import Distance, VectorParams, PointStruct, Filter, FieldCondition, MatchValue
+    from qdrant_client.models import (
+        Distance,
+        PointStruct,
+        VectorParams,
+    )
     QDRANT_AVAILABLE = True
 except ImportError:
     QDRANT_AVAILABLE = False
@@ -72,7 +77,10 @@ class QdrantVectorStore:
                 print("[VectorStore] Connected to Qdrant Cloud")
                 self._ensure_collections()
             except Exception as e:
-                print(f"[VectorStore] Qdrant connection failed: {e}. Using in-memory.")
+                print(
+                    "[VectorStore] Qdrant connection failed "
+                    f"({type(e).__name__}). Using in-memory."
+                )
         else:
             print("[VectorStore] No Qdrant credentials. Using in-memory store.")
     
@@ -281,13 +289,13 @@ class QdrantVectorStore:
             import math
             
             def cosine_sim(v1, v2):
-                dot = sum(a*b for a, b in zip(v1, v2))
+                dot = sum(a*b for a, b in zip(v1, v2, strict=False))
                 mag1 = math.sqrt(sum(a*a for a in v1))
                 mag2 = math.sqrt(sum(b*b for b in v2))
                 return dot / (mag1 * mag2) if mag1 and mag2 else 0
             
             scored = []
-            for key, data in self.in_memory_store.items():
+            for _key, data in self.in_memory_store.items():
                 score = cosine_sim(query_embedding, data["embedding"])
                 if score >= threshold:
                     scored.append((score, data))

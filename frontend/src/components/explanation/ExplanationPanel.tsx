@@ -13,7 +13,7 @@ export function ExplanationPanel({ krrResult }: ExplanationPanelProps) {
     if (!krrResult) {
         return (
             <div className="card">
-                <h3 className="text-sm font-medium text-slate-text/50 mb-2">Hybrid Analysis</h3>
+                <h3 className="text-sm font-medium text-slate-text/50 mb-2">Explainable Analysis</h3>
                 <p className="text-sm text-slate-text/40 italic">
                     Waiting for your message to analyze signals...
                 </p>
@@ -30,7 +30,7 @@ export function ExplanationPanel({ krrResult }: ExplanationPanelProps) {
             <div className="flex items-center justify-between">
                 <h3 className="font-medium flex items-center gap-2">
                     <ShieldCheck size={18} className="text-primary" />
-                    Hybrid Agentic Analysis
+                    Explainable Analysis
                 </h3>
                 <button
                     onClick={() => setIsExpanded(!isExpanded)}
@@ -68,7 +68,7 @@ export function ExplanationPanel({ krrResult }: ExplanationPanelProps) {
                         <div className="space-y-3">
                             <h4 className="text-[10px] font-bold text-slate-text/40 uppercase tracking-wider flex items-center gap-1.5">
                                 <BrainCircuit size={12} />
-                                Extracted Signals (ML)
+                                Extracted Signals
                             </h4>
 
                             <div className="space-y-3 pl-1">
@@ -159,7 +159,7 @@ export function ExplanationPanel({ krrResult }: ExplanationPanelProps) {
                         )}
 
                         <div className="pt-2 text-[9px] text-slate-300 font-mono text-center opacity-50">
-                            Hybrid Pipeline v2.0 • Deterministic Symbolic Trace
+                            Companion v2.0 | Deterministic Rule Trace
                         </div>
                     </motion.div>
                 )}

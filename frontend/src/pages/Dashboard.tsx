@@ -1,37 +1,43 @@
 import { motion } from 'framer-motion';
 import { TrendingUp, AlertTriangle, Activity, MessageSquare, Sparkles, X } from 'lucide-react';
-import { useState, useEffect } from 'react';
-import { getSessionStats, SessionStats, getDashboardInsight } from '../api/sessions';
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { getSessionStats, getDashboardInsight, sessionKeys } from '../api/sessions';
+import { useAuth } from '../context/AuthContext';
 
 export function Dashboard() {
-    const [stats, setStats] = useState<SessionStats | null>(null);
-    const [insight, setInsight] = useState<string | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
-    const [showInsight, setShowInsight] = useState(true);
+    const { user } = useAuth();
+    const dismissalKey = `companion:daily-observation-dismissed:${user?.user_id || 'anonymous'}`;
+    const [showInsight, setShowInsight] = useState(
+        () => sessionStorage.getItem(dismissalKey) !== 'true'
+    );
+    const statsQuery = useQuery({
+        queryKey: sessionKeys.stats,
+        queryFn: getSessionStats,
+        staleTime: 60 * 1000
+    });
+    const insightQuery = useQuery({
+        queryKey: sessionKeys.insight,
+        queryFn: getDashboardInsight,
+        enabled: Boolean(statsQuery.data?.total_sessions),
+        refetchInterval: (query) => query.state.data?.status === 'generating' ? 2000 : false
+    });
+    const stats = statsQuery.data;
+    const insight = insightQuery.data?.insight || null;
 
-    useEffect(() => {
-        loadData();
-    }, []);
-
-    const loadData = async () => {
-        try {
-            const [statsData, insightData] = await Promise.all([
-                getSessionStats(),
-                getDashboardInsight().catch(() => ({ insight: null })) // Fail gracefully
-            ]);
-            setStats(statsData);
-            setInsight(insightData.insight);
-        } catch (error) {
-            console.error("Failed to load dashboard data", error);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    if (isLoading) {
+    if (statsQuery.isLoading) {
         return (
-            <div className="flex h-full items-center justify-center">
-                <p className="text-slate-text/50">Loading analytics...</p>
+            <div className="p-4 md:p-6 max-w-6xl mx-auto" aria-label="Loading dashboard">
+                <div className="h-8 w-48 bg-slate-200 rounded animate-pulse mb-6" />
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                    {[0, 1, 2, 3].map((item) => (
+                        <div key={item} className="card animate-pulse">
+                            <div className="h-10 w-10 bg-slate-200 rounded mb-3" />
+                            <div className="h-7 w-16 bg-slate-200 rounded mb-2" />
+                            <div className="h-4 w-24 bg-slate-100 rounded" />
+                        </div>
+                    ))}
+                </div>
             </div>
         );
     }
@@ -65,13 +71,13 @@ export function Dashboard() {
             color: 'secondary'
         },
         {
-            label: 'High Risk Sessions',
+            label: 'Sessions With Urgent Flags',
             value: stats.risk_distribution.high.toString(),
             icon: <AlertTriangle size={20} />,
             color: 'warning'
         },
         {
-            label: 'Safe Sessions',
+            label: 'Sessions Without Elevated Flags',
             value: stats.risk_distribution.low.toString(),
             icon: <TrendingUp size={20} />,
             color: 'success'
@@ -79,7 +85,7 @@ export function Dashboard() {
     ];
 
     return (
-        <div className="h-full overflow-y-auto pb-20 md:pb-0 p-4 md:p-6 max-w-6xl mx-auto">
+        <div className="pb-20 md:pb-8 p-4 md:p-6 max-w-6xl mx-auto">
             <h1 className="text-2xl font-semibold mb-6">Your Insights</h1>
 
             {insight && showInsight && (
@@ -89,7 +95,10 @@ export function Dashboard() {
                     className="bg-gradient-to-r from-primary/5 to-indigo-500/5 border border-primary/10 rounded-2xl p-6 mb-8 relative"
                 >
                     <button
-                        onClick={() => setShowInsight(false)}
+                        onClick={() => {
+                            sessionStorage.setItem(dismissalKey, 'true');
+                            setShowInsight(false);
+                        }}
                         className="absolute top-4 right-4 text-slate-text/40 hover:text-slate-text/70 transition-colors"
                         title="Dismiss"
                     >
@@ -169,7 +178,7 @@ export function Dashboard() {
                     transition={{ delay: 0.5 }}
                     className="card"
                 >
-                    <h3 className="font-medium mb-4">Risk Level Distribution</h3>
+                    <h3 className="font-medium mb-4">Safety Flag Distribution</h3>
                     <div className="flex items-end justify-center gap-8 h-48 py-4">
                         {['Low', 'Medium', 'High'].map((level) => {
                             const key = level.toLowerCase() as keyof typeof stats.risk_distribution;

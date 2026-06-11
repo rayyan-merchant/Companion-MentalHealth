@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { useState } from 'react';
 import { AuthProvider } from './context/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
@@ -11,27 +11,35 @@ import { Dashboard } from './pages/Dashboard';
 import { About } from './pages/About';
 import { Login } from './pages/Login';
 import { Signup } from './pages/Signup';
+import { ChangePassword } from './pages/ChangePassword';
+import { Recovery } from './pages/Recovery';
+import { Privacy } from './pages/Privacy';
+import { Safety } from './pages/Safety';
 
 function AppLayout({ children }: { children: React.ReactNode }) {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const location = useLocation();
+    const isChat = location.pathname.startsWith('/chat');
 
     return (
-        <div className="fixed inset-0 flex bg-slate-50 overflow-hidden">
+        <div className="relative min-h-screen flex bg-slate-50 overflow-x-clip">
             {/* Background Decoration */}
             <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-primary/10 blur-[100px] pointer-events-none animate-float" />
             <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-secondary/10 blur-[100px] pointer-events-none animate-float" style={{ animationDelay: '2s' }} />
             <div className="absolute top-[20%] right-[10%] w-[20%] h-[20%] rounded-full bg-accent/5 blur-[80px] pointer-events-none animate-float" style={{ animationDelay: '4s' }} />
 
-            <div className="relative z-10 flex h-full w-full">
+            <div className="relative z-10 flex min-h-screen w-full">
                 <LeftNav
                     isOpen={mobileMenuOpen}
                     onClose={() => setMobileMenuOpen(false)}
                 />
 
-                <div className="flex-1 flex flex-col min-w-0">
-                    <TopNav onMenuClick={() => setMobileMenuOpen(!mobileMenuOpen)} />
+                <div className="flex-1 flex flex-col min-w-0 min-h-screen">
+                    <div className="sticky top-0 z-30">
+                        <TopNav onMenuClick={() => setMobileMenuOpen(!mobileMenuOpen)} />
+                    </div>
 
-                    <main className="flex-1 overflow-hidden relative">
+                    <main className={`flex-1 min-h-0 relative ${isChat ? 'h-[calc(100vh-57px)] overflow-hidden' : ''}`}>
                         {children}
                     </main>
 
@@ -49,6 +57,9 @@ export default function App() {
                     {/* Public routes - no layout */}
                     <Route path="/login" element={<Login />} />
                     <Route path="/signup" element={<Signup />} />
+                    <Route path="/recovery" element={<Recovery />} />
+                    <Route path="/privacy" element={<Privacy />} />
+                    <Route path="/safety" element={<Safety />} />
 
                     {/* Protected routes - with layout */}
                     <Route path="/" element={
@@ -80,6 +91,11 @@ export default function App() {
                     <Route path="/about" element={
                         <ProtectedRoute>
                             <AppLayout><About /></AppLayout>
+                        </ProtectedRoute>
+                    } />
+                    <Route path="/change-password" element={
+                        <ProtectedRoute>
+                            <ChangePassword />
                         </ProtectedRoute>
                     } />
                 </Routes>

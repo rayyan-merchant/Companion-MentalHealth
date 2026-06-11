@@ -6,10 +6,11 @@ import { MessageItem } from './MessageItem';
 interface ChatShellProps {
     messages: Message[];
     isLoading?: boolean;
+    loadingLabel?: string;
     onSelectMessage?: (id: string) => void;
 }
 
-function TypingIndicator() {
+function TypingIndicator({ label }: { label: string }) {
     return (
         <motion.div
             initial={{ opacity: 0, y: 8 }}
@@ -23,12 +24,13 @@ function TypingIndicator() {
                     <span></span>
                     <span></span>
                 </div>
+                <p className="text-xs text-slate-text/50 mt-1" role="status">{label}</p>
             </div>
         </motion.div>
     );
 }
 
-export function ChatShell({ messages, isLoading, onSelectMessage }: ChatShellProps) {
+export function ChatShell({ messages, isLoading, loadingLabel = 'Companion is thinking...', onSelectMessage }: ChatShellProps) {
     const scrollRef = useRef<HTMLDivElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
 
@@ -53,7 +55,7 @@ export function ChatShell({ messages, isLoading, onSelectMessage }: ChatShellPro
     return (
         <div
             ref={containerRef}
-            className="flex-1 overflow-y-auto px-4 md:px-6 py-6 space-y-4"
+            className="flex-1 min-w-0 max-w-full overflow-x-hidden overflow-y-auto px-4 md:px-6 py-6 space-y-4"
         >
             <AnimatePresence mode="popLayout">
                 {displayMessages.map((message) => (
@@ -64,7 +66,7 @@ export function ChatShell({ messages, isLoading, onSelectMessage }: ChatShellPro
                     />
                 ))}
 
-                {isLoading && <TypingIndicator />}
+                {isLoading && <TypingIndicator label={loadingLabel} />}
             </AnimatePresence>
 
             <div ref={scrollRef} />

@@ -1,4 +1,4 @@
-import { Menu, HelpCircle, LogOut } from 'lucide-react';
+import { Menu, HelpCircle, KeyRound, LogOut, Shield } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Logo } from './Logo';
@@ -13,6 +13,8 @@ export function TopNav({ onMenuClick }: TopNavProps) {
     const { user, logout, isAuthenticated } = useAuth();
     const [showUserMenu, setShowUserMenu] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
+    const menuButtonRef = useRef<HTMLButtonElement>(null);
+    const firstMenuItemRef = useRef<HTMLAnchorElement>(null);
 
     // Close menu when clicking outside
     useEffect(() => {
@@ -21,12 +23,26 @@ export function TopNav({ onMenuClick }: TopNavProps) {
                 setShowUserMenu(false);
             }
         }
+        function handleKeyDown(event: KeyboardEvent) {
+            if (event.key === 'Escape') {
+                setShowUserMenu(false);
+                menuButtonRef.current?.focus();
+            }
+        }
         document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
+        document.addEventListener('keydown', handleKeyDown);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener('keydown', handleKeyDown);
+        };
     }, []);
 
-    const handleLogout = () => {
-        logout();
+    useEffect(() => {
+        if (showUserMenu) firstMenuItemRef.current?.focus();
+    }, [showUserMenu]);
+
+    const handleLogout = async () => {
+        await logout();
         setShowUserMenu(false);
         navigate('/login');
     };
@@ -71,16 +87,27 @@ export function TopNav({ onMenuClick }: TopNavProps) {
                 {isAuthenticated && (
                     <div className="relative" ref={menuRef}>
                         <button
+                            ref={menuButtonRef}
                             onClick={() => setShowUserMenu(!showUserMenu)}
                             className="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center text-white font-medium text-sm hover:shadow-md transition-shadow"
                             aria-label="User menu"
+                            aria-expanded={showUserMenu}
+                            aria-controls="user-menu"
                         >
                             {getUserInitials()}
                         </button>
 
                         {/* Dropdown Menu */}
                         {showUserMenu && (
-                            <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-50 animate-fade-in">
+                            <>
+                            <button
+                                className="fixed inset-0 z-40 bg-black/20 sm:bg-transparent"
+                                onClick={() => setShowUserMenu(false)}
+                                aria-label="Close user menu"
+                                tabIndex={-1}
+                            />
+                            <div id="user-menu" role="menu"
+                                className="fixed right-2 top-14 sm:absolute sm:right-0 sm:top-auto sm:mt-2 w-[min(14rem,calc(100vw-1rem))] max-h-[calc(100vh-4rem)] overflow-y-auto bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-50 animate-fade-in">
                                 <div className="px-4 py-3 border-b border-gray-100">
                                     <div className="flex items-center gap-3">
                                         <div className="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center text-white font-medium">
@@ -96,19 +123,30 @@ export function TopNav({ onMenuClick }: TopNavProps) {
                                         </div>
                                     </div>
                                 </div>
-
-
-
+                                <div className="py-1">
+                                    <Link ref={firstMenuItemRef} to="/change-password" role="menuitem"
+                                        onClick={() => setShowUserMenu(false)}
+                                        className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-gray-50">
+                                        <KeyRound size={16} /> Change password
+                                    </Link>
+                                    <Link to="/privacy" role="menuitem"
+                                        onClick={() => setShowUserMenu(false)}
+                                        className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-gray-50">
+                                        <Shield size={16} /> Privacy
+                                    </Link>
+                                </div>
                                 <div className="border-t border-gray-100 py-1">
                                     <button
                                         onClick={handleLogout}
                                         className="flex items-center gap-2 px-4 py-2 text-sm text-error hover:bg-error/5 transition-colors w-full text-left"
+                                        role="menuitem"
                                     >
                                         <LogOut size={16} />
                                         Sign Out
                                     </button>
                                 </div>
                             </div>
+                            </>
                         )}
                     </div>
                 )}

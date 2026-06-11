@@ -1,126 +1,163 @@
-import { useState, useEffect, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
+import { AlertCircle, Brain, Plus, RotateCcw } from 'lucide-react';
 import { ChatShell } from '../components/chat/ChatShell';
 import { Composer } from '../components/chat/Composer';
 import { QuickPrompts } from '../components/chat/QuickPrompts';
 import { ExplanationPanel } from '../components/explanation/ExplanationPanel';
-import { Message, KrrResult } from '../types';
-import { getSession, sendMessage, createSession, Session } from '../api/sessions';
-import { Loader2, Plus, AlertCircle } from 'lucide-react';
 import { CrisisAlert } from '../components/chat/CrisisAlert';
+import { useAuth } from '../context/AuthContext';
+import { KrrResult, Message, MessageMetadata } from '../types';
+import {
+    createSession,
+    getSession,
+    sendMessage,
+    sessionKeys,
+    Session
+} from '../api/sessions';
 
-function generateId(): string {
-    return `msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+function clientMessageId(): string {
+    if (globalThis.crypto?.randomUUID) return globalThis.crypto.randomUUID();
+    return `message-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
+
+function toMessages(session: Session): Message[] {
+    return session.messages.map((message) => ({
+        id: message.id,
+        sender: message.role === 'assistant' ? 'bot' : message.role,
+        text: message.content,
+        timestamp: message.timestamp,
+        metadata: message.metadata ? {
+            confidence: message.metadata.confidence === 'high' ? 0.9
+                : message.metadata.confidence === 'medium' ? 0.6 : 0.3,
+            state: message.metadata.state,
+            action: message.metadata.action as MessageMetadata['action'],
+            evidence: message.metadata.evidence,
+            clarificationQuestions: message.metadata.follow_up_questions,
+            disclaimer: message.metadata.disclaimer,
+            crisisType: message.metadata.crisis_type
+        } : undefined
+    }));
+}
+
+function latestResult(session: Session): KrrResult | null {
+    const message = [...session.messages].reverse().find((item) => item.role === 'assistant');
+    if (!message?.metadata) return null;
+    return {
+        session_id: session.session_id,
+        response: message.content,
+        state: message.metadata.state || '',
+        confidence: message.metadata.confidence || 'low',
+        action: (message.metadata.action || 'ask_clarification') as KrrResult['action'],
+        evidence: {
+            emotions: message.metadata.evidence?.emotions || [],
+            symptoms: message.metadata.evidence?.symptoms || [],
+            triggers: message.metadata.evidence?.triggers || [],
+            intensity: 'medium'
+        },
+        reasoning_trace: message.metadata.reasoning_trace || [],
+        follow_up_questions: message.metadata.follow_up_questions || [],
+        disclaimer: message.metadata.disclaimer || '',
+        crisis_type: message.metadata.crisis_type
+    };
 }
 
 export function Chat() {
     const { sessionId } = useParams<{ sessionId?: string }>();
     const navigate = useNavigate();
+    const queryClient = useQueryClient();
+    const { user } = useAuth();
+    const creatingRef = useRef(false);
+    const promptKey = `companion:suggestions-dismissed:${user?.user_id || 'anonymous'}`;
 
-    // Session state
     const [currentSession, setCurrentSession] = useState<Session | null>(null);
     const [messages, setMessages] = useState<Message[]>([]);
     const [krrResult, setKrrResult] = useState<KrrResult | null>(null);
-    const [isLoading, setIsLoading] = useState(false);
     const [isInitializing, setIsInitializing] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-    const [showQuickPrompts, setShowQuickPrompts] = useState(true);
+    const [isSending, setIsSending] = useState(false);
+    const [waitingLonger, setWaitingLonger] = useState(false);
+    const [loadError, setLoadError] = useState<string | null>(null);
+    const [sendError, setSendError] = useState<string | null>(null);
+    const [retryPayload, setRetryPayload] = useState<{ text: string; id: string } | null>(null);
+    const [explanationOpen, setExplanationOpen] = useState(false);
+    const [showSuggestions, setShowSuggestions] = useState(
+        () => localStorage.getItem(promptKey) !== 'true'
+    );
 
-    // Initialize session
     useEffect(() => {
-        initializeSession();
-    }, [sessionId]);
+        setShowSuggestions(localStorage.getItem(promptKey) !== 'true');
+    }, [promptKey]);
 
-    const initializeSession = async () => {
-        setIsInitializing(true);
-        setError(null);
-
-        try {
-            if (sessionId) {
-                // Load existing session
-                const session = await getSession(sessionId);
-                setCurrentSession(session);
-
-                // Convert session messages to our format
-                const loadedMessages: Message[] = session.messages.map(msg => ({
-                    id: msg.id,
-                    sender: msg.role === 'assistant' ? 'bot' : msg.role as 'user' | 'system',
-                    text: msg.content,
-                    timestamp: msg.timestamp,
-                    metadata: msg.metadata ? {
-                        confidence: msg.metadata.confidence === 'high' ? 0.9 :
-                            msg.metadata.confidence === 'medium' ? 0.6 : 0.3,
-                        state: msg.metadata.state,
-                        action: msg.metadata.action as any,
-                        evidence: msg.metadata.evidence,
-                        clarificationQuestions: msg.metadata.follow_up_questions,
-                        disclaimer: msg.metadata.disclaimer
-                    } : undefined
-                }));
-
-                setMessages(loadedMessages);
-
-                // Set latest KRR result from last assistant message
-                const lastAssistant = session.messages.filter(m => m.role === 'assistant').pop();
-                if (lastAssistant?.metadata) {
-                    setKrrResult({
-                        session_id: session.session_id,
-                        response: lastAssistant.content,
-                        state: lastAssistant.metadata.state || '',
-                        confidence: lastAssistant.metadata.confidence || 'low',
-                        action: (lastAssistant.metadata.action || 'ask_clarification') as any,
-                        evidence: {
-                            emotions: lastAssistant.metadata.evidence?.emotions || [],
-                            symptoms: lastAssistant.metadata.evidence?.symptoms || [],
-                            triggers: lastAssistant.metadata.evidence?.triggers || [],
-                            intensity: 'medium'
-                        },
-                        follow_up_questions: lastAssistant.metadata.follow_up_questions || [],
-                        disclaimer: lastAssistant.metadata.disclaimer || ''
-                    });
+    useEffect(() => {
+        let active = true;
+        async function initialize() {
+            setIsInitializing(true);
+            setLoadError(null);
+            try {
+                if (!sessionId) {
+                    if (creatingRef.current) return;
+                    creatingRef.current = true;
+                    const created = await createSession();
+                    queryClient.invalidateQueries({ queryKey: sessionKeys.all });
+                    navigate(`/chat/${created.session_id}`, { replace: true });
+                    return;
                 }
-            } else {
-                // Create new session
-                const newSession = await createSession();
-                setCurrentSession(newSession);
-                setMessages([]);
-                setKrrResult(null);
-                // Update URL to include session ID
-                navigate(`/chat/${newSession.session_id}`, { replace: true });
+                const session = await queryClient.fetchQuery({
+                    queryKey: sessionKeys.detail(sessionId),
+                    queryFn: () => getSession(sessionId),
+                    staleTime: 5 * 60 * 1000
+                });
+                if (!active) return;
+                setCurrentSession(session);
+                setMessages(toMessages(session));
+                setKrrResult(latestResult(session));
+            } catch (reason) {
+                if (active) {
+                    setLoadError(reason instanceof Error ? reason.message : 'Failed to load conversation');
+                }
+            } finally {
+                if (active) setIsInitializing(false);
             }
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to initialize session');
-        } finally {
-            setIsInitializing(false);
         }
-    };
+        initialize();
+        return () => { active = false; };
+    }, [navigate, queryClient, sessionId]);
 
-    const sendUserMessage = useCallback(async (text: string) => {
-        if (!currentSession) return;
+    useEffect(() => {
+        if (!isSending) {
+            setWaitingLonger(false);
+            return;
+        }
+        const timer = window.setTimeout(() => setWaitingLonger(true), 4000);
+        return () => window.clearTimeout(timer);
+    }, [isSending]);
 
-        const userMessageId = generateId();
-        const userMessage: Message = {
-            id: userMessageId,
-            sender: 'user',
-            text,
-            timestamp: new Date().toISOString()
-        };
-
-        setMessages(prev => [...prev, userMessage]);
-        setIsLoading(true);
-        setError(null);
-
+    const sendUserMessage = useCallback(async (
+        text: string,
+        id = clientMessageId(),
+        optimistic = true
+    ) => {
+        if (!currentSession || isSending) return;
+        if (optimistic) {
+            setMessages((previous) => [...previous, {
+                id,
+                sender: 'user',
+                text,
+                timestamp: new Date().toISOString()
+            }]);
+        }
+        setShowSuggestions(false);
+        setIsSending(true);
+        setSendError(null);
         try {
-            // Send message through API
-            const response = await sendMessage(currentSession.session_id, text);
-
-            // Update KRR result
-            setKrrResult({
+            const response = await sendMessage(currentSession.session_id, text, id);
+            const result: KrrResult = {
                 session_id: response.session_id,
                 response: response.response,
                 state: response.state || '',
                 confidence: response.confidence || 'low',
-                action: (response.action || 'ask_clarification') as any,
+                action: (response.action || 'ask_clarification') as KrrResult['action'],
                 evidence: {
                     emotions: response.evidence?.emotions || [],
                     symptoms: response.evidence?.symptoms || [],
@@ -132,84 +169,78 @@ export function Chat() {
                 disclaimer: response.disclaimer || '',
                 reasoning_trace: response.reasoning_trace || [],
                 crisis_type: response.crisis_type
-            });
-
-            // Add bot response to messages
-            const botMessage: Message = {
+            };
+            setKrrResult(result);
+            setMessages((previous) => [...previous, {
                 id: response.assistant_message_id,
                 sender: 'bot',
                 text: response.response,
                 timestamp: new Date().toISOString(),
                 metadata: {
-                    confidence: response.confidence === 'high' ? 0.9 :
-                        response.confidence === 'medium' ? 0.6 : 0.3,
+                    confidence: response.confidence === 'high' ? 0.9
+                        : response.confidence === 'medium' ? 0.6 : 0.3,
                     state: response.state,
-                    action: response.action as any,
+                    action: response.action as MessageMetadata['action'],
                     evidence: {
                         emotions: response.evidence?.emotions || [],
                         symptoms: response.evidence?.symptoms || [],
                         triggers: response.evidence?.triggers || []
                     },
                     clarificationQuestions: response.follow_up_questions,
-                    disclaimer: response.disclaimer
+                    disclaimer: response.disclaimer,
+                    crisisType: response.crisis_type
                 }
-            };
-
-            setMessages(prev => [...prev, botMessage]);
-
-        } catch (err) {
-            const errorMessage: Message = {
-                id: generateId(),
-                sender: 'system',
-                text: 'System Error: ' + (err instanceof Error ? err.message : 'Unable to process request'),
-                timestamp: new Date().toISOString()
-            };
-            setMessages(prev => [...prev, errorMessage]);
+            }]);
+            setRetryPayload(null);
+            queryClient.invalidateQueries({ queryKey: sessionKeys.all });
+            queryClient.invalidateQueries({ queryKey: sessionKeys.detail(currentSession.session_id) });
+            queryClient.invalidateQueries({ queryKey: sessionKeys.stats });
+        } catch (reason) {
+            setSendError(reason instanceof Error ? reason.message : 'Unable to get a response');
+            setRetryPayload({ text, id });
         } finally {
-            setIsLoading(false);
+            setIsSending(false);
         }
-    }, [currentSession]);
+    }, [currentSession, isSending, queryClient]);
 
-    const handleQuickPrompt = (text: string) => {
-        sendUserMessage(text);
-    };
+    async function newSession() {
+        const created = await createSession();
+        queryClient.invalidateQueries({ queryKey: sessionKeys.all });
+        setCurrentSession(created);
+        setMessages([]);
+        setKrrResult(null);
+        navigate(`/chat/${created.session_id}`, { replace: true });
+    }
 
-    const handleNewSession = async () => {
-        try {
-            const newSession = await createSession();
-            setCurrentSession(newSession);
-            setMessages([]);
-            setKrrResult(null);
-            navigate(`/chat/${newSession.session_id}`, { replace: true });
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to create session');
-        }
-    };
+    function dismissSuggestions() {
+        localStorage.setItem(promptKey, 'true');
+        setShowSuggestions(false);
+    }
 
-    // Loading state
+    function restoreSuggestions() {
+        localStorage.removeItem(promptKey);
+        setShowSuggestions(true);
+    }
+
     if (isInitializing) {
         return (
-            <div className="flex h-full items-center justify-center">
-                <div className="text-center">
-                    <Loader2 className="w-8 h-8 text-primary animate-spin mx-auto mb-4" />
-                    <p className="text-slate-text/50">Loading conversation...</p>
-                </div>
+            <div className="h-full p-4 md:p-6 space-y-5" aria-label="Loading conversation">
+                <div className="h-8 w-48 rounded bg-slate-200 animate-pulse" />
+                <div className="h-20 max-w-lg rounded-2xl bg-white animate-pulse" />
+                <div className="h-16 max-w-md ml-auto rounded-2xl bg-primary/10 animate-pulse" />
+                <div className="h-20 max-w-lg rounded-2xl bg-white animate-pulse" />
             </div>
         );
     }
 
-    // Error state
-    if (error && !currentSession) {
+    if (loadError || !currentSession) {
         return (
-            <div className="flex h-full items-center justify-center">
-                <div className="text-center max-w-md mx-auto p-6">
-                    <AlertCircle className="w-12 h-12 text-error mx-auto mb-4" />
-                    <p className="text-error mb-4">{error}</p>
-                    <button
-                        onClick={() => navigate('/chat')}
-                        className="btn-primary"
-                    >
-                        Start New Conversation
+            <div className="h-full grid place-items-center p-6 text-center">
+                <div>
+                    <AlertCircle className="text-error mx-auto mb-3" size={40} />
+                    <p className="text-error mb-4">{loadError || 'Conversation unavailable'}</p>
+                    <button className="btn-primary" onClick={() => navigate('/chat')}>
+                        Start a new conversation
                     </button>
                 </div>
             </div>
@@ -217,47 +248,69 @@ export function Chat() {
     }
 
     return (
-        <div className="flex h-full">
-            <div className="flex-1 flex flex-col min-w-0">
-                {/* Session Header */}
-                <div className="px-4 py-2 border-b border-gray-100 flex items-center justify-between bg-white/50">
-                    <div className="flex-1 min-w-0">
-                        <h2 className="font-medium truncate">
-                            {currentSession?.title || 'New Conversation'}
-                        </h2>
+        <div className="flex h-full min-w-0 overflow-hidden">
+            <section className="flex-1 flex flex-col min-w-0 max-w-full">
+                <div className="px-4 py-2 border-b border-gray-100 flex items-center justify-between bg-white/80">
+                    <h2 className="font-medium truncate min-w-0">{currentSession.title}</h2>
+                    <div className="flex items-center gap-1">
+                        <button onClick={() => setExplanationOpen(true)}
+                            className="lg:hidden p-2 text-primary rounded-lg hover:bg-primary/10"
+                            aria-label="Open response explanation">
+                            <Brain size={18} />
+                        </button>
+                        <button onClick={newSession}
+                            className="flex items-center gap-1 text-sm text-primary hover:bg-primary/10 px-3 py-1.5 rounded-lg">
+                            <Plus size={16} /> New
+                        </button>
                     </div>
-                    <button
-                        onClick={handleNewSession}
-                        className="flex items-center gap-1 text-sm text-primary hover:bg-primary/10 px-3 py-1.5 rounded-lg transition-colors"
-                    >
-                        <Plus size={16} />
-                        New
-                    </button>
                 </div>
 
                 <ChatShell
                     messages={messages}
-                    isLoading={isLoading}
+                    isLoading={isSending}
+                    loadingLabel={waitingLonger ? 'Still working...' : 'Companion is thinking...'}
                 />
 
                 {krrResult?.action === 'crisis_intervention' && (
-                    <div className="px-4">
-                        <CrisisAlert type={krrResult.crisis_type} />
+                    <div className="px-4"><CrisisAlert type={krrResult.crisis_type} /></div>
+                )}
+                {sendError && retryPayload && (
+                    <div role="alert" className="mx-4 mb-2 p-3 rounded-xl bg-error/10 text-error text-sm flex items-center gap-3">
+                        <span className="flex-1">{sendError}</span>
+                        <button className="font-medium flex items-center gap-1"
+                            onClick={() => sendUserMessage(retryPayload.text, retryPayload.id, false)}>
+                            <RotateCcw size={14} /> Retry
+                        </button>
                     </div>
                 )}
-
-                {showQuickPrompts && (
-                    <QuickPrompts
-                        onSelect={handleQuickPrompt}
-                        onClose={() => setShowQuickPrompts(false)}
-                    />
+                {showSuggestions && messages.length === 0 ? (
+                    <QuickPrompts onSelect={sendUserMessage} onClose={dismissSuggestions} />
+                ) : (
+                    !showSuggestions && messages.length === 0 && (
+                        <button onClick={restoreSuggestions}
+                            className="mx-4 mb-2 self-start text-xs text-primary hover:underline">
+                            Show suggested messages
+                        </button>
+                    )
                 )}
-                <Composer onSend={sendUserMessage} disabled={isLoading} />
-            </div>
+                <Composer onSend={sendUserMessage} disabled={isSending} />
+            </section>
 
-            <aside className="hidden lg:block w-80 xl:w-96 border-l border-gray-100 bg-background overflow-y-auto p-4 pb-2 space-y-4">
+            <aside className="hidden lg:block w-80 xl:w-96 min-w-0 border-l border-gray-100 bg-background overflow-y-auto p-4 space-y-4">
                 <ExplanationPanel krrResult={krrResult} />
             </aside>
+
+            {explanationOpen && (
+                <div className="fixed inset-0 z-50 lg:hidden">
+                    <button className="absolute inset-0 bg-black/30" aria-label="Close explanation"
+                        onClick={() => setExplanationOpen(false)} />
+                    <aside className="absolute inset-y-0 right-0 w-[min(92vw,24rem)] bg-background p-4 overflow-y-auto shadow-xl">
+                        <button onClick={() => setExplanationOpen(false)}
+                            className="mb-3 text-sm text-primary">Close explanation</button>
+                        <ExplanationPanel krrResult={krrResult} />
+                    </aside>
+                </div>
+            )}
         </div>
     );
 }

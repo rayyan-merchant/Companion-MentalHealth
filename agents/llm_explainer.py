@@ -1,8 +1,8 @@
-from typing import Dict, List, Any, Optional, Tuple
-from dataclasses import dataclass
-from pathlib import Path
 import os
 import random
+import time
+from dataclasses import dataclass
+from typing import Any, Dict, List, Optional, Tuple
 
 try:
     from dotenv import load_dotenv
@@ -95,7 +95,10 @@ RAG_SNIPPETS = {
                 "Focus on a single object in the room and describe it in detail."
             ]
         },
-        "empathy": "Panic attacks are terrifying, but they are temporary. You are safe."
+        "empathy": (
+            "Panic-like symptoms can feel frightening. New or severe chest pain, "
+            "fainting, or breathing difficulty needs urgent medical assessment."
+        )
     },
     "SleepDisturbance": {
         "description": "Difficulties falling or staying asleep.",
@@ -222,37 +225,45 @@ class LLMExplanationAgent:
         self.gemini_keys = []
         self.model = os.getenv("LLM_MODEL", "llama-3.3-70b-versatile")
         self.gemini_model = os.getenv("GEMINI_LLM_MODEL", "gemini-2.0-flash")
+        self.provider_budget_seconds = float(
+            os.getenv("PROVIDER_TIMEOUT_SECONDS", "6")
+        )
         self.use_groq = False
         self.use_gemini = False
-        
+        llm_enabled = os.getenv("ENABLE_LLM", "false").lower() == "true"
+
         # Load Groq keys from arg or env
-        if api_key:
+        if llm_enabled and api_key:
             self.groq_keys = [k.strip() for k in api_key.split(",") if k.strip()]
-        else:
+        elif llm_enabled:
             env_keys = os.getenv("GROQ_API_KEY", "")
             self.groq_keys = [k.strip() for k in env_keys.split(",") if k.strip()]
         
-        if GROQ_AVAILABLE and self.groq_keys:
-            self.use_groq = True
-            print(f"[LLM] Groq: {len(self.groq_keys)} keys loaded. Model: {self.model}")
-        elif not GROQ_AVAILABLE:
-            print("[LLM] Groq: SDK not installed.")
-        else:
-            print("[LLM] Groq: No API keys found.")
+        if llm_enabled:
+            if GROQ_AVAILABLE and self.groq_keys:
+                self.use_groq = True
+                print(f"[LLM] Groq: {len(self.groq_keys)} keys loaded. Model: {self.model}")
+            elif not GROQ_AVAILABLE:
+                print("[LLM] Groq: SDK not installed.")
+            else:
+                print("[LLM] Groq: No API keys found.")
         
         # Load Gemini keys from env
-        gemini_env = os.getenv("GEMINI_API_KEY", "")
+        gemini_env = os.getenv("GEMINI_API_KEY", "") if llm_enabled else ""
         self.gemini_keys = [k.strip() for k in gemini_env.split(",") if k.strip()]
         
-        if GEMINI_AVAILABLE and self.gemini_keys:
-            self.use_gemini = True
-            print(f"[LLM] Gemini: {len(self.gemini_keys)} keys loaded. Model: {self.gemini_model}")
-        elif not GEMINI_AVAILABLE:
-            print("[LLM] Gemini: SDK not installed.")
-        else:
-            print("[LLM] Gemini: No API keys found.")
-        
-        if not self.use_groq and not self.use_gemini:
+        if llm_enabled:
+            if GEMINI_AVAILABLE and self.gemini_keys:
+                self.use_gemini = True
+                print(f"[LLM] Gemini: {len(self.gemini_keys)} keys loaded. Model: {self.gemini_model}")
+            elif not GEMINI_AVAILABLE:
+                print("[LLM] Gemini: SDK not installed.")
+            else:
+                print("[LLM] Gemini: No API keys found.")
+
+        if not llm_enabled:
+            print("[LLM] Disabled. Set ENABLE_LLM=true to use configured providers.")
+        elif not self.use_groq and not self.use_gemini:
             print("[LLM] WARNING: No LLM providers available! Using template fallback only.")
         
         self.rag_db = RAG_SNIPPETS
@@ -279,9 +290,13 @@ class LLMExplanationAgent:
         
         selected_key = random.choice(self.groq_keys)
         try:
-            return Groq(api_key=selected_key)
+            return Groq(
+                api_key=selected_key,
+                timeout=self.provider_budget_seconds,
+                max_retries=0,
+            )
         except Exception as e:
-            print(f"[LLM] Groq client creation failed (key ...{selected_key[-4:]}): {e}")
+            print(f"[LLM] Groq client creation failed: {type(e).__name__}")
             return None
 
     def _call_groq(self, system_prompt: str, user_prompt: str, max_tokens: int = 150, temperature: float = 0.7) -> Optional[str]:
@@ -289,30 +304,22 @@ class LLMExplanationAgent:
         if not self.use_groq:
             return None
         
-        attempts = 0
-        max_attempts = min(len(self.groq_keys) * 2, 6)
-        
-        while attempts < max_attempts:
-            client = self._get_groq_client()
-            if not client:
-                break
-            
-            try:
-                response = client.chat.completions.create(
-                    model=self.model,
-                    messages=[
-                        {"role": "system", "content": system_prompt},
-                        {"role": "user", "content": user_prompt}
-                    ],
-                    max_tokens=max_tokens,
-                    temperature=temperature
-                )
-                return response.choices[0].message.content
-            except Exception as e:
-                print(f"[LLM] Groq attempt {attempts+1} failed: {e}")
-                attempts += 1
-        
-        print("[LLM] All Groq keys exhausted.")
+        client = self._get_groq_client()
+        if not client:
+            return None
+        try:
+            response = client.chat.completions.create(
+                model=self.model,
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_prompt}
+                ],
+                max_tokens=max_tokens,
+                temperature=temperature
+            )
+            return response.choices[0].message.content
+        except Exception as e:
+            print(f"[LLM] Groq attempt failed: {type(e).__name__}")
         return None
 
     def _call_gemini(self, system_prompt: str, user_prompt: str, max_tokens: int = 150, temperature: float = 0.7) -> Optional[str]:
@@ -320,37 +327,40 @@ class LLMExplanationAgent:
         if not self.use_gemini:
             return None
         
-        for i, key in enumerate(self.gemini_keys):
-            try:
-                client = genai.Client(api_key=key)
-                response = client.models.generate_content(
-                    model=self.gemini_model,
-                    contents=user_prompt,
-                    config=genai_types.GenerateContentConfig(
-                        system_instruction=system_prompt,
-                        max_output_tokens=max_tokens,
-                        temperature=temperature,
-                    )
+        key = random.choice(self.gemini_keys)
+        try:
+            client = genai.Client(
+                api_key=key,
+                http_options=genai_types.HttpOptions(
+                    timeout=int(self.provider_budget_seconds * 1000)
                 )
-                if response and response.text:
-                    return response.text
-            except Exception as e:
-                print(f"[LLM] Gemini attempt {i+1} failed (key ...{key[-4:]}): {e}")
-        
-        print("[LLM] All Gemini keys exhausted.")
+            )
+            response = client.models.generate_content(
+                model=self.gemini_model,
+                contents=user_prompt,
+                config=genai_types.GenerateContentConfig(
+                    system_instruction=system_prompt,
+                    max_output_tokens=max_tokens,
+                    temperature=temperature,
+                )
+            )
+            if response and response.text:
+                return response.text
+        except Exception as e:
+            print(f"[LLM] Gemini attempt failed: {type(e).__name__}")
         return None
 
     def _call_llm(self, system_prompt: str, user_prompt: str, max_tokens: int = 150, temperature: float = 0.7) -> Tuple[Optional[str], Optional[str]]:
         """Call LLM with Groq-first, Gemini-fallback strategy.
         Returns (response_text, provider_name) or (None, None)."""
         
-        # Try Groq first (faster, higher throughput)
+        started = time.monotonic()
         result = self._call_groq(system_prompt, user_prompt, max_tokens, temperature)
         if result:
             return result, "groq"
-        
-        # Fallback to Gemini
-        print("[LLM] Falling back to Gemini...")
+
+        if time.monotonic() - started >= self.provider_budget_seconds:
+            return None, None
         result = self._call_gemini(system_prompt, user_prompt, max_tokens, temperature)
         if result:
             return result, "gemini"

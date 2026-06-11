@@ -1,234 +1,164 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { Calendar, Download, Trash2, MessageCircle, Plus, Search, Loader2, AlertCircle } from 'lucide-react';
-import { getSessions, deleteSession, SessionSummary } from '../api/sessions';
+import {
+    AlertCircle,
+    Calendar,
+    Loader2,
+    MessageCircle,
+    Plus,
+    Search,
+    Trash2
+} from 'lucide-react';
+import {
+    deleteSession,
+    getSessions,
+    sessionKeys
+} from '../api/sessions';
+
+const PAGE_LOADED_AT = Date.now();
 
 export function Session() {
     const navigate = useNavigate();
-    const [sessions, setSessions] = useState<SessionSummary[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+    const queryClient = useQueryClient();
     const [searchQuery, setSearchQuery] = useState('');
-    const [deletingId, setDeletingId] = useState<string | null>(null);
-
-    // Fetch sessions on mount
-    useEffect(() => {
-        loadSessions();
-    }, []);
-
-    const loadSessions = async () => {
-        try {
-            setIsLoading(true);
-            setError(null);
-            const data = await getSessions();
-            setSessions(data);
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to load sessions');
-        } finally {
-            setIsLoading(false);
+    const sessionsQuery = useQuery({
+        queryKey: sessionKeys.all,
+        queryFn: getSessions,
+        staleTime: 60 * 1000
+    });
+    const deletion = useMutation({
+        mutationFn: deleteSession,
+        onSuccess: (_, sessionId) => {
+            queryClient.setQueryData(sessionKeys.all, (current: unknown) =>
+                Array.isArray(current)
+                    ? current.filter((item) => item.session_id !== sessionId)
+                    : current
+            );
+            queryClient.invalidateQueries({ queryKey: sessionKeys.stats });
         }
-    };
+    });
 
-    const handleOpenSession = (sessionId: string) => {
-        navigate(`/chat/${sessionId}`);
-    };
-
-    const handleDeleteSession = async (sessionId: string, e: React.MouseEvent) => {
-        e.stopPropagation();
-        if (!confirm('Are you sure you want to delete this session?')) return;
-
-        try {
-            setDeletingId(sessionId);
-            await deleteSession(sessionId);
-            setSessions(prev => prev.filter(s => s.session_id !== sessionId));
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to delete session');
-        } finally {
-            setDeletingId(null);
-        }
-    };
-
-    const handleNewSession = () => {
-        navigate('/chat');
-    };
-
-    // Filter sessions by search query
-    const filteredSessions = sessions.filter(session =>
-        session.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        session.last_message_preview?.toLowerCase().includes(searchQuery.toLowerCase())
+    const sessions = sessionsQuery.data || [];
+    const query = searchQuery.trim().toLowerCase();
+    const filtered = sessions.filter((session) =>
+        session.title.toLowerCase().includes(query)
+        || (session.last_message_preview || '').toLowerCase().includes(query)
     );
-
     const riskColors = {
         low: 'bg-secondary/10 text-secondary-dark',
         medium: 'bg-warning/50 text-amber-700',
         high: 'bg-error/10 text-error'
     };
 
-    const formatDate = (dateString: string) => {
-        const date = new Date(dateString);
-        const now = new Date();
-        const diff = now.getTime() - date.getTime();
-        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    async function remove(sessionId: string, event: React.MouseEvent) {
+        event.stopPropagation();
+        if (deletion.isPending) return;
+        if (!window.confirm('Are you sure you want to delete this session?')) return;
+        deletion.mutate(sessionId);
+    }
 
-        if (days === 0) {
-            return 'Today';
-        } else if (days === 1) {
-            return 'Yesterday';
-        } else if (days < 7) {
-            return `${days} days ago`;
-        } else {
-            return date.toLocaleDateString();
-        }
-    };
+    function formatDate(value: string) {
+        const date = new Date(value);
+        const days = Math.floor((PAGE_LOADED_AT - date.getTime()) / 86_400_000);
+        if (days === 0) return 'Today';
+        if (days === 1) return 'Yesterday';
+        if (days < 7) return `${days} days ago`;
+        return date.toLocaleDateString();
+    }
 
     return (
-        <div className="h-full overflow-y-auto pb-20 md:pb-0 p-4 md:p-6 max-w-4xl mx-auto">
-            {/* Header */}
-            <div className="flex items-center justify-between mb-6">
+        <div className="pb-20 md:pb-8 p-4 md:p-6 max-w-4xl mx-auto min-w-0">
+            <div className="flex flex-wrap gap-3 items-center justify-between mb-6">
                 <h1 className="text-2xl font-semibold">Session History</h1>
-                <button
-                    onClick={handleNewSession}
-                    className="btn-primary flex items-center gap-2"
-                >
-                    <Plus size={18} />
-                    New Session
+                <button onClick={() => navigate('/chat')} className="btn-primary flex items-center gap-2">
+                    <Plus size={18} /> New Session
                 </button>
             </div>
-
-            {/* Search Bar */}
             <div className="relative mb-6">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-text/40" size={20} />
-                <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search sessions..."
-                    className="w-full pl-12 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
-                />
+                <input value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)}
+                    maxLength={100} placeholder="Search sessions..."
+                    className="w-full pl-12 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50" />
             </div>
 
-            {/* Error State */}
-            {error && (
-                <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="mb-6 p-4 bg-error/10 border border-error/20 rounded-xl flex items-center gap-3"
-                >
-                    <AlertCircle className="text-error flex-shrink-0" size={20} />
-                    <p className="text-error text-sm">{error}</p>
-                    <button
-                        onClick={loadSessions}
-                        className="ml-auto text-sm text-error hover:underline"
-                    >
-                        Retry
-                    </button>
-                </motion.div>
-            )}
-
-            {/* Loading State */}
-            {isLoading && (
-                <div className="flex flex-col items-center justify-center py-12">
-                    <Loader2 className="w-8 h-8 text-primary animate-spin mb-4" />
-                    <p className="text-slate-text/50">Loading sessions...</p>
+            {(sessionsQuery.error || deletion.error) && (
+                <div role="alert" className="mb-6 p-4 bg-error/10 text-error rounded-xl flex gap-3">
+                    <AlertCircle size={20} />
+                    <span className="flex-1">
+                        {(sessionsQuery.error || deletion.error) instanceof Error
+                            ? (sessionsQuery.error || deletion.error)?.message
+                            : 'Could not update sessions'}
+                    </span>
+                    <button onClick={() => sessionsQuery.refetch()} className="font-medium">Retry</button>
                 </div>
             )}
 
-            {/* Sessions List */}
-            {!isLoading && (
-                <div className="space-y-4">
-                    {filteredSessions.map((session, index) => (
-                        <motion.div
-                            key={session.session_id}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: index * 0.05 }}
-                            onClick={() => handleOpenSession(session.session_id)}
-                            className="card flex items-center justify-between cursor-pointer hover:shadow-md hover:border-primary/20 transition-all"
-                        >
-                            <div className="flex items-start gap-4 flex-1 min-w-0">
-                                <div className="p-2 bg-primary/10 rounded-lg flex-shrink-0">
+            {sessionsQuery.isLoading ? (
+                <div className="space-y-4" aria-label="Loading session history">
+                    {[0, 1, 2].map((item) => (
+                        <div key={item} className="card animate-pulse">
+                            <div className="h-5 bg-slate-200 rounded w-1/2 mb-3" />
+                            <div className="h-4 bg-slate-100 rounded w-4/5 mb-3" />
+                            <div className="h-3 bg-slate-100 rounded w-1/3" />
+                        </div>
+                    ))}
+                </div>
+            ) : (
+                <div className="space-y-4 min-w-0">
+                    {filtered.map((session, index) => (
+                        <motion.article key={session.session_id}
+                            initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: index * 0.04 }}
+                            onClick={() => navigate(`/chat/${session.session_id}`)}
+                            className="card flex items-center justify-between cursor-pointer hover:shadow-md min-w-0 max-w-full">
+                            <div className="flex items-start gap-4 flex-1 min-w-0 max-w-full">
+                                <div className="p-2 bg-primary/10 rounded-lg shrink-0">
                                     <MessageCircle className="text-primary" size={20} />
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <p className="font-medium mb-1 truncate">{session.title}</p>
                                     {session.last_message_preview && (
-                                        <p className="text-sm text-slate-text/50 truncate mb-2">
+                                        <p className="text-sm text-slate-text/50 break-words [overflow-wrap:anywhere] line-clamp-2 mb-2">
                                             {session.last_message_preview}
                                         </p>
                                     )}
                                     <div className="flex items-center gap-3 flex-wrap">
                                         <span className="text-sm text-slate-text/50 flex items-center gap-1">
-                                            <Calendar size={14} />
-                                            {formatDate(session.updated_at)}
+                                            <Calendar size={14} /> {formatDate(session.updated_at)}
                                         </span>
-                                        <span className="text-sm text-slate-text/50">
-                                            {session.message_count} messages
-                                        </span>
+                                        <span className="text-sm text-slate-text/50">{session.message_count} messages</span>
                                         <span className={`text-xs px-2 py-0.5 rounded-full ${riskColors[session.risk_level]}`}>
                                             {session.risk_level} risk
                                         </span>
                                     </div>
                                 </div>
                             </div>
-
-                            <div className="flex items-center gap-2 ml-4">
-                                <button
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        // TODO: Implement export
-                                    }}
-                                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                                    title="Export"
-                                >
-                                    <Download size={18} className="text-slate-text/50" />
-                                </button>
-                                <button
-                                    onClick={(e) => handleDeleteSession(session.session_id, e)}
-                                    disabled={deletingId === session.session_id}
-                                    className="p-2 hover:bg-error/10 rounded-lg transition-colors disabled:opacity-50"
-                                    title="Delete"
-                                >
-                                    {deletingId === session.session_id ? (
-                                        <Loader2 size={18} className="text-error/50 animate-spin" />
-                                    ) : (
-                                        <Trash2 size={18} className="text-error/50" />
-                                    )}
-                                </button>
-                            </div>
-                        </motion.div>
+                            <button onClick={(event) => remove(session.session_id, event)}
+                                disabled={deletion.isPending}
+                                className="p-2 ml-2 hover:bg-error/10 rounded-lg disabled:opacity-50"
+                                aria-label={`Delete ${session.title}`}>
+                                {deletion.isPending && deletion.variables === session.session_id
+                                    ? <Loader2 size={18} className="text-error animate-spin" />
+                                    : <Trash2 size={18} className="text-error/60" />}
+                            </button>
+                        </motion.article>
                     ))}
                 </div>
             )}
 
-            {/* Empty State */}
-            {!isLoading && filteredSessions.length === 0 && (
+            {!sessionsQuery.isLoading && filtered.length === 0 && (
                 <div className="text-center py-12">
-                    <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <div className="w-16 h-16 bg-primary/10 rounded-full grid place-items-center mx-auto mb-4">
                         <MessageCircle className="text-primary" size={32} />
                     </div>
-                    {searchQuery ? (
-                        <>
-                            <p className="text-slate-text/70 mb-2">No sessions match your search</p>
-                            <button
-                                onClick={() => setSearchQuery('')}
-                                className="text-primary text-sm hover:underline"
-                            >
-                                Clear search
-                            </button>
-                        </>
-                    ) : (
-                        <>
-                            <p className="text-slate-text/70 mb-4">No sessions yet. Start a conversation to create your first session.</p>
-                            <button
-                                onClick={handleNewSession}
-                                className="btn-primary inline-flex items-center gap-2"
-                            >
-                                <Plus size={18} />
-                                Start Your First Conversation
-                            </button>
-                        </>
-                    )}
+                    <p className="text-slate-text/70 mb-4">
+                        {query ? 'No sessions match your search.' : 'No conversations yet. Start one to build your private session history.'}
+                    </p>
+                    {query
+                        ? <button onClick={() => setSearchQuery('')} className="text-primary">Clear search</button>
+                        : <button onClick={() => navigate('/chat')} className="btn-primary">Start a conversation</button>}
                 </div>
             )}
         </div>

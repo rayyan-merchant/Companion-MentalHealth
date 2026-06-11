@@ -1,0 +1,8 @@
+{"id":"negated-depression","category":"negation","text":"I am not depressed, just tired.","expect_crisis":null,"forbid_state":"DepressiveSpectrum"}
+{"id":"academic-stress","category":"inference","text":"I feel stressed about my exams.","expect_crisis":null,"expect_state":"AcademicStress","expect_rule":"R_ACS_02"}
+{"id":"anxiety-sleep","category":"inference","text":"I am anxious and cannot sleep.","expect_crisis":null,"expect_state":"AnxietyRisk","expect_rule":"R_ANX_physio"}
+{"id":"direct-suicide","category":"crisis","text":"I want to kill myself tonight.","expect_crisis":"suicidal_ideation"}
+{"id":"denied-suicide","category":"negation","text":"I do not want to die. I want support.","expect_crisis":null}
+{"id":"harm-target","category":"crisis","text":"I want to hurt my classmate.","expect_crisis":"harm_to_others"}
+{"id":"medical-red-flag","category":"medical","text":"My chest hurts and I cannot breathe.","expect_crisis":"medical_emergency"}
+{"id":"safe-idiom","category":"false-positive","text":"This assignment is killing me.","expect_crisis":null}

@@ -1,100 +1,127 @@
-# Companion: Ontology-Driven Mental Health Chatbot
+# Companion
 
-## Overview
+Companion is a non-clinical wellness reflection app for Pakistani university
+students. It combines deterministic signal extraction, a versioned YAML rule
+catalog, safety interception, explainable evidence, session history, and
+optional provider-assisted phrasing.
 
-**Companion** is an ontology-driven Knowledge Representation & Reasoning (KRR) chatbot designed to promote **explainable mental health risk awareness** for university students.
-It analyzes user text to identify emotions, symptoms, and triggers, maps them onto a custom **mental health ontology (OWL)**, and applies **symbolic reasoning (SWRL + SPARQL)** to infer potential risk patterns.
-The system provides **transparent, human-readable “why” explanations** for its inferences.
+Companion is not a diagnosis, therapist, emergency service, or substitute for
+professional care.
 
-⚠️ *Companion is a non-clinical, educational support tool and does not provide medical diagnosis or therapy.*
+## Architecture
 
----
+- React, TypeScript, Tailwind CSS, and TanStack Query
+- FastAPI with async SQLAlchemy
+- PostgreSQL in production and SQLite for local development/tests
+- Redis-backed production rate limits and dashboard observation cache
+- Opaque hashed session tokens in `HttpOnly`, `Secure`, `SameSite=Lax` cookies
+- Double-submit CSRF protection for every state-changing request
+- Versioned runtime rules in `reasoning/rules/catalog.v1.yaml`
+- OWL, RDF, and SPARQL retained only as research-validation artifacts
+- Deterministic responses by default; Groq/Gemini phrasing is opt-in
 
+## Local Development
 
-## Key Features
+Requirements: Python 3.11+, Node.js 22+, and optionally Docker Desktop.
 
-* **Emotion & Symptom Extraction** from user text
-* **Ontology-Based Mapping** using OWL and RDF
-* **Symbolic Reasoning** via SWRL rules
-* **SPARQL Querying** for inferred patterns
-* **Explainable Outputs** with causal “why” explanations
-* **Interactive Chat Interface** (React-based UI)
-* **Ethical & Safety Alerts** (e.g crisis resources for high-risk indicators)
-
----
-
-## Tech Stack
-
-* **Backend:** Python, FastAPI
-* **Frontend:** React, Vite
-* **Semantic Web:** OWL, RDF, SWRL, SPARQL, RDFlib
-* **NLP:** Keyword-based emotion & symptom extraction (spaCy and NLTK)
-
----
-
-## Installation
-
-### 1️⃣ Clone the Repository
-
-```bash
-git clone https://github.com/rayyan-merchant/Companion-MentalHealth.git
-cd Companion-MentalHealth
+```powershell
+python -m pip install -r requirements.txt
+python -m alembic upgrade head
+python -m uvicorn backend.main:app --reload --port 8000
 ```
 
-### 2️⃣ Backend Setup
+In a second terminal:
 
-```bash
-pip install -r requirements.txt
-uvicorn main:app --reload --port 8000
-```
-
-### 3️⃣ Frontend Setup
-
-```bash
+```powershell
 cd frontend
-npm install
+npm ci
 npm run dev
 ```
 
-Access the app at **[http://localhost:3000](http://localhost:3000)**.
+The frontend runs at `http://localhost:3000` and proxies `/api` to port 8000.
+SQLite and an in-memory rate-limit fallback are used outside production.
 
----
+## Production-Like Docker
 
-## Usage
-
-1. Start both backend and frontend servers
-2. Open the chat UI in your browser
-3. Enter a message describing your feelings or symptoms
-4. View inferred mental health patterns, confidence levels, and clear explanations
-5. Safety advisories appear automatically when high-risk indicators are detected
-
----
-
-## Project Structure
-
-```
-agents/            Conversational logic modules
-backend/           FastAPI backend & reasoning integration
-frontend/          React chat UI
-nlp/               Emotion & symptom extraction
-ontology/          Mental health ontology (OWL and RDF)
-reasoning/         SWRL rules & orchestrator
-data/session_graphs/ Session-level knowledge graphs
+```powershell
+docker compose up --build
 ```
 
----
+This starts PostgreSQL, Redis, runs Alembic migrations, and serves the same-origin
+frontend/API at `http://localhost:10000`.
+
+Production requires explicit `DATABASE_URL`, `REDIS_URL`,
+`CORS_ALLOWED_ORIGINS`, and `SUPPORT_EMAIL` settings. PostgreSQL and Redis
+readiness are checked by `/api/ready`.
+
+## Render Deployment
+
+The production Render stack is defined in `render.yaml` and includes the Docker
+web service, PostgreSQL, Redis-compatible Key Value, migrations, readiness
+checks, and daily retention cleanup. See [DEPLOY_RENDER.md](DEPLOY_RENDER.md)
+for the safe migration and deployment procedure.
+
+## Legacy Data Import
+
+The importer preserves legacy UUIDs, timestamps, metadata, and soft-deletion
+state. It is idempotent and never modifies the source JSON.
+
+```powershell
+python -m backend.import_json --data-dir .\data
+```
+
+## Account Administration
+
+The beta uses support-assisted recovery rather than a public reset endpoint.
+
+```powershell
+python -m backend.admin reset-password --email student@example.com
+```
+
+The command prints a one-time temporary password, revokes existing sessions,
+requires a password change, and records an audit event.
+
+Retention cleanup can be scheduled daily:
+
+```powershell
+python -m backend.maintenance purge
+```
+
+Deleted conversations are purged after 30 days by default. Redacted audit and
+safety records are retained for 90 days.
+
+## Verification
+
+```powershell
+python -m unittest discover -s tests -v
+cd frontend
+npm test
+npm run lint
+npm run build
+npm audit --audit-level=high
+```
+
+Playwright tests target a running app:
+
+```powershell
+npm run test:e2e
+```
+
+The versioned JSONL evaluation corpus covers extraction, negation, crisis
+detection, medical red flags, inference, and false positives. It is a regression
+suite, not evidence of clinical accuracy.
+
+## Privacy and Safety
+
+The app includes public Privacy and Safety pages covering stored data, optional
+provider processing, retention, deletion, emergency limitations, and
+Pakistan-specific resources. Logs contain request metadata and redacted rule
+information, not raw mental-health messages or credentials.
+
+Unrestricted public release remains gated on clinician review of the evaluation
+corpus, rule thresholds, coping content, and regional crisis resources.
 
 ## License
 
-All rights are reserved by the project authors.
-Permission is required for reuse, modification, or distribution.
-
----
-
-## 👥 Project Contributors  
-
-<div align="center">  <a href="https://www.linkedin.com/in/rayyanmerchant2004/" target="_blank">    <img src="https://img.shields.io/badge/Rayyan%20Merchant-%230077B5.svg?style=for-the-badge&logo=linkedin&logoColor=white" alt="Rayyan Merchant"/>  </a>  <a href="https://www.linkedin.com/in/rija-ali-731095296" target="_blank">    <img src="https://img.shields.io/badge/Syeda%20Rija%20Ali-%230077B5.svg?style=for-the-badge&logo=linkedin&logoColor=white" alt="Syeda Rija Ali"/>  </a>  <a href="https://www.linkedin.com/in/riya-bhart-339036287/" target="_blank">    <img src="https://img.shields.io/badge/Riya%20Bhart-%230077B5.svg?style=for-the-badge&logo=linkedin&logoColor=white" alt="Riya Bhart"/>  </a></div>
-
-
-
-
+All rights are reserved by the project authors. Permission is required for
+reuse, modification, or distribution.

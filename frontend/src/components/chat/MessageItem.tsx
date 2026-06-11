@@ -11,12 +11,12 @@ function EvidencePill({ label, items }: { label: string; items: string[] }) {
     if (!items || items.length === 0) return null;
 
     return (
-        <div className="flex flex-wrap gap-1 items-center">
+        <div className="flex flex-wrap gap-1 items-center min-w-0 max-w-full">
             <span className="text-xs text-slate-text/60">{label}:</span>
             {items.map((item, i) => (
                 <span
                     key={i}
-                    className="px-2 py-0.5 text-xs bg-primary/10 text-primary rounded-full"
+                    className="px-2 py-0.5 text-xs bg-primary/10 text-primary rounded-full break-words [overflow-wrap:anywhere] max-w-full"
                 >
                     {item}
                 </span>
@@ -75,9 +75,9 @@ export function MessageItem({ message, onSelect }: MessageItemProps) {
             <motion.div
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="flex justify-center my-4"
+                className="flex justify-center my-4 min-w-0 max-w-full"
             >
-                <div className="px-4 py-2 bg-warning/30 text-amber-700 text-sm rounded-full">
+                <div className="px-4 py-2 bg-warning/30 text-amber-700 text-sm rounded-full break-words [overflow-wrap:anywhere] max-w-full">
                     {message.text}
                 </div>
             </motion.div>
@@ -89,13 +89,13 @@ export function MessageItem({ message, onSelect }: MessageItemProps) {
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2 }}
-            className={`flex flex-col gap-1 ${isUser ? 'items-end' : 'items-start'}`}
+            className={`flex flex-col gap-1 min-w-0 max-w-full ${isUser ? 'items-end' : 'items-start'}`}
             onClick={() => onSelect?.(message.id)}
             aria-live={isUser ? undefined : 'polite'}
         >
-            <div className={`message-bubble ${isUser ? 'user' : 'bot'} max-w-lg`}>
+            <div className={`message-bubble ${isUser ? 'user' : 'bot'} max-w-lg min-w-0 max-w-full`}>
                 {/* Main message text */}
-                <p className="text-[15px] leading-relaxed whitespace-pre-wrap">{message.text}</p>
+                <p className="text-[15px] leading-relaxed whitespace-pre-wrap break-words [overflow-wrap:anywhere] max-w-full">{message.text}</p>
 
                 {/* Bot-only: Evidence section */}
                 {!isUser && metadata?.evidence && (

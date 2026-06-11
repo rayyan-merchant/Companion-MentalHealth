@@ -1,162 +1,118 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-
-// ============================================================================
-// Types
-// ============================================================================
+import {
+    createContext,
+    ReactNode,
+    useContext,
+    useEffect,
+    useState
+} from 'react';
+import { apiFetch, getPublicConfig } from '../api/client';
 
 export interface User {
     user_id: string;
     email: string;
     created_at: string;
+    must_change_password: boolean;
 }
 
 interface AuthContextType {
     user: User | null;
-    token: string | null;
     isLoading: boolean;
     isAuthenticated: boolean;
-    login: (email: string, password: string) => Promise<void>;
-    signup: (email: string, password: string) => Promise<void>;
-    logout: () => void;
+    login: (email: string, password: string) => Promise<User>;
+    signup: (email: string, password: string) => Promise<User>;
+    logout: () => Promise<void>;
+    changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
 }
 
 interface AuthResponse {
-    access_token: string;
-    token_type: string;
     user: User;
 }
 
-// ============================================================================
-// Context
-// ============================================================================
-
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-const API_BASE = '/api';
-const TOKEN_KEY = 'companion_auth_token';
-const USER_KEY = 'companion_user';
-
-// ============================================================================
-// Provider Component
-// ============================================================================
 
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
-    const [token, setToken] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
-    // Initialize auth state from localStorage
     useEffect(() => {
-        const storedToken = localStorage.getItem(TOKEN_KEY);
-        const storedUser = localStorage.getItem(USER_KEY);
-
-        if (storedToken && storedUser) {
+        let active = true;
+        async function bootstrap() {
             try {
-                setToken(storedToken);
-                setUser(JSON.parse(storedUser));
-                // Validate token is still valid
-                validateToken(storedToken);
-            } catch (e) {
-                // Clear invalid data
-                localStorage.removeItem(TOKEN_KEY);
-                localStorage.removeItem(USER_KEY);
+                await getPublicConfig();
+                const current = await apiFetch<User>('/auth/me');
+                if (active) setUser(current);
+            } catch {
+                if (active) setUser(null);
+            } finally {
+                if (active) setIsLoading(false);
             }
         }
-        setIsLoading(false);
+        bootstrap();
+        const clear = () => setUser(null);
+        window.addEventListener('companion:unauthorized', clear);
+        return () => {
+            active = false;
+            window.removeEventListener('companion:unauthorized', clear);
+        };
     }, []);
 
-    const validateToken = async (authToken: string) => {
-        try {
-            const response = await fetch(`${API_BASE}/auth/me`, {
-                headers: {
-                    'Authorization': `Bearer ${authToken}`
-                }
-            });
-
-            if (!response.ok) {
-                // Token is invalid, clear auth state
-                logout();
-            }
-        } catch (e) {
-            // Network error, keep existing auth state
-            console.warn('Could not validate token:', e);
-        }
-    };
-
     const login = async (email: string, password: string) => {
-        const response = await fetch(`${API_BASE}/auth/login`, {
+        const data = await apiFetch<AuthResponse>('/auth/login', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password })
         });
-
-        if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-            throw new Error(errorData.detail || 'Login failed');
-        }
-
-        const data: AuthResponse = await response.json();
-
-        // Store in state and localStorage
-        setToken(data.access_token);
         setUser(data.user);
-        localStorage.setItem(TOKEN_KEY, data.access_token);
-        localStorage.setItem(USER_KEY, JSON.stringify(data.user));
+        return data.user;
     };
 
     const signup = async (email: string, password: string) => {
-        const response = await fetch(`${API_BASE}/auth/signup`, {
+        const data = await apiFetch<AuthResponse>('/auth/signup', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password })
         });
-
-        if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-            throw new Error(errorData.detail || 'Signup failed');
-        }
-
-        const data: AuthResponse = await response.json();
-
-        // Store in state and localStorage
-        setToken(data.access_token);
         setUser(data.user);
-        localStorage.setItem(TOKEN_KEY, data.access_token);
-        localStorage.setItem(USER_KEY, JSON.stringify(data.user));
+        return data.user;
     };
 
-    const logout = () => {
-        setToken(null);
-        setUser(null);
-        localStorage.removeItem(TOKEN_KEY);
-        localStorage.removeItem(USER_KEY);
+    const logout = async () => {
+        try {
+            await apiFetch('/auth/logout', { method: 'POST' });
+        } finally {
+            setUser(null);
+        }
+    };
+
+    const changePassword = async (
+        currentPassword: string,
+        newPassword: string
+    ) => {
+        const updated = await apiFetch<User>('/auth/change-password', {
+            method: 'POST',
+            body: JSON.stringify({
+                current_password: currentPassword,
+                new_password: newPassword
+            })
+        });
+        setUser(updated);
     };
 
     return (
-        <AuthContext.Provider
-            value={{
-                user,
-                token,
-                isLoading,
-                isAuthenticated: !!token && !!user,
-                login,
-                signup,
-                logout
-            }}
-        >
+        <AuthContext.Provider value={{
+            user,
+            isLoading,
+            isAuthenticated: Boolean(user),
+            login,
+            signup,
+            logout,
+            changePassword
+        }}>
             {children}
         </AuthContext.Provider>
     );
 }
 
-// ============================================================================
-// Hook
-// ============================================================================
-
 export function useAuth() {
     const context = useContext(AuthContext);
-    if (context === undefined) {
-        throw new Error('useAuth must be used within an AuthProvider');
-    }
+    if (!context) throw new Error('useAuth must be used within AuthProvider');
     return context;
 }

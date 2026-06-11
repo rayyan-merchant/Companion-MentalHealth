@@ -1,13 +1,12 @@
-from typing import Dict, List, Any, Optional
+import os
+import re
 from dataclasses import dataclass, field
 from datetime import datetime
-import json
-import os
-from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 try:
     from qdrant_client import QdrantClient
-    from qdrant_client.models import Distance, VectorParams, PointStruct
+    from qdrant_client.models import Distance, PointStruct, VectorParams
     VECTOR_STORE_AVAILABLE = True
 except ImportError:
     VECTOR_STORE_AVAILABLE = False
@@ -54,9 +53,13 @@ class SessionMemoryAgent:
         }
         
         self.client = None
-        self.collection_name = f"session_{self.session_id}"
+        safe_session_id = re.sub(r"[^A-Za-z0-9_-]", "_", self.session_id)[:120]
+        self.collection_name = f"session_{safe_session_id}"
         
-        if VECTOR_STORE_AVAILABLE:
+        vector_memory_enabled = (
+            os.getenv("ENABLE_VECTOR_MEMORY", "false").lower() == "true"
+        )
+        if VECTOR_STORE_AVAILABLE and vector_memory_enabled:
             self._init_vector_store()
     
     def _init_vector_store(self):
@@ -82,7 +85,10 @@ class SessionMemoryAgent:
                 self.client = None
                 
         except Exception as e:
-            print(f"Failed to initialize session vector store: {e}")
+            print(
+                "Failed to initialize session vector store: "
+                f"{type(e).__name__}"
+            )
             self.client = None
     
     def add_turn(
@@ -129,7 +135,9 @@ class SessionMemoryAgent:
         Re-populate memory from persistent message history.
         This handles server restarts/statelessness.
         """
-        from agents.ml_extractor import extract_signals # Import here to avoid circular dependencies
+        from agents.ml_extractor import (
+            extract_signals,  # Import here to avoid circular dependencies
+        )
         
         # Clear current volatile memory
         self.memory = []
@@ -322,7 +330,7 @@ if __name__ == "__main__":
         print(f"\nAdded: {text}")
     
     context = session.get_context()
-    print(f"\n--- Session Context ---")
+    print("\n--- Session Context ---")
     print(f"Turn count: {context.turn_count}")
     print(f"Accumulated emotions: {context.accumulated_emotions}")
     print(f"Repeated patterns: {context.repeated_patterns}")

@@ -1,4 +1,7 @@
 Dockerization and Deployment Plan
+
+> Historical plan: this file records the original containerization work. See
+> `README.md` and `PROJECT_AUDIT.md` for current setup and verification.
 Goal Description
 Containerize the application using Docker to enable easy deployment to cloud platforms like Render or Railway. The goal is to have a single Docker image that runs both the FastAPI backend and provides the React frontend.
 

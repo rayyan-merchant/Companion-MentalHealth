@@ -1,13 +1,13 @@
-from typing import Dict, Any, Optional, List
-from dataclasses import dataclass, asdict
-import uuid
 import re
+import uuid
+from dataclasses import asdict, dataclass
+from typing import Any, Dict, List, Optional
 
-from agents.ml_extractor import extract_signals
-from agents.session_memory import get_session, SessionMemoryAgent
-from agents.symbolic_reasoner import reason_from_signals
 from agents.confidence_gate import evaluate_confidence
 from agents.llm_explainer import generate_explanation
+from agents.ml_extractor import extract_signals
+from agents.session_memory import get_session
+from agents.symbolic_reasoner import get_rule_version, reason_from_signals
 
 
 @dataclass
@@ -112,6 +112,25 @@ CONTEXTUAL_PATTERNS = [
 
     # "I'm going to do something terrible/violent"
     (r"\bi'?m\s+(going|gonna)\s+(to\s+)?do\s+something\s+(terrible|violent|horrible|awful|drastic)", "harm_to_others"),
+
+    # "I cannot keep myself safe"
+    (r"\b(i\s+)?(can'?t|cannot|don'?t\s+think\s+i\s+can)\s+keep\s+myself\s+safe\b", "suicidal_ideation"),
+
+    # Passive death wish: "I wish I would not wake up"
+    (r"\b(wish|hope)(?:\s+\w+){0,4}\s+(not|never)\s+(to\s+)?wake\s+up\b", "suicidal_ideation"),
+
+    # Access to a method combined with farewell language
+    (r"\b(pills?|gun|knife|rope)\b.{0,80}\b(saying\s+goodbye|goodbye\s+letter|farewell|final\s+message)\b", "suicidal_ideation"),
+
+    # Threats toward a specifically named relationship or role
+    (r"\b(i|i'?m)\s+((gonna)|((want|need|going|plan)\s+to))\s+"
+     r"(hurt|harm|attack|injure|kill)\s+(my\s+)?"
+     r"(boss|teacher|partner|parent|mother|father|friend|classmate|coworker|roommate|family)\b", "harm_to_others"),
+]
+
+MEDICAL_RED_FLAG_PATTERNS = [
+    r"\b(chest\s+(pain|hurts?|tightness|pressure))\b.{0,80}\b(can'?t\s+breathe|cannot\s+breathe|short\s+of\s+breath|faint(?:ing)?|collapse[sd]?|dizz(?:y|iness))\b",
+    r"\b(can'?t\s+breathe|cannot\s+breathe|short\s+of\s+breath)\b.{0,80}\b(chest\s+(pain|hurts?|tightness|pressure))\b",
 ]
 
 # =============================================================================
@@ -177,13 +196,57 @@ ESCALATION_OVERRIDES = [
 ]
 
 
+def _is_explicitly_denied(text: str, phrase: str) -> bool:
+    """Return True only when every occurrence is directly scoped by a denial."""
+    phrase_starts = [
+        match.start() for match in re.finditer(re.escape(phrase), text)
+    ]
+    if not phrase_starts:
+        return False
+
+    denial_pattern = (
+        r"(?:\bdon't\b|\bdo not\b|\bdidn't\b|\bdid not\b|\bnever\b|"
+        r"\bnot\b)(?:\s+\w+){0,4}\s*$"
+    )
+    return all(
+        re.search(
+            denial_pattern,
+            text[max(0, phrase_start - 45):phrase_start]
+        )
+        for phrase_start in phrase_starts
+    )
+
+
 def check_crisis(text: str, extraction_result: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     """Three-tier crisis detection: exact phrases → contextual patterns → idiom filter.
     
     Returns crisis intervention dict if a genuine crisis is detected, None otherwise.
     """
     text_lower = " ".join(text.lower().split())
-    negated_terms = extraction_result.get("negated_terms", [])
+
+    # Acute physical red flags must not be mislabeled as panic without first
+    # directing the user to urgent medical assessment.
+    for pattern in MEDICAL_RED_FLAG_PATTERNS:
+        if re.search(pattern, text_lower):
+            return {
+                "response_text": (
+                    "Chest pain together with trouble breathing can need urgent "
+                    "medical attention. Please call emergency services now or ask "
+                    "someone nearby to help you get immediate care."
+                ),
+                "primary_state": "Urgent Medical Concern",
+                "confidence": "high",
+                "action_taken": "crisis_intervention",
+                "crisis_type": "medical_emergency",
+                "evidence_summary": {
+                    "symptoms": ["Chest Pain", "Breathing Difficulty"],
+                    "emotions": [],
+                    "triggers": ["Medical Red Flag"],
+                    "keyword": "[medical red flag]"
+                },
+                "clarification_questions": [],
+                "disclaimer": "URGENT: Seek immediate medical care."
+            }
 
     # ── Step 1: Check if this is a false-positive idiom FIRST ─────────────
     # We check idioms early because they need to gate the result.
@@ -205,7 +268,7 @@ def check_crisis(text: str, extraction_result: Dict[str, Any]) -> Optional[Dict[
     crisis_type = None
 
     for phrase in CRISIS_PHRASES_SELF:
-        if phrase in text_lower:
+        if phrase in text_lower and not _is_explicitly_denied(text_lower, phrase):
             triggered_phrase = phrase
             # Distinguish suicidal ideation vs self-harm
             self_harm_markers = ["cut", "slit", "burn", "harm", "hurt myself", "self-harm", "self harm"]
@@ -232,16 +295,6 @@ def check_crisis(text: str, extraction_result: Dict[str, Any]) -> Optional[Dict[
         return None
 
     # ── Step 5: Negation check ────────────────────────────────────────────
-    # Only for Tier 1 exact phrases (not regex patterns)
-    if not triggered_phrase.startswith("[pattern]"):
-        is_negated = False
-        for term in negated_terms:
-            if term in triggered_phrase:
-                is_negated = True
-                break
-        if is_negated:
-            return None
-
     # ── Step 6: Build crisis response ─────────────────────────────────────
     if crisis_type == "harm_to_others":
         response_text = (
@@ -311,6 +364,7 @@ def run_hybrid_pipeline(
     # 2. Crisis Interceptor (now aware of negation)
     crisis_result = check_crisis(user_input, extraction_result)
     if crisis_result:
+        crisis_type = crisis_result.get("crisis_type")
         result = PipelineResult(
             session_id=session_id,
             response_text=crisis_result["response_text"],
@@ -320,7 +374,19 @@ def run_hybrid_pipeline(
             evidence_summary=crisis_result["evidence_summary"],
             clarification_questions=crisis_result["clarification_questions"],
             disclaimer=crisis_result["disclaimer"],
-            debug={"crisis_detected": True, "crisis_type": crisis_result.get("crisis_type"), "keyword": crisis_result["evidence_summary"]["keyword"]}
+            debug={
+                "crisis_detected": True,
+                "crisis_type": crisis_type,
+                "keyword": crisis_result["evidence_summary"]["keyword"],
+                "rules_fired": [f"SAFETY_{crisis_type or 'CRISIS'}"],
+                "rule_version": get_rule_version(),
+                "confidence_rationale": {
+                    "reason": "Explicit safety rule matched",
+                    "evidence_categories": 1,
+                },
+                "used_llm": False,
+                "llm_provider": None,
+            }
         )
         return asdict(result)
     
@@ -337,11 +403,18 @@ def run_hybrid_pipeline(
     
     persistence = session_context.persistence_detected
     
-    similar_past = session.retrieve_similar(user_input, n_results=2)
-    
-    emotions = [e["label"] for e in extraction_result.get("emotions", [])]
-    symptoms = [s["label"] for s in extraction_result.get("symptoms", [])]
-    triggers = [t["label"] for t in extraction_result.get("triggers", [])]
+    emotions = [
+        e["label"] for e in extraction_result.get("emotions", [])
+        if not e.get("negated", False)
+    ]
+    symptoms = [
+        s["label"] for s in extraction_result.get("symptoms", [])
+        if not s.get("negated", False)
+    ]
+    triggers = [
+        t["label"] for t in extraction_result.get("triggers", [])
+        if not t.get("negated", False)
+    ]
     
     reasoning_result = reason_from_signals(
         emotions=emotions,
@@ -358,6 +431,19 @@ def run_hybrid_pipeline(
         session_context=session.get_memory_summary()
     )
     debug_info["confidence"] = confidence_decision
+    debug_info["rules_fired"] = reasoning_result.get("rules_fired", [])
+    debug_info["rule_version"] = reasoning_result.get(
+        "rule_version", get_rule_version()
+    )
+    debug_info["confidence_rationale"] = {
+        "reason": confidence_decision.get("reason", "Rule and evidence coverage"),
+        "evidence_categories": sum(
+            bool(items) for items in (emotions, symptoms, triggers)
+        ),
+        "needs_clarification": reasoning_result.get(
+            "needs_clarification", False
+        ),
+    }
     
     explanation_result = generate_explanation(
         primary_state=reasoning_result.get("primary_state", "NeedsMoreContext"),
@@ -432,6 +518,8 @@ def run_hybrid_pipeline(
          pass
 
     debug_info["explanation"] = explanation_result
+    debug_info["used_llm"] = explanation_result.get("used_llm", False)
+    debug_info["llm_provider"] = explanation_result.get("llm_provider")
     
     session.add_turn(
         raw_text=user_input,
@@ -475,6 +563,7 @@ def process_message(
     
     # Format for frontend
     crisis_type = result.get("debug", {}).get("crisis_type")
+    debug = result.get("debug", {})
     response = {
         "session_id": result["session_id"],
         "response": result["response_text"],
@@ -483,7 +572,12 @@ def process_message(
         "action": result["action_taken"],
         "evidence": result["evidence_summary"],
         "follow_up_questions": result["clarification_questions"],
-        "disclaimer": result["disclaimer"]
+        "disclaimer": result["disclaimer"],
+        "rules_fired": debug.get("rules_fired", []),
+        "rule_version": debug.get("rule_version", get_rule_version()),
+        "confidence_rationale": debug.get("confidence_rationale", {}),
+        "used_fallback": not debug.get("used_llm", False),
+        "provider": debug.get("llm_provider"),
     }
     if crisis_type:
         response["crisis_type"] = crisis_type
@@ -515,7 +609,7 @@ if __name__ == "__main__":
     print(f"{'Input':<40} | {'Expected':<20} | {'Actual':<20} | {'Action':<20}")
     print("-" * 105)
     
-    for text, exp in zip(test_inputs, expected):
+    for text, exp in zip(test_inputs, expected, strict=False):
         result = process_message(test_session, text)
         state = result.get("state", "None")
         action = result.get("action", "unknown")

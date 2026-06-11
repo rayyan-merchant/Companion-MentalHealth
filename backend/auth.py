@@ -1,234 +1,167 @@
-"""
-Authentication module for the Mental Health Companion application.
-Handles user registration, login, JWT token management, and password hashing.
-"""
+from dataclasses import dataclass
+from datetime import datetime, timezone
 
-from datetime import datetime, timedelta
-from typing import Optional, Dict, Any
-from pathlib import Path
-import json
-import uuid
-import os
-
+from fastapi import Depends, HTTPException, Request, status
 from passlib.context import CryptContext
-from jose import JWTError, jwt
-from pydantic import BaseModel, EmailStr
-from fastapi import HTTPException, status, Depends
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from pydantic import BaseModel, EmailStr, Field, field_validator
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
-# ============================================================================
-# Configuration
-# ============================================================================
+from .config import get_settings
+from .database import get_db
+from .models import AuthSession, User
+from .security import (
+    hash_identifier,
+    safe_equal_hash,
+    secret_hash,
+    session_expiry,
+    validate_double_submit_csrf,
+)
 
-# JWT Settings - In production, use environment variables
-SECRET_KEY = os.getenv("JWT_SECRET_KEY", "companion-mental-health-secret-key-change-in-production")
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # 7 days
-
-# Password hashing
+settings = get_settings()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-# Security scheme
-security = HTTPBearer()
-
-# Data directory
-DATA_DIR = Path(__file__).parent.parent / "data"
-USERS_DIR = DATA_DIR / "users"
-USERS_FILE = USERS_DIR / "users.json"
-
-
-# ============================================================================
-# Models
-# ============================================================================
 
 class UserCreate(BaseModel):
-    """Schema for user registration"""
-    email: str
-    password: str
+    email: EmailStr
+    password: str = Field(min_length=12, max_length=128)
+
+    @field_validator("email")
+    @classmethod
+    def normalize_email(cls, value: EmailStr) -> str:
+        return str(value).strip().lower()
 
 
 class UserLogin(BaseModel):
-    """Schema for user login"""
-    email: str
-    password: str
+    email: EmailStr
+    password: str = Field(min_length=1, max_length=128)
+
+    @field_validator("email")
+    @classmethod
+    def normalize_email(cls, value: EmailStr) -> str:
+        return str(value).strip().lower()
+
+
+class ChangePasswordRequest(BaseModel):
+    current_password: str = Field(min_length=1, max_length=128)
+    new_password: str = Field(min_length=12, max_length=128)
 
 
 class UserResponse(BaseModel):
-    """Schema for user data returned to client (no password)"""
     user_id: str
     email: str
     created_at: str
+    must_change_password: bool
 
 
-class TokenResponse(BaseModel):
-    """Schema for JWT token response"""
-    access_token: str
-    token_type: str = "bearer"
+class AuthResponse(BaseModel):
     user: UserResponse
 
 
-class User(BaseModel):
-    """Internal user model with password hash"""
-    user_id: str
-    email: str
-    password_hash: str
-    created_at: str
+@dataclass
+class CurrentAuth:
+    user: User
+    auth_session: AuthSession
 
-
-# ============================================================================
-# User Storage Functions
-# ============================================================================
-
-def _ensure_data_dirs():
-    """Create data directories if they don't exist"""
-    USERS_DIR.mkdir(parents=True, exist_ok=True)
-    if not USERS_FILE.exists():
-        USERS_FILE.write_text("[]")
-
-
-def _load_users() -> list[dict]:
-    """Load all users from JSON file"""
-    _ensure_data_dirs()
-    try:
-        return json.loads(USERS_FILE.read_text())
-    except (json.JSONDecodeError, FileNotFoundError):
-        return []
-
-
-def _save_users(users: list[dict]):
-    """Save users to JSON file"""
-    _ensure_data_dirs()
-    USERS_FILE.write_text(json.dumps(users, indent=2))
-
-
-def get_user_by_email(email: str) -> Optional[User]:
-    """Find a user by email address"""
-    users = _load_users()
-    for user_data in users:
-        if user_data["email"].lower() == email.lower():
-            return User(**user_data)
-    return None
-
-
-def get_user_by_id(user_id: str) -> Optional[User]:
-    """Find a user by ID"""
-    users = _load_users()
-    for user_data in users:
-        if user_data["user_id"] == user_id:
-            return User(**user_data)
-    return None
-
-
-def create_user(email: str, password: str) -> User:
-    """Create a new user with hashed password"""
-    users = _load_users()
-    
-    # Check if email already exists
-    if get_user_by_email(email):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Email already registered"
-        )
-    
-    # Create new user
-    user = User(
-        user_id=str(uuid.uuid4()),
-        email=email.lower(),
-        password_hash=pwd_context.hash(password),
-        created_at=datetime.utcnow().isoformat() + "Z"
-    )
-    
-    users.append(user.model_dump())
-    _save_users(users)
-    
-    return user
-
-
-# ============================================================================
-# Password Functions
-# ============================================================================
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    """Verify a password against its hash"""
     return pwd_context.verify(plain_password, hashed_password)
 
 
-def authenticate_user(email: str, password: str) -> Optional[User]:
-    """Authenticate a user by email and password"""
-    user = get_user_by_email(email)
-    if not user:
-        return None
-    if not verify_password(password, user.password_hash):
+def hash_password(password: str) -> str:
+    return pwd_context.hash(password)
+
+
+async def get_user_by_email(db: AsyncSession, email: str) -> User | None:
+    return await db.scalar(select(User).where(User.email == email.strip().lower()))
+
+
+async def authenticate_user(
+    db: AsyncSession,
+    email: str,
+    password: str,
+) -> User | None:
+    user = await get_user_by_email(db, email)
+    if user is None or not verify_password(password, user.password_hash):
         return None
     return user
 
 
-# ============================================================================
-# JWT Functions
-# ============================================================================
-
-def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
-    """Create a JWT access token"""
-    to_encode = data.copy()
-    
-    if expires_delta:
-        expire = datetime.utcnow() + expires_delta
-    else:
-        expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    
-    to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-    
-    return encoded_jwt
+def _as_utc(value: datetime) -> datetime:
+    if value.tzinfo is None:
+        return value.replace(tzinfo=timezone.utc)
+    return value.astimezone(timezone.utc)
 
 
-def decode_token(token: str) -> Optional[dict]:
-    """Decode and validate a JWT token"""
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        return payload
-    except JWTError:
-        return None
+async def get_current_auth(
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+) -> CurrentAuth:
+    token = request.cookies.get(settings.session_cookie_name)
+    unauthorized = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Authentication required",
+    )
+    if not token:
+        raise unauthorized
 
+    auth_session = await db.scalar(
+        select(AuthSession).where(AuthSession.token_hash == secret_hash(token))
+    )
+    now = datetime.now(timezone.utc)
+    if (
+        auth_session is None
+        or auth_session.revoked_at is not None
+        or _as_utc(auth_session.expires_at) <= now
+    ):
+        raise unauthorized
 
-# ============================================================================
-# Auth Dependencies
-# ============================================================================
+    user = await db.get(User, auth_session.user_id)
+    if user is None:
+        raise unauthorized
+
+    auth_session.last_seen_at = now
+    auth_session.expires_at = session_expiry()
+    await db.commit()
+    request.state.auth_session = auth_session
+    request.state.user = user
+    return CurrentAuth(user=user, auth_session=auth_session)
+
 
 async def get_current_user(
-    credentials: HTTPAuthorizationCredentials = Depends(security)
+    current: CurrentAuth = Depends(get_current_auth),
 ) -> User:
-    """
-    Dependency to get the current authenticated user from JWT token.
-    Use this in protected routes.
-    """
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Invalid or expired token",
-        headers={"WWW-Authenticate": "Bearer"},
+    return current.user
+
+
+async def require_csrf(
+    request: Request,
+    current: CurrentAuth = Depends(get_current_auth),
+) -> CurrentAuth:
+    token = validate_double_submit_csrf(request)
+    if not safe_equal_hash(token, current.auth_session.csrf_hash):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="CSRF validation failed",
+        )
+    return current
+
+
+def request_ip_hash(request: Request) -> str:
+    forwarded = request.headers.get("x-forwarded-for", "")
+    ip = forwarded.split(",", 1)[0].strip() or (
+        request.client.host if request.client else "unknown"
     )
-    
-    token = credentials.credentials
-    payload = decode_token(token)
-    
-    if payload is None:
-        raise credentials_exception
-    
-    user_id: str = payload.get("sub")
-    if user_id is None:
-        raise credentials_exception
-    
-    user = get_user_by_id(user_id)
-    if user is None:
-        raise credentials_exception
-    
-    return user
+    return hash_identifier(ip)
 
 
 def user_to_response(user: User) -> UserResponse:
-    """Convert internal User model to response model (without password)"""
+    created_at = user.created_at
+    if created_at.tzinfo is None:
+        created_at = created_at.replace(tzinfo=timezone.utc)
     return UserResponse(
-        user_id=user.user_id,
+        user_id=user.id,
         email=user.email,
-        created_at=user.created_at
+        created_at=created_at.isoformat().replace("+00:00", "Z"),
+        must_change_password=user.must_change_password,
     )

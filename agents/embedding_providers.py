@@ -15,11 +15,11 @@ Features:
 
 import os
 import time
-import random
-import requests
-from typing import List, Optional, Dict, Any
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime, timedelta
+from typing import List, Optional
+
+import requests
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -94,7 +94,7 @@ class HuggingFaceProvider(EmbeddingProvider):
         return self._clients[key]
     
     def get_embedding(self, text: str) -> Optional[List[float]]:
-        for attempt in range(len(self.keys)):
+        for _attempt in range(len(self.keys)):
             key = self.get_next_key()
             if not key:
                 return None
@@ -123,7 +123,7 @@ class HuggingFaceProvider(EmbeddingProvider):
                         return result
                         
             except Exception as e:
-                print(f"[{self.name}] Error with key ...{key[-4:]}: {e}")
+                print(f"[{self.name}] Request failed: {type(e).__name__}")
                 time.sleep(1)  # Small delay before retry
                 continue
         
@@ -168,7 +168,7 @@ class JinaProvider(EmbeddingProvider):
                         return embedding
                         
             except Exception as e:
-                print(f"[{self.name}] Error with key ...{key[-4:]}: {e}")
+                print(f"[{self.name}] Request failed: {type(e).__name__}")
                 continue
         
         self.health.record_failure()
@@ -207,7 +207,7 @@ class GeminiProvider(EmbeddingProvider):
                     return data["embedding"]["values"]
                         
             except Exception as e:
-                print(f"[{self.name}] Error with key ...{key[-4:]}: {e}")
+                print(f"[{self.name}] Request failed: {type(e).__name__}")
                 continue
         
         self.health.record_failure()

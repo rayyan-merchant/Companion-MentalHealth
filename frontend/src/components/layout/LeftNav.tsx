@@ -43,8 +43,8 @@ export function LeftNav({ isOpen = false, onClose }: LeftNavProps) {
 
             {/* Sidebar */}
             <nav className={`
-                fixed md:static inset-y-0 left-0 z-50 
-                flex flex-col h-full bg-card border-r border-gray-100/50 shadow-sm 
+                fixed md:sticky md:top-0 inset-y-0 left-0 z-50
+                flex flex-col h-screen bg-card border-r border-gray-100/50 shadow-sm
                 transition-all duration-300 ease-in-out
                 ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
                 ${isCollapsed ? 'w-20' : 'w-64'}

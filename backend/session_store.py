@@ -1,384 +1,337 @@
-"""
-Session persistence module for the Mental Health Companion application.
-Handles session storage, retrieval, and management in JSON files.
-"""
-
-from datetime import datetime
-from typing import Optional, List, Dict, Any
-from pathlib import Path
-import json
-import uuid
-import re
+from datetime import datetime, timezone
+from typing import Any, Literal, cast
 
 from pydantic import BaseModel, Field
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
+
+from .models import Assessment, Conversation, Message
 
 
-# ============================================================================
-# Configuration
-# ============================================================================
+def isoformat(value: datetime) -> str:
+    if value.tzinfo is None:
+        value = value.replace(tzinfo=timezone.utc)
+    return value.isoformat().replace("+00:00", "Z")
 
-DATA_DIR = Path(__file__).parent.parent / "data"
-SESSIONS_DIR = DATA_DIR / "sessions"
-
-
-# ============================================================================
-# Models
-# ============================================================================
 
 class SessionMessage(BaseModel):
-    """A single message in a session"""
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    role: str  # "user" | "assistant" | "system"
+    id: str
+    role: Literal["user", "assistant", "system"]
     content: str
-    timestamp: str = Field(default_factory=lambda: datetime.utcnow().isoformat() + "Z")
-    metadata: Optional[Dict[str, Any]] = None
+    timestamp: str
+    metadata: dict[str, Any] | None = None
 
 
 class SessionCreate(BaseModel):
-    """Schema for creating a new session"""
-    title: Optional[str] = None
+    title: str | None = Field(default=None, max_length=120)
 
 
 class SessionSummary(BaseModel):
-    """Summary view of a session for listing"""
     session_id: str
     user_id: str
     title: str
     created_at: str
     updated_at: str
     message_count: int
-    risk_level: str = "low"
-    last_message_preview: Optional[str] = None
+    risk_level: Literal["low", "medium", "high"] = "low"
+    last_message_preview: str | None = None
 
 
 class Session(BaseModel):
-    """Full session model with all messages"""
     session_id: str
     user_id: str
     title: str
     created_at: str
     updated_at: str
-    messages: List[SessionMessage] = []
-    inferred_states: List[str] = []
-    risk_level: str = "low"
-    is_deleted: bool = False
+    messages: list[SessionMessage] = Field(default_factory=list)
+    inferred_states: list[str] = Field(default_factory=list)
+    risk_level: Literal["low", "medium", "high"] = "low"
 
 
 class MessageRequest(BaseModel):
-    """Request to send a message"""
-    text: str
-
-
-# ============================================================================
-# Session Storage Functions
-# ============================================================================
-
-def _get_user_sessions_dir(user_id: str) -> Path:
-    """Get the sessions directory for a specific user"""
-    user_dir = SESSIONS_DIR / user_id
-    user_dir.mkdir(parents=True, exist_ok=True)
-    return user_dir
-
-
-def _get_session_file(user_id: str, session_id: str) -> Path:
-    """Get the file path for a specific session"""
-    return _get_user_sessions_dir(user_id) / f"{session_id}.json"
-
-
-def _generate_title_from_message(message: str) -> str:
-    """
-    Generate a session title from the first user message.
-    Cleans and truncates the message to create a readable title.
-    """
-    # Remove extra whitespace
-    clean = " ".join(message.split())
-    
-    # Truncate to reasonable length
-    if len(clean) > 50:
-        # Try to truncate at a word boundary
-        truncated = clean[:47]
-        last_space = truncated.rfind(" ")
-        if last_space > 30:
-            truncated = truncated[:last_space]
-        return truncated + "..."
-    
-    return clean if clean else "New Conversation"
-
-
-def create_session(user_id: str, title: Optional[str] = None) -> Session:
-    """Create a new session for a user"""
-    session = Session(
-        session_id=str(uuid.uuid4()),
-        user_id=user_id,
-        title=title or "New Conversation",
-        created_at=datetime.utcnow().isoformat() + "Z",
-        updated_at=datetime.utcnow().isoformat() + "Z",
-        messages=[],
-        inferred_states=[],
-        risk_level="low"
+    text: str = Field(min_length=1, max_length=4000)
+    client_message_id: str = Field(
+        min_length=8,
+        max_length=80,
+        pattern=r"^[A-Za-z0-9._:-]+$",
     )
-    
-    # Save to file
-    session_file = _get_session_file(user_id, session.session_id)
-    session_file.write_text(json.dumps(session.model_dump(), indent=2))
-    
-    return session
 
 
-def get_session(user_id: str, session_id: str) -> Optional[Session]:
-    """Get a session by ID, ensuring it belongs to the user"""
-    session_file = _get_session_file(user_id, session_id)
-    
-    if not session_file.exists():
-        return None
-    
-    try:
-        data = json.loads(session_file.read_text())
-        session = Session(**data)
-        
-        # Verify ownership
-        if session.user_id != user_id:
-            return None
-        
-        # Don't return deleted sessions
-        if session.is_deleted:
-            return None
-            
-        return session
-    except (json.JSONDecodeError, Exception):
-        return None
+def generate_title(message: str) -> str:
+    clean = " ".join(message.split())
+    if len(clean) <= 50:
+        return clean or "New Conversation"
+    truncated = clean[:47]
+    boundary = truncated.rfind(" ")
+    if boundary > 30:
+        truncated = truncated[:boundary]
+    return f"{truncated}..."
 
 
-def update_session(session: Session) -> Session:
-    """Update a session in storage"""
-    session.updated_at = datetime.utcnow().isoformat() + "Z"
-    session_file = _get_session_file(session.user_id, session.session_id)
-    session_file.write_text(json.dumps(session.model_dump(), indent=2))
-    return session
+def message_to_schema(message: Message) -> SessionMessage:
+    return SessionMessage(
+        id=message.id,
+        role=cast(Literal["user", "assistant", "system"], message.role),
+        content=message.content,
+        timestamp=isoformat(message.created_at),
+        metadata=message.message_metadata,
+    )
 
 
-def list_sessions(user_id: str) -> List[SessionSummary]:
-    """List all sessions for a user (excluding deleted)"""
-    user_dir = _get_user_sessions_dir(user_id)
-    sessions = []
-    
-    for session_file in user_dir.glob("*.json"):
-        try:
-            data = json.loads(session_file.read_text())
-            session = Session(**data)
-            
-            # Skip deleted sessions
-            if session.is_deleted:
-                continue
-            
-            # Get last message preview
-            last_preview = None
-            if session.messages:
-                last_msg = session.messages[-1]
-                preview = last_msg.content[:100]
-                if len(last_msg.content) > 100:
-                    preview += "..."
-                last_preview = preview
-            
-            summary = SessionSummary(
-                session_id=session.session_id,
-                user_id=session.user_id,
-                title=session.title,
-                created_at=session.created_at,
-                updated_at=session.updated_at,
-                message_count=len(session.messages),
-                risk_level=session.risk_level,
-                last_message_preview=last_preview
+def conversation_to_schema(
+    conversation: Conversation,
+    messages: list[Message] | None = None,
+) -> Session:
+    loaded_messages = conversation.messages if messages is None else messages
+    return Session(
+        session_id=conversation.id,
+        user_id=conversation.user_id,
+        title=conversation.title,
+        created_at=isoformat(conversation.created_at),
+        updated_at=isoformat(conversation.updated_at),
+        messages=[message_to_schema(item) for item in loaded_messages],
+        inferred_states=conversation.inferred_states or [],
+        risk_level=cast(
+            Literal["low", "medium", "high"], conversation.risk_level
+        ),
+    )
+
+
+async def create_session(
+    db: AsyncSession,
+    user_id: str,
+    title: str | None = None,
+) -> Conversation:
+    conversation = Conversation(
+        user_id=user_id,
+        title=(title or "New Conversation").strip() or "New Conversation",
+        messages=[],
+    )
+    db.add(conversation)
+    await db.commit()
+    await db.refresh(conversation)
+    return conversation
+
+
+async def get_session(
+    db: AsyncSession,
+    user_id: str,
+    session_id: str,
+) -> Conversation | None:
+    statement = (
+        select(Conversation)
+        .options(selectinload(Conversation.messages))
+        .where(
+            Conversation.id == session_id,
+            Conversation.user_id == user_id,
+            Conversation.deleted_at.is_(None),
+        )
+    )
+    return await db.scalar(statement)
+
+
+async def list_sessions(
+    db: AsyncSession,
+    user_id: str,
+) -> list[SessionSummary]:
+    conversations = (
+        await db.scalars(
+            select(Conversation)
+            .options(selectinload(Conversation.messages))
+            .where(
+                Conversation.user_id == user_id,
+                Conversation.deleted_at.is_(None),
             )
-            sessions.append(summary)
-        except (json.JSONDecodeError, Exception):
-            continue
-    
-    # Sort by updated_at descending (most recent first)
-    sessions.sort(key=lambda s: s.updated_at, reverse=True)
-    
-    return sessions
+            .order_by(Conversation.updated_at.desc())
+        )
+    ).all()
+    summaries: list[SessionSummary] = []
+    for conversation in conversations:
+        preview = None
+        if conversation.messages:
+            content = conversation.messages[-1].content
+            preview = content[:100] + ("..." if len(content) > 100 else "")
+        summaries.append(
+            SessionSummary(
+                session_id=conversation.id,
+                user_id=conversation.user_id,
+                title=conversation.title,
+                created_at=isoformat(conversation.created_at),
+                updated_at=isoformat(conversation.updated_at),
+                message_count=len(conversation.messages),
+                risk_level=cast(
+                    Literal["low", "medium", "high"],
+                    conversation.risk_level,
+                ),
+                last_message_preview=preview,
+            )
+        )
+    return summaries
 
 
-def delete_session(user_id: str, session_id: str) -> bool:
-    """Soft delete a session"""
-    session = get_session(user_id, session_id)
-    if not session:
+async def soft_delete_session(
+    db: AsyncSession,
+    user_id: str,
+    session_id: str,
+) -> bool:
+    conversation = await get_session(db, user_id, session_id)
+    if conversation is None:
         return False
-    
-    session.is_deleted = True
-    update_session(session)
+    conversation.deleted_at = datetime.now(timezone.utc)
+    conversation.updated_at = datetime.now(timezone.utc)
+    await db.commit()
     return True
 
 
-def add_message_to_session(
-    session: Session,
-    role: str,
+async def find_idempotent_exchange(
+    conversation: Conversation,
+    client_message_id: str,
+) -> tuple[Message, Message | None] | None:
+    for index, message in enumerate(conversation.messages):
+        if (
+            message.role == "user"
+            and message.client_message_id == client_message_id
+        ):
+            assistant = next(
+                (
+                    candidate
+                    for candidate in conversation.messages[index + 1 :]
+                    if candidate.role == "assistant"
+                    and (candidate.message_metadata or {}).get("reply_to")
+                    == client_message_id
+                ),
+                None,
+            )
+            return message, assistant
+    return None
+
+
+async def add_user_message(
+    db: AsyncSession,
+    conversation: Conversation,
     content: str,
-    metadata: Optional[Dict[str, Any]] = None
-) -> SessionMessage:
-    """Add a message to a session"""
-    message = SessionMessage(
-        role=role,
+    client_message_id: str,
+) -> Message:
+    message = Message(
+        conversation_id=conversation.id,
+        role="user",
         content=content,
-        metadata=metadata
+        client_message_id=client_message_id,
     )
-    
-    session.messages.append(message)
-    
-    # Auto-generate title from first user message
-    if len(session.messages) == 1 and role == "user" and session.title == "New Conversation":
-        session.title = _generate_title_from_message(content)
-    
-    update_session(session)
+    db.add(message)
+    if not conversation.messages and conversation.title == "New Conversation":
+        conversation.title = generate_title(content)
+    conversation.updated_at = datetime.now(timezone.utc)
+    await db.commit()
+    await db.refresh(message)
+    conversation.messages.append(message)
     return message
 
 
-def update_session_risk(session: Session, risk_level: str):
-    """Update the risk level of a session"""
-    if risk_level in ["low", "medium", "high"]:
-        session.risk_level = risk_level
-        update_session(session)
+async def add_assistant_message(
+    db: AsyncSession,
+    conversation: Conversation,
+    content: str,
+    metadata: dict[str, Any],
+    assessment_data: dict[str, Any],
+) -> Message:
+    message = Message(
+        conversation_id=conversation.id,
+        role="assistant",
+        content=content,
+        message_metadata=metadata,
+    )
+    db.add(message)
+    await db.flush()
+    db.add(
+        Assessment(
+            conversation_id=conversation.id,
+            message_id=message.id,
+            **assessment_data,
+        )
+    )
+    state = metadata.get("state")
+    states = list(conversation.inferred_states or [])
+    if state and state not in states:
+        states.append(state)
+        conversation.inferred_states = states
+    conversation.risk_level = risk_level_for_result(
+        state or "", metadata.get("crisis_type")
+    )
+    conversation.updated_at = datetime.now(timezone.utc)
+    await db.commit()
+    await db.refresh(message)
+    conversation.messages.append(message)
+    return message
 
 
-def add_inferred_state(session: Session, state: str):
-    """Add an inferred state to the session if not already present"""
-    if state and state not in session.inferred_states:
-        session.inferred_states.append(state)
-        update_session(session)
+def risk_level_for_result(state: str, crisis_type: str | None) -> str:
+    if crisis_type:
+        return "high"
+    lowered = state.lower()
+    if any(word in lowered for word in ("panic", "crisis", "severe", "suicid")):
+        return "high"
+    if any(word in lowered for word in ("persistent", "moderate", "depress")):
+        return "medium"
+    return "low"
 
 
-def get_user_stats(user_id: str) -> Dict[str, Any]:
-    """
-    Calculate statistics for a user's sessions.
-    Returns total sessions, risk distribution, top symptoms, and trends.
-    """
-    user_dir = _get_user_sessions_dir(user_id)
-    
-    total_sessions = 0
+async def get_user_stats(db: AsyncSession, user_id: str) -> dict[str, Any]:
+    conversations = (
+        await db.scalars(
+            select(Conversation)
+            .options(selectinload(Conversation.messages))
+            .where(
+                Conversation.user_id == user_id,
+                Conversation.deleted_at.is_(None),
+            )
+        )
+    ).all()
     risk_counts = {"low": 0, "medium": 0, "high": 0}
-    symptom_counts = {}
+    theme_counts: dict[str, int] = {}
     total_messages = 0
-    sessions_by_date = {}
-
-    for session_file in user_dir.glob("*.json"):
-        try:
-            data = json.loads(session_file.read_text())
-            session = Session(**data)
-            
-            # Skip deleted sessions from stats?
-            if session.is_deleted:
-                continue
-
-            total_sessions += 1
-            
-            # Risk level
-            risk = session.risk_level or "low"
-            risk_counts[risk] = risk_counts.get(risk, 0) + 1
-            
-            # Messages
-            total_messages += len(session.messages)
-            
-            # Symptoms/States
-            # Aggregate from inferred_states
-            for state in session.inferred_states:
-                symptom_counts[state] = symptom_counts.get(state, 0) + 1
-            
-            # Also check messages for evidence if inferred_states is empty
-            if not session.inferred_states:
-                for msg in session.messages:
-                    if msg.role == "assistant" and msg.metadata:
-                        evidence = msg.metadata.get("evidence", {})
-                        if isinstance(evidence, dict):
-                            for symptom in evidence.get("symptoms", []):
-                                symptom_counts[symptom] = symptom_counts.get(symptom, 0) + 1
-                            for emotion in evidence.get("emotions", []):
-                                symptom_counts[emotion] = symptom_counts.get(emotion, 0) + 1
-                                
-        except (json.JSONDecodeError, Exception):
-            continue
-
-    # Calculate top symptoms
-    top_symptoms = sorted(
-        [{"name": k, "count": v} for k, v in symptom_counts.items()],
-        key=lambda x: x["count"],
-        reverse=True
+    for conversation in conversations:
+        risk_counts[conversation.risk_level] += 1
+        total_messages += len(conversation.messages)
+        for state in conversation.inferred_states or []:
+            theme_counts[state] = theme_counts.get(state, 0) + 1
+    ranked_themes = sorted(
+        theme_counts.items(),
+        key=lambda item: item[1],
+        reverse=True,
     )[:5]
-
-    # Calculate average sentiment (simple heuristic based on crisis/risk)
-    sentiment_score = 0.5  # Neutral default
-    if risk_counts["high"] > 0:
-        sentiment_score = 0.2
-    elif risk_counts["medium"] > 0:
-        sentiment_score = 0.4
-    elif risk_counts["low"] > 0:
-        sentiment_score = 0.8
-        
+    top_symptoms = [
+        {"name": name, "count": count}
+        for name, count in ranked_themes
+    ]
     return {
-        "total_sessions": total_sessions,
+        "total_sessions": len(conversations),
         "risk_distribution": risk_counts,
         "top_symptoms": top_symptoms,
         "total_messages": total_messages,
-        "avg_sentiment": sentiment_score
     }
 
 
-def get_recent_chat_history(user_id: str, limit: int = 50) -> str:
-    """
-    Get recent chat history across all sessions for a user, 
-    formatted as a text transcript for LLM context.
-    
-    Args:
-        user_id: The user ID to fetch history for.
-        limit: Max number of messages to include.
-        
-    Returns:
-        String transcript of recent conversations.
-    """
-    user_dir = _get_user_sessions_dir(user_id)
-    if not user_dir.exists():
-        return ""
-        
-    all_messages = []
-    
-    # Collect all messages from all sessions
-    for session_file in user_dir.glob("*.json"):
-        try:
-            data = json.loads(session_file.read_text())
-            session = Session(**data)
-            
-            if session.is_deleted or not session.messages:
-                continue
-            
-            # Add session context to messages
-            for msg in session.messages:
-                all_messages.append({
-                    "timestamp": msg.timestamp,
-                    "role": msg.role,
-                    "content": msg.content,
-                    "session_title": session.title or "Untitled Session"
-                })
-        except (json.JSONDecodeError, Exception):
-            continue
-            
-    # Sort by timestamp descending (newest first)
-    all_messages.sort(key=lambda x: x["timestamp"], reverse=True)
-    
-    # Take top N
-    recent_msgs = all_messages[:limit]
-    
-    # Sort back to chronological for the transcript
-    recent_msgs.sort(key=lambda x: x["timestamp"])
-    
-    transcript = []
-    current_session = None
-    
-    for msg in recent_msgs:
-        if msg["session_title"] != current_session:
-            transcript.append(f"\n[Session: {msg['session_title']}]")
-            current_session = msg["session_title"]
-            
-        role_label = "User" if msg["role"] == "user" else "Companion"
-        transcript.append(f"{role_label}: {msg['content']}")
-        
-    return "\n".join(transcript)
+async def get_recent_chat_history(
+    db: AsyncSession,
+    user_id: str,
+    limit: int = 30,
+) -> str:
+    messages = (
+        await db.scalars(
+            select(Message)
+            .join(Conversation)
+            .where(
+                Conversation.user_id == user_id,
+                Conversation.deleted_at.is_(None),
+            )
+            .order_by(Message.created_at.desc())
+            .limit(limit)
+        )
+    ).all()
+    messages = list(reversed(messages))
+    return "\n".join(
+        f"{'User' if item.role == 'user' else 'Companion'}: {item.content}"
+        for item in messages
+    )
