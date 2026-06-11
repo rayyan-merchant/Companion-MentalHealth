@@ -1,83 +1,79 @@
 services:
-  - type: web
-    name: companion-production
-    runtime: docker
-    plan: starter
-    region: singapore
-    dockerfilePath: ./Dockerfile
-    dockerContext: .
-    preDeployCommand: python -m alembic upgrade head
-    healthCheckPath: /api/ready
-    autoDeployTrigger: checksPass
-    envVars:
-      - key: APP_ENV
-        value: production
-      - key: DATABASE_URL
-        fromDatabase:
-          name: companion-postgres
-          property: connectionString
-      - key: REDIS_URL
-        fromService:
-          name: companion-redis
-          type: keyvalue
-          property: connectionString
-      - key: SUPPORT_EMAIL
-        sync: false
-      - key: CORS_ALLOWED_ORIGINS
-        sync: false
-      - key: SESSION_DAYS
-        value: "7"
-      - key: DELETED_CONVERSATION_RETENTION_DAYS
-        value: "30"
-      - key: SECURITY_LOG_RETENTION_DAYS
-        value: "90"
-      - key: PROVIDER_TIMEOUT_SECONDS
-        value: "6"
-      - key: INSIGHT_CACHE_SECONDS
-        value: "900"
-      - key: LOG_LEVEL
-        value: INFO
-      - key: ENABLE_LLM
-        value: "false"
-      - key: ENABLE_EMBEDDINGS
-        value: "false"
-      - key: ENABLE_VECTOR_MEMORY
-        value: "false"
-      - key: PREWARM_CONCEPT_EMBEDDINGS
-        value: "false"
 
-  - type: keyvalue
+* type: web
+  name: companion-production
+  runtime: docker
+  plan: free
+  region: singapore
+  dockerfilePath: ./Dockerfile
+  dockerContext: .
+  preDeployCommand: python -m alembic upgrade head
+  healthCheckPath: /api/ready
+  autoDeployTrigger: checksPass
+  envVars:
+
+  * key: APP_ENV
+    value: production
+
+  * key: DATABASE_URL
+    fromDatabase:
+    name: companion-postgres
+    property: connectionString
+
+  * key: REDIS_URL
+    fromService:
     name: companion-redis
-    plan: starter
-    region: singapore
-    ipAllowList: []
-    maxmemoryPolicy: noeviction
+    type: keyvalue
+    property: connectionString
 
-  - type: cron
-    name: companion-retention
-    runtime: docker
-    plan: starter
-    region: singapore
-    schedule: "17 2 * * *"
-    dockerfilePath: ./Dockerfile
-    dockerContext: .
-    dockerCommand: python -m backend.maintenance purge
-    envVars:
-      - key: APP_ENV
-        value: production
-      - key: DATABASE_URL
-        fromDatabase:
-          name: companion-postgres
-          property: connectionString
-      - key: DELETED_CONVERSATION_RETENTION_DAYS
-        value: "30"
-      - key: SECURITY_LOG_RETENTION_DAYS
-        value: "90"
+  * key: SUPPORT_EMAIL
+    sync: false
+
+  * key: CORS_ALLOWED_ORIGINS
+    sync: false
+
+  * key: SESSION_DAYS
+    value: "7"
+
+  * key: DELETED_CONVERSATION_RETENTION_DAYS
+    value: "30"
+
+  * key: SECURITY_LOG_RETENTION_DAYS
+    value: "90"
+
+  * key: PROVIDER_TIMEOUT_SECONDS
+    value: "6"
+
+  * key: INSIGHT_CACHE_SECONDS
+    value: "900"
+
+  * key: LOG_LEVEL
+    value: INFO
+
+  * key: ENABLE_LLM
+    value: "false"
+
+  * key: ENABLE_EMBEDDINGS
+    value: "false"
+
+  * key: ENABLE_VECTOR_MEMORY
+    value: "false"
+
+  * key: PREWARM_CONCEPT_EMBEDDINGS
+    value: "false"
+
+* type: keyvalue
+  name: companion-redis
+  plan: free
+  region: singapore
+  ipAllowList: []
+  maxmemoryPolicy: noeviction
 
 databases:
-  - name: companion-postgres
-    plan: basic-256mb
-    region: singapore
-    databaseName: companion
-    user: companion
-    ipAllowList: []
+
+* name: companion-postgres
+  plan: free
+  region: singapore
+  databaseName: companion
+  user: companion
+  ipAllowList: []
