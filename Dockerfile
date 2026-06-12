@@ -58,5 +58,6 @@ EXPOSE 10000
 
 USER appuser
 
-# Database migrations run as Render's pre-deploy command in production.
-CMD ["sh", "-c", "exec uvicorn backend.main:app --host 0.0.0.0 --port ${PORT:-10000}"]
+# Free Render services cannot use pre-deploy commands or cron jobs. Migrations
+# are idempotent, and retention cleanup runs whenever the container starts.
+CMD ["sh", "-c", "python -m alembic upgrade head && python -m backend.maintenance purge && exec uvicorn backend.main:app --host 0.0.0.0 --port ${PORT:-10000}"]
