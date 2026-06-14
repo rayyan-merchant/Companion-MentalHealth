@@ -148,10 +148,10 @@ async def list_sessions(
     ).all()
     summaries: list[SessionSummary] = []
     for conversation in conversations:
-        preview = None
-        if conversation.messages:
-            content = conversation.messages[-1].content
-            preview = content[:100] + ("..." if len(content) > 100 else "")
+        if not conversation.messages:
+            continue
+        content = conversation.messages[-1].content
+        preview = content[:100] + ("..." if len(content) > 100 else "")
         summaries.append(
             SessionSummary(
                 session_id=conversation.id,
@@ -292,6 +292,8 @@ async def get_user_stats(db: AsyncSession, user_id: str) -> dict[str, Any]:
     theme_counts: dict[str, int] = {}
     total_messages = 0
     for conversation in conversations:
+        if not conversation.messages:
+            continue
         risk_counts[conversation.risk_level] += 1
         total_messages += len(conversation.messages)
         for state in conversation.inferred_states or []:

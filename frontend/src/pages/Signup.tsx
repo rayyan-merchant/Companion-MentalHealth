@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { AlertCircle, Check, Lock, Mail, UserPlus } from 'lucide-react';
 import { ApiError } from '../api/client';
 import { Logo } from '../components/layout/Logo';
+import { SiteFooter } from '../components/layout/SiteFooter';
 import { useAuth } from '../context/AuthContext';
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -55,8 +56,8 @@ export function Signup() {
     }
 
     return (
-        <main className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-slate-50 via-primary/5 to-secondary/5">
-            <div className="relative z-10 w-full max-w-md">
+        <main className="min-h-dvh flex flex-col items-start justify-center p-4 py-8 sm:items-center sm:py-12 bg-gradient-to-br from-slate-50 via-primary/5 to-secondary/5">
+            <div className="relative z-10 w-full max-w-md flex flex-col">
                 <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/50 p-6 sm:p-8">
                     <header className="text-center mb-8">
                         <div className="flex justify-center mb-4"><Logo size={48} /></div>
@@ -107,9 +108,7 @@ export function Signup() {
                         Already registered? <Link to="/login" className="text-primary font-medium">Sign in</Link>
                     </p>
                 </div>
-                <p className="mt-5 text-center text-xs text-slate-text/50">
-                    By continuing, review our <Link className="underline" to="/privacy">Privacy notice</Link> and <Link className="underline" to="/safety">Safety guidance</Link>.
-                </p>
+                <SiteFooter compact />
             </div>
         </main>
     );

@@ -1,30 +1,18 @@
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { MessageCircle, Brain, Shield, Loader2 } from 'lucide-react';
+import { MessageCircle, Brain, Shield } from 'lucide-react';
 import { Logo } from '../components/layout/Logo';
-import { createSession } from '../api/sessions';
-import { useState } from 'react';
+import { SiteFooter } from '../components/layout/SiteFooter';
 
 export function Home() {
     const navigate = useNavigate();
-    const [isCreating, setIsCreating] = useState(false);
 
     const handleStartConversation = async () => {
-        try {
-            setIsCreating(true);
-            const session = await createSession();
-            navigate(`/chat/${session.session_id}`);
-        } catch (error) {
-            console.error('Failed to create session:', error);
-            // Fall back to navigating to /chat which will create a session
-            navigate('/chat');
-        } finally {
-            setIsCreating(false);
-        }
+        navigate('/chat');
     };
 
     return (
-        <div className="min-h-[calc(100vh-57px)] flex flex-col">
+        <div className="min-h-dvh flex flex-col">
             <section className="flex-1 flex flex-col items-center justify-center px-4 py-2">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -49,20 +37,10 @@ export function Home() {
 
                     <button
                         onClick={handleStartConversation}
-                        disabled={isCreating}
-                        className="btn-primary inline-flex items-center gap-2 text-lg px-8 py-3 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="btn-primary inline-flex items-center gap-2 text-lg px-8 py-3"
                     >
-                        {isCreating ? (
-                            <>
-                                <Loader2 size={22} className="animate-spin" />
-                                Starting...
-                            </>
-                        ) : (
-                            <>
-                                <MessageCircle size={22} />
-                                Start Conversation
-                            </>
-                        )}
+                        <MessageCircle size={22} />
+                        Start Conversation
                     </button>
                 </motion.div>
             </section>
@@ -107,10 +85,7 @@ export function Home() {
                 </div>
             </section>
 
-            <footer className="px-6 py-4 text-center text-xs text-slate-text/50">
-                <p>This is a supportive tool, not a replacement for professional help.</p>
-                <p className="mt-1">If you're in crisis, please contact a mental health professional.</p>
-            </footer>
+            <SiteFooter />
         </div>
     );
 }

@@ -22,24 +22,24 @@ function AppLayout({ children }: { children: React.ReactNode }) {
     const isChat = location.pathname.startsWith('/chat');
 
     return (
-        <div className="relative min-h-screen flex bg-slate-50 overflow-x-clip">
+        <div className="relative h-dvh flex bg-slate-50 overflow-hidden">
             {/* Background Decoration */}
             <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-primary/10 blur-[100px] pointer-events-none animate-float" />
             <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-secondary/10 blur-[100px] pointer-events-none animate-float" style={{ animationDelay: '2s' }} />
             <div className="absolute top-[20%] right-[10%] w-[20%] h-[20%] rounded-full bg-accent/5 blur-[80px] pointer-events-none animate-float" style={{ animationDelay: '4s' }} />
 
-            <div className="relative z-10 flex min-h-screen w-full">
+            <div className="relative z-10 flex h-dvh w-full">
                 <LeftNav
                     isOpen={mobileMenuOpen}
                     onClose={() => setMobileMenuOpen(false)}
                 />
 
-                <div className="flex-1 flex flex-col min-w-0 min-h-screen">
+                <div className="flex-1 flex flex-col min-w-0 h-dvh">
                     <div className="sticky top-0 z-30">
                         <TopNav onMenuClick={() => setMobileMenuOpen(!mobileMenuOpen)} />
                     </div>
 
-                    <main className={`flex-1 min-h-0 relative ${isChat ? 'h-[calc(100vh-57px)] overflow-hidden' : ''}`}>
+                    <main className={`flex-1 min-h-0 relative ${isChat ? 'overflow-hidden' : 'overflow-y-auto'}`}>
                         {children}
                     </main>
 

@@ -196,6 +196,72 @@ ESCALATION_OVERRIDES = [
 ]
 
 
+def _normalize_text(text: str) -> str:
+    return " ".join(text.lower().split())
+
+
+def _token_similarity(left: str, right: str) -> float:
+    if not left or not right:
+        return 0.0
+    shorter = min(len(left), len(right))
+    longer = max(len(left), len(right))
+    if longer - shorter > 2:
+        return 0.0
+    matches = sum(1 for a, b in zip(left, right) if a == b)
+    return matches / longer
+
+
+def _contains_fuzzy_token(text_lower: str, target: str) -> bool:
+    target_lower = target.lower()
+    # First check for exact multi-word match
+    if target_lower in text_lower:
+        return True
+    
+    # Check single token fuzzy match
+    for token in re.findall(r"[a-z']+", text_lower):
+        if token == target_lower:
+            return True
+        if _token_similarity(token, target_lower) >= 0.7:
+            return True
+    
+    # For multi-word targets, check if all words are present with fuzzy matching
+    target_words = target_lower.split()
+    if len(target_words) > 1:
+        text_tokens = re.findall(r"[a-z']+", text_lower)
+        all_found = True
+        for t_word in target_words:
+            found = False
+            for token in text_tokens:
+                if token == t_word or _token_similarity(token, t_word) >= 0.7:
+                    found = True
+                    break
+            if not found:
+                all_found = False
+                break
+        if all_found:
+            return True
+            
+    return False
+
+
+def _history_has_recent_user_crisis(history_text: str) -> bool:
+    if not history_text:
+        return False
+    history_lower = _normalize_text(history_text)
+    indicators = (
+        CRISIS_PHRASES_SELF
+        + CRISIS_PHRASES_OTHERS
+        + ["wanna die", "suicide", "suicidal", "i will suicide", "suicdie"]
+    )
+    return any(indicator in history_lower for indicator in indicators) or any(
+        re.search(pattern, history_lower)
+        for pattern in (
+            r"\b(i\s+)?(can'?t|cannot|couldn'?t)\s+(take|handle|do|bear|stand|survive)\s+(it|this|life|things|anything)\s+(any\s*more|anymore|any\s*longer)",
+            r"\b(there'?s|there\s+is)\s+(absolutely\s+|just\s+)?no\s+(way\s+out|escape|hope|future|point)",
+        )
+    )
+
+
 def _is_explicitly_denied(text: str, phrase: str) -> bool:
     """Return True only when every occurrence is directly scoped by a denial."""
     phrase_starts = [
@@ -217,12 +283,16 @@ def _is_explicitly_denied(text: str, phrase: str) -> bool:
     )
 
 
-def check_crisis(text: str, extraction_result: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+def check_crisis(
+    text: str,
+    extraction_result: Dict[str, Any],
+    conversation_history: str | None = None,
+) -> Optional[Dict[str, Any]]:
     """Three-tier crisis detection: exact phrases → contextual patterns → idiom filter.
     
     Returns crisis intervention dict if a genuine crisis is detected, None otherwise.
     """
-    text_lower = " ".join(text.lower().split())
+    text_lower = _normalize_text(text)
 
     # Acute physical red flags must not be mislabeled as panic without first
     # directing the user to urgent medical assessment.
@@ -248,6 +318,31 @@ def check_crisis(text: str, extraction_result: Dict[str, Any]) -> Optional[Dict[
                 "disclaimer": "URGENT: Seek immediate medical care."
             }
 
+    # First, always check history for recent crisis, because if user is in crisis, any short utterance should trigger crisis
+    if conversation_history and _history_has_recent_user_crisis(conversation_history):
+        # If history has crisis, any short message like "kill", "die", "help", "please", "suicide" triggers crisis
+        triggered_phrase = f"[context] {text_lower}"
+        crisis_type = "suicidal_ideation"
+        return {
+            "response_text": (
+                "I hear how much pain you're in right now. Please, you don't have to go through "
+                "this alone. There are people who want to listen and help you stay safe. "
+                "Your life matters."
+            ),
+            "primary_state": "Crisis (Suicidal Ideation)",
+            "confidence": "high",
+            "action_taken": "crisis_intervention",
+            "crisis_type": crisis_type,
+            "evidence_summary": {
+                "symptoms": ["Suicidal Ideation"],
+                "emotions": ["Despair"],
+                "triggers": ["Crisis"],
+                "keyword": triggered_phrase,
+            },
+            "clarification_questions": [],
+            "disclaimer": "URGENT: Immediate professional support is recommended.",
+        }
+
     # ── Step 1: Check if this is a false-positive idiom FIRST ─────────────
     # We check idioms early because they need to gate the result.
     idiom_matched = False
@@ -262,6 +357,33 @@ def check_crisis(text: str, extraction_result: Dict[str, Any]) -> Optional[Dict[
         has_escalation = any(esc in text_lower for esc in ESCALATION_OVERRIDES)
         if not has_escalation:
             return None  # Safe idiom, no crisis
+
+    # ── Step 1b: Short crisis utterances and typo-level variants ──────────
+    # Check fuzzy for suicidal phrases - expanded list
+    crisis_keywords = ["die", "suicide", "suicidal", "suicdie", "kill", "wanna die", "want to die", "will suicide"]
+    for keyword in crisis_keywords:
+        if _contains_fuzzy_token(text_lower, keyword):
+            triggered_phrase = f"[fuzzy] {keyword}"
+            crisis_type = "suicidal_ideation"
+            return {
+                "response_text": (
+                    "I hear how much pain you're in right now. Please, you don't have to go through "
+                    "this alone. There are people who want to listen and help you stay safe. "
+                    "Your life matters."
+                ),
+                "primary_state": "Crisis (Suicidal Ideation)",
+                "confidence": "high",
+                "action_taken": "crisis_intervention",
+                "crisis_type": crisis_type,
+                "evidence_summary": {
+                    "symptoms": ["Suicidal Ideation"],
+                    "emotions": ["Despair"],
+                    "triggers": ["Crisis"],
+                    "keyword": triggered_phrase,
+                },
+                "clarification_questions": [],
+                "disclaimer": "URGENT: Immediate professional support is recommended.",
+            }
 
     # ── Step 2: Tier 1 — Exact phrase matching ────────────────────────────
     triggered_phrase = None
@@ -356,13 +478,18 @@ def run_hybrid_pipeline(
     if previous_messages:
         session.hydrate(previous_messages)
         debug_info["hydrated"] = True
+    history_text = "\n".join(
+        str(message.get("content", ""))
+        for message in (previous_messages or [])
+        if message.get("role") == "user"
+    )
     
     # 1. Extraction first (to get negation context)
     extraction_result = extract_signals(user_input)
     debug_info["extraction"] = extraction_result
 
     # 2. Crisis Interceptor (now aware of negation)
-    crisis_result = check_crisis(user_input, extraction_result)
+    crisis_result = check_crisis(user_input, extraction_result, history_text)
     if crisis_result:
         crisis_type = crisis_result.get("crisis_type")
         result = PipelineResult(

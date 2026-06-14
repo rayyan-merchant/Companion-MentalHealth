@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { AlertCircle, Brain, Plus, RotateCcw } from 'lucide-react';
@@ -11,6 +11,7 @@ import { useAuth } from '../context/AuthContext';
 import { KrrResult, Message, MessageMetadata } from '../types';
 import {
     createSession,
+    deleteSession,
     getSession,
     sendMessage,
     sessionKeys,
@@ -68,7 +69,6 @@ export function Chat() {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
     const { user } = useAuth();
-    const creatingRef = useRef(false);
     const promptKey = `companion:suggestions-dismissed:${user?.user_id || 'anonymous'}`;
 
     const [currentSession, setCurrentSession] = useState<Session | null>(null);
@@ -96,11 +96,10 @@ export function Chat() {
             setLoadError(null);
             try {
                 if (!sessionId) {
-                    if (creatingRef.current) return;
-                    creatingRef.current = true;
-                    const created = await createSession();
-                    queryClient.invalidateQueries({ queryKey: sessionKeys.all });
-                    navigate(`/chat/${created.session_id}`, { replace: true });
+                    if (!active) return;
+                    setCurrentSession(null);
+                    setMessages([]);
+                    setKrrResult(null);
                     return;
                 }
                 const session = await queryClient.fetchQuery({
@@ -138,20 +137,28 @@ export function Chat() {
         id = clientMessageId(),
         optimistic = true
     ) => {
-        if (!currentSession || isSending) return;
-        if (optimistic) {
-            setMessages((previous) => [...previous, {
-                id,
-                sender: 'user',
-                text,
-                timestamp: new Date().toISOString()
-            }]);
-        }
-        setShowSuggestions(false);
+        if (isSending) return;
         setIsSending(true);
         setSendError(null);
         try {
-            const response = await sendMessage(currentSession.session_id, text, id);
+            let session = currentSession;
+            let createdSession = false;
+            if (!session) {
+                session = await createSession();
+                createdSession = true;
+                setCurrentSession(session);
+                queryClient.invalidateQueries({ queryKey: sessionKeys.all });
+            }
+            if (optimistic) {
+                setMessages((previous) => [...previous, {
+                    id,
+                    sender: 'user',
+                    text,
+                    timestamp: new Date().toISOString()
+                }]);
+            }
+            setShowSuggestions(false);
+            const response = await sendMessage(session.session_id, text, id);
             const result: KrrResult = {
                 session_id: response.session_id,
                 response: response.response,
@@ -193,23 +200,35 @@ export function Chat() {
             }]);
             setRetryPayload(null);
             queryClient.invalidateQueries({ queryKey: sessionKeys.all });
-            queryClient.invalidateQueries({ queryKey: sessionKeys.detail(currentSession.session_id) });
+            queryClient.invalidateQueries({ queryKey: sessionKeys.detail(session.session_id) });
             queryClient.invalidateQueries({ queryKey: sessionKeys.stats });
+            if (!sessionId) {
+                navigate(`/chat/${session.session_id}`, { replace: true });
+            }
         } catch (reason) {
             setSendError(reason instanceof Error ? reason.message : 'Unable to get a response');
             setRetryPayload({ text, id });
+            if (createdSession) {
+                try {
+                    await deleteSession(session.session_id);
+                    queryClient.invalidateQueries({ queryKey: sessionKeys.all });
+                    queryClient.invalidateQueries({ queryKey: sessionKeys.stats });
+                } catch {
+                    // Ignore cleanup errors; empty sessions are filtered out server-side.
+                }
+            }
         } finally {
             setIsSending(false);
         }
-    }, [currentSession, isSending, queryClient]);
+    }, [currentSession, isSending, navigate, queryClient, sessionId]);
 
     async function newSession() {
-        const created = await createSession();
-        queryClient.invalidateQueries({ queryKey: sessionKeys.all });
-        setCurrentSession(created);
+        setCurrentSession(null);
         setMessages([]);
         setKrrResult(null);
-        navigate(`/chat/${created.session_id}`, { replace: true });
+        setSendError(null);
+        setRetryPayload(null);
+        navigate('/chat', { replace: true });
     }
 
     function dismissSuggestions() {
@@ -233,7 +252,7 @@ export function Chat() {
         );
     }
 
-    if (loadError || !currentSession) {
+    if (loadError) {
         return (
             <div className="h-full grid place-items-center p-6 text-center">
                 <div>
@@ -243,6 +262,57 @@ export function Chat() {
                         Start a new conversation
                     </button>
                 </div>
+            </div>
+        );
+    }
+
+    if (!currentSession) {
+        return (
+            <div className="flex h-full min-w-0 overflow-hidden">
+                <section className="flex-1 flex flex-col min-w-0 max-w-full">
+                    <div className="px-4 py-2 border-b border-gray-100 flex items-center justify-between bg-white/80">
+                        <h2 className="font-medium truncate min-w-0">New conversation</h2>
+                        <button onClick={newSession}
+                            className="flex items-center gap-1 text-sm text-primary hover:bg-primary/10 px-3 py-1.5 rounded-lg">
+                            <Plus size={16} /> Reset
+                        </button>
+                    </div>
+
+                    <ChatShell
+                        messages={messages}
+                        isLoading={isSending}
+                        loadingLabel={waitingLonger ? 'Still working...' : 'Companion is thinking...'}
+                    />
+
+                    {showSuggestions && messages.length === 0 ? (
+                        <QuickPrompts onSelect={sendUserMessage} onClose={dismissSuggestions} />
+                    ) : (
+                        !showSuggestions && messages.length === 0 && (
+                            <button onClick={restoreSuggestions}
+                                className="mx-4 mb-2 self-start text-xs text-primary hover:underline">
+                                Show suggested messages
+                            </button>
+                        )
+                    )}
+
+                    <Composer onSend={sendUserMessage} disabled={isSending} placeholder="Start a new conversation..." />
+                </section>
+
+                <aside className="hidden lg:block w-80 xl:w-96 min-w-0 border-l border-gray-100 bg-background overflow-y-auto p-4 space-y-4">
+                    <ExplanationPanel krrResult={krrResult} />
+                </aside>
+
+                {explanationOpen && (
+                    <div className="fixed inset-0 z-50 lg:hidden">
+                        <button className="absolute inset-0 bg-black/30" aria-label="Close explanation"
+                            onClick={() => setExplanationOpen(false)} />
+                        <aside className="absolute inset-y-0 right-0 w-[min(92vw,24rem)] bg-background p-4 overflow-y-auto shadow-xl">
+                            <button onClick={() => setExplanationOpen(false)}
+                                className="mb-3 text-sm text-primary">Close explanation</button>
+                            <ExplanationPanel krrResult={krrResult} />
+                        </aside>
+                    </div>
+                )}
             </div>
         );
     }

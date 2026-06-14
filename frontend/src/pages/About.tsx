@@ -10,6 +10,7 @@ import {
     Phone,
     Shield
 } from 'lucide-react';
+import { SiteFooter } from '../components/layout/SiteFooter';
 
 function CopyNumber({ value }: { value: string }) {
     const [copied, setCopied] = useState(false);
@@ -52,19 +53,20 @@ const developers = [
 
 export function About() {
     return (
-        <div className="pb-20 md:pb-8 p-4 md:p-6 max-w-4xl mx-auto min-w-0">
-            <motion.header initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-                className="text-center mb-10">
-                <div className="w-16 h-16 bg-gradient-to-br from-primary to-secondary rounded-2xl grid place-items-center mx-auto mb-4">
-                    <Heart className="text-white" size={32} />
-                </div>
-                <h1 className="text-3xl font-semibold mb-3">About Companion</h1>
-                <p className="text-slate-text/60 max-w-2xl mx-auto leading-relaxed">
-                    A supportive reflection tool for Pakistani university students. It uses a
-                    versioned rule catalog and deterministic guidance when optional AI phrasing
-                    providers are unavailable.
-                </p>
-            </motion.header>
+        <div className="min-h-dvh flex flex-col">
+            <div className="flex-1 pb-20 md:pb-8 p-4 md:p-6 max-w-4xl mx-auto min-w-0">
+                <motion.header initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+                    className="text-center mb-10">
+                    <div className="w-16 h-16 bg-gradient-to-br from-primary to-secondary rounded-2xl grid place-items-center mx-auto mb-4">
+                        <Heart className="text-white" size={32} />
+                    </div>
+                    <h1 className="text-3xl font-semibold mb-3">About Companion</h1>
+                    <p className="text-slate-text/60 max-w-2xl mx-auto leading-relaxed">
+                        A supportive reflection tool for Pakistani university students. It uses a
+                        versioned rule catalog and deterministic guidance when optional AI phrasing
+                        providers are unavailable.
+                    </p>
+                </motion.header>
 
             <div className="grid md:grid-cols-2 gap-6">
                 <section className="card space-y-4 min-w-0">
@@ -115,36 +117,38 @@ export function About() {
                 </div>
             </section>
 
-            <section className="mt-8">
-                <h2 className="mb-5 flex items-center gap-2"><Code2 /> Developers</h2>
-                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {developers.map((developer) => (
-                        <article key={developer.name} className="bg-white p-5 rounded-xl border border-gray-100 min-w-0">
-                            <div className="w-12 h-12 bg-primary/10 rounded-full grid place-items-center text-primary font-bold mb-3">
-                                {developer.name.charAt(0)}
-                            </div>
-                            <h3 className="font-medium break-words">{developer.name}</h3>
-                            <a href={`mailto:${developer.email}`} className="text-xs text-slate-text/50 break-all">
-                                {developer.email}
-                            </a>
-                            <div className="flex gap-3 mt-3 text-sm">
-                                <a href={developer.github} target="_blank" rel="noopener noreferrer">GitHub</a>
-                                <a href={developer.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn</a>
-                            </div>
-                        </article>
-                    ))}
-                </div>
-            </section>
+                <section className="mt-8">
+                    <h2 className="mb-5 flex items-center gap-2"><Code2 /> Developers</h2>
+                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {developers.map((developer) => (
+                            <article key={developer.name} className="bg-white p-5 rounded-xl border border-gray-100 min-w-0">
+                                <div className="w-12 h-12 bg-primary/10 rounded-full grid place-items-center text-primary font-bold mb-3">
+                                    {developer.name.charAt(0)}
+                                </div>
+                                <h3 className="font-medium break-words">{developer.name}</h3>
+                                <a href={`mailto:${developer.email}`} className="text-xs text-slate-text/50 break-all">
+                                    {developer.email}
+                                </a>
+                                <div className="flex gap-3 mt-3 text-sm">
+                                    <a href={developer.github} target="_blank" rel="noopener noreferrer">GitHub</a>
+                                    <a href={developer.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn</a>
+                                </div>
+                            </article>
+                        ))}
+                    </div>
+                </section>
 
-            <section className="mt-8">
-                <h2 className="mb-5 flex items-center gap-2"><Cpu /> Technologies used</h2>
-                <div className="grid sm:grid-cols-2 gap-4">
-                    <Tech title="Frontend" text="React, TypeScript, TanStack Query, Tailwind CSS" />
-                    <Tech title="Backend" text="FastAPI, async SQLAlchemy, PostgreSQL, Redis" />
-                    <Tech title="Runtime reasoning" text="Versioned YAML rules and deterministic response templates" />
-                    <Tech title="Research validation" text="OWL, RDFLib, and SPARQL artifacts outside the production request path" />
-                </div>
-            </section>
+                <section className="mt-8">
+                    <h2 className="mb-5 flex items-center gap-2"><Cpu /> Technologies used</h2>
+                    <div className="grid sm:grid-cols-2 gap-4">
+                        <Tech title="Frontend" text="React, TypeScript, TanStack Query, Tailwind CSS" />
+                        <Tech title="Backend" text="FastAPI, async SQLAlchemy, PostgreSQL, Redis" />
+                        <Tech title="Runtime reasoning" text="Versioned YAML rules and deterministic response templates" />
+                        <Tech title="Research validation" text="OWL, RDFLib, and SPARQL artifacts outside the production request path" />
+                    </div>
+                </section>
+            </div>
+            <SiteFooter compact />
         </div>
     );
 }

@@ -53,6 +53,17 @@ class SafetyPipelineTests(unittest.TestCase):
         result = check_crisis(text, self.extract(text))
         self.assertEqual(result["crisis_type"], "suicidal_ideation")
 
+    def test_common_variants_and_typos_trigger_crisis(self):
+        for text in ("I wanna die", "I will suicide", "suicdie"):
+            with self.subTest(text=text):
+                result = check_crisis(text, self.extract(text))
+                self.assertEqual(result["crisis_type"], "suicidal_ideation")
+
+    def test_short_follow_up_in_crisis_context_triggers_crisis(self):
+        history = "User: I want to die\nUser: I feel hopeless"
+        result = check_crisis("kill", self.extract("kill"), history)
+        self.assertEqual(result["crisis_type"], "suicidal_ideation")
+
     def test_inability_to_stay_safe_triggers_crisis(self):
         text = "I cannot keep myself safe tonight."
         result = check_crisis(text, self.extract(text))
