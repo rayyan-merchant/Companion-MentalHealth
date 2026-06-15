@@ -10,6 +10,9 @@ Desktop.ini
 *.temp
 *.bak
 *.orig
+test*.py
+run*.py
+check*.py
 
 # Python
 __pycache__/
