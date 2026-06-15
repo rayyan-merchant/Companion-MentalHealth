@@ -207,7 +207,7 @@ def _token_similarity(left: str, right: str) -> float:
     longer = max(len(left), len(right))
     if longer - shorter > 2:
         return 0.0
-    matches = sum(1 for a, b in zip(left, right) if a == b)
+    matches = sum(1 for a, b in zip(left, right, strict=False) if a == b)
     return matches / longer
 
 
@@ -363,27 +363,38 @@ def check_crisis(
     crisis_keywords = ["die", "suicide", "suicidal", "suicdie", "kill", "wanna die", "want to die", "will suicide"]
     for keyword in crisis_keywords:
         if _contains_fuzzy_token(text_lower, keyword):
-            triggered_phrase = f"[fuzzy] {keyword}"
-            crisis_type = "suicidal_ideation"
-            return {
-                "response_text": (
-                    "I hear how much pain you're in right now. Please, you don't have to go through "
-                    "this alone. There are people who want to listen and help you stay safe. "
-                    "Your life matters."
-                ),
-                "primary_state": "Crisis (Suicidal Ideation)",
-                "confidence": "high",
-                "action_taken": "crisis_intervention",
-                "crisis_type": crisis_type,
-                "evidence_summary": {
-                    "symptoms": ["Suicidal Ideation"],
-                    "emotions": ["Despair"],
-                    "triggers": ["Crisis"],
-                    "keyword": triggered_phrase,
-                },
-                "clarification_questions": [],
-                "disclaimer": "URGENT: Immediate professional support is recommended.",
-            }
+            # Check for explicit denial using the most relevant exact phrase from CRISIS_PHRASES_SELF
+            is_denied = False
+            for exact_phrase in CRISIS_PHRASES_SELF:
+                if exact_phrase in text_lower:
+                    if _is_explicitly_denied(text, exact_phrase):
+                        is_denied = True
+                        break
+            # Also check for denial of the keyword itself (if it's a single word or short phrase)
+            if keyword in text_lower and _is_explicitly_denied(text, keyword):
+                is_denied = True
+            if not is_denied:
+                triggered_phrase = f"[fuzzy] {keyword}"
+                crisis_type = "suicidal_ideation"
+                return {
+                    "response_text": (
+                        "I hear how much pain you're in right now. Please, you don't have to go through "
+                        "this alone. There are people who want to listen and help you stay safe. "
+                        "Your life matters."
+                    ),
+                    "primary_state": "Crisis (Suicidal Ideation)",
+                    "confidence": "high",
+                    "action_taken": "crisis_intervention",
+                    "crisis_type": crisis_type,
+                    "evidence_summary": {
+                        "symptoms": ["Suicidal Ideation"],
+                        "emotions": ["Despair"],
+                        "triggers": ["Crisis"],
+                        "keyword": triggered_phrase,
+                    },
+                    "clarification_questions": [],
+                    "disclaimer": "URGENT: Immediate professional support is recommended.",
+                }
 
     # ── Step 2: Tier 1 — Exact phrase matching ────────────────────────────
     triggered_phrase = None

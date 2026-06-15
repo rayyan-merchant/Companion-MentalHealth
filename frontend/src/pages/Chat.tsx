@@ -140,9 +140,9 @@ export function Chat() {
         if (isSending) return;
         setIsSending(true);
         setSendError(null);
+        let session: Session | null = currentSession;
+        let createdSession = false;
         try {
-            let session = currentSession;
-            let createdSession = false;
             if (!session) {
                 session = await createSession();
                 createdSession = true;
@@ -208,7 +208,7 @@ export function Chat() {
         } catch (reason) {
             setSendError(reason instanceof Error ? reason.message : 'Unable to get a response');
             setRetryPayload({ text, id });
-            if (createdSession) {
+            if (createdSession && session) {
                 try {
                     await deleteSession(session.session_id);
                     queryClient.invalidateQueries({ queryKey: sessionKeys.all });
