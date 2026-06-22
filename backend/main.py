@@ -146,7 +146,7 @@ async def health_check():
     return {"status": "active", "service": "Mental Health KRR System"}
 
 
-@app.get("/api/ready")
+@app.api_route("/api/ready", methods=["GET", "HEAD"])
 async def readiness_check():
     checks = {"database": False, "redis": False}
     try:
