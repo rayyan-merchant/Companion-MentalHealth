@@ -1,5 +1,6 @@
 import os
 import random
+import re
 import time
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Tuple
@@ -205,6 +206,14 @@ DO NOT diagnose. DO NOT give advice. Just a supportive observation.
 Keep it under 2 sentences.
 Speak directly to the user ("You...").
 """
+
+
+POSITIVE_STATUS_PATTERN = (
+    r"\b(i\s+)?feel\s+(very\s+|really\s+|so\s+)?"
+    r"(happy|good|great|better|okay|ok|fine|calm|relieved|safe)\b|"
+    r"\bi('?m| am)\s+(very\s+|really\s+|so\s+)?"
+    r"(happy|good|great|better|okay|ok|fine|calm|relieved|safe)\b"
+)
 
 @dataclass
 class ExplanationResult:
@@ -455,6 +464,14 @@ class LLMExplanationAgent:
         rag_data: Dict,
         history_context: str = ""
     ) -> Tuple[str, Optional[str]]:
+        if re.search(POSITIVE_STATUS_PATTERN, user_input.lower()):
+            return (
+                "I'm glad to hear that. It can be worth noticing what feels "
+                "different right now, even if it is small, so you can come back "
+                "to it later. What do you think helped you feel this way?",
+                None,
+            )
+
         empathy = rag_data.get("empathy", "I want to understand what you're going through.")
         
         if questions:

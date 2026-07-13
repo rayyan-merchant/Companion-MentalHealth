@@ -262,6 +262,64 @@ def _history_has_recent_user_crisis(history_text: str) -> bool:
     )
 
 
+SAFE_STATUS_PATTERNS = [
+    r"\b(i\s+)?feel\s+(very\s+|really\s+|so\s+)?(happy|good|great|better|okay|ok|fine|calm|relieved|safe)\b",
+    r"\bi('?m| am)\s+(very\s+|really\s+|so\s+)?(happy|good|great|better|okay|ok|fine|calm|relieved|safe)\b",
+    r"\b(i\s+)?(am|feel)\s+no\s+longer\s+(suicidal|unsafe|in\s+danger)\b",
+    r"\b(i\s+)?(do\s+not|don't)\s+(want\s+to\s+die|want\s+to\s+hurt\s+myself|feel\s+suicidal)\b",
+]
+
+
+CRISIS_CONTEXT_FOLLOW_UP_PATTERNS = [
+    r"\b(help|please|urgent|emergency|unsafe|not\s+safe|danger|alone)\b",
+    r"\b(kill|die|suicide|suicidal|self[-\s]?harm|hurt\s+myself|harm\s+myself)\b",
+    r"\b(can'?t|cannot|don'?t\s+think\s+i\s+can)\s+keep\s+myself\s+safe\b",
+    r"\b(pills?|gun|knife|rope|bridge|overdose|goodbye|farewell)\b",
+    r"\b(hopeless|despair|no\s+way\s+out|no\s+hope|can'?t\s+go\s+on)\b",
+]
+
+
+def _is_safe_status_update(text_lower: str) -> bool:
+    """Detect clear de-escalating updates that should not inherit crisis state."""
+    if any(
+        re.search(pattern, text_lower)
+        for pattern in CRISIS_CONTEXT_FOLLOW_UP_PATTERNS
+    ):
+        return False
+    return any(re.search(pattern, text_lower) for pattern in SAFE_STATUS_PATTERNS)
+
+
+def _should_escalate_from_crisis_history(
+    text_lower: str,
+    extraction_result: Dict[str, Any],
+) -> bool:
+    """Use crisis history only for ambiguous unsafe follow-ups, not every turn."""
+    if _is_safe_status_update(text_lower):
+        return False
+    if any(
+        re.search(pattern, text_lower)
+        for pattern in CRISIS_CONTEXT_FOLLOW_UP_PATTERNS
+    ):
+        return True
+
+    positive_emotions = {
+        item["label"]
+        for item in extraction_result.get("emotions", [])
+        if not item.get("negated", False)
+    }
+    positive_symptoms = {
+        item["label"]
+        for item in extraction_result.get("symptoms", [])
+        if not item.get("negated", False)
+    }
+    high_concern_emotions = {"depression", "panic", "overwhelm"}
+    high_concern_symptoms = {"anhedonia", "withdrawal"}
+    return bool(
+        positive_emotions.intersection(high_concern_emotions)
+        or positive_symptoms.intersection(high_concern_symptoms)
+    )
+
+
 def _is_explicitly_denied(text: str, phrase: str) -> bool:
     """Return True only when every occurrence is directly scoped by a denial."""
     phrase_starts = [
@@ -318,9 +376,14 @@ def check_crisis(
                 "disclaimer": "URGENT: Seek immediate medical care."
             }
 
-    # First, always check history for recent crisis, because if user is in crisis, any short utterance should trigger crisis
-    if conversation_history and _history_has_recent_user_crisis(conversation_history):
-        # If history has crisis, any short message like "kill", "die", "help", "please", "suicide" triggers crisis
+    # Recent crisis history matters, but it must not trap a whole session in
+    # crisis mode. Re-escalate only when the current turn is an ambiguous or
+    # unsafe follow-up, and allow clear safe/recovery updates to continue.
+    if (
+        conversation_history
+        and _history_has_recent_user_crisis(conversation_history)
+        and _should_escalate_from_crisis_history(text_lower, extraction_result)
+    ):
         triggered_phrase = f"[context] {text_lower}"
         crisis_type = "suicidal_ideation"
         return {

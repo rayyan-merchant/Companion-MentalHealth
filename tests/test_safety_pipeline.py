@@ -64,6 +64,17 @@ class SafetyPipelineTests(unittest.TestCase):
         result = check_crisis("kill", self.extract("kill"), history)
         self.assertEqual(result["crisis_type"], "suicidal_ideation")
 
+    def test_safe_update_after_crisis_context_does_not_repeat_crisis(self):
+        history = "User: I want to die\nUser: I feel hopeless"
+        text = "I feel very happy right now"
+        self.assertIsNone(check_crisis(text, self.extract(text), history))
+
+    def test_help_request_after_crisis_context_still_triggers_crisis(self):
+        history = "User: I want to die\nUser: I feel hopeless"
+        text = "help please"
+        result = check_crisis(text, self.extract(text), history)
+        self.assertEqual(result["crisis_type"], "suicidal_ideation")
+
     def test_inability_to_stay_safe_triggers_crisis(self):
         text = "I cannot keep myself safe tonight."
         result = check_crisis(text, self.extract(text))
